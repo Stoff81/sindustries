@@ -22,10 +22,14 @@ Health checks:
 - `GET /health`
 - `GET /api/v1/health`
 
-Read API (M2 slice):
-- `GET /api/v1/tasks` (status/priority/assignee/tag/q/dueBefore/dueAfter filters + basic cursor pagination)
+REST API (M3 slice):
+- `GET /api/v1/tasks` (status/priority/assignee/tag/q/dueBefore/dueAfter filters + cursor pagination)
 - `GET /api/v1/tasks/:id`
+- `POST /api/v1/tasks`
+- `PATCH /api/v1/tasks/:id`
+- `DELETE /api/v1/tasks/:id` (archive-only)
 - `GET /api/v1/tags`
+- `POST /api/v1/tags`
 
 ## Database workflow
 ```bash
