@@ -1,5 +1,7 @@
 import express from 'express';
 import { healthRouter } from './routes/health.js';
+import { tasksRouter } from './routes/tasks.js';
+import { tagsRouter } from './routes/tags.js';
 
 export function createApp() {
   const app = express();
@@ -11,6 +13,13 @@ export function createApp() {
   });
 
   app.use('/api/v1', healthRouter);
+  app.use('/api/v1', tasksRouter);
+  app.use('/api/v1', tagsRouter);
+
+  app.use((error, _req, res, _next) => {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  });
 
   return app;
 }

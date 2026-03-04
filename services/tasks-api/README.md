@@ -22,6 +22,11 @@ Health checks:
 - `GET /health`
 - `GET /api/v1/health`
 
+Read API (M2 slice):
+- `GET /api/v1/tasks` (status/priority/assignee/tag/q/dueBefore/dueAfter filters + basic cursor pagination)
+- `GET /api/v1/tasks/:id`
+- `GET /api/v1/tags`
+
 ## Database workflow
 ```bash
 # generate Prisma client
