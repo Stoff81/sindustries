@@ -14,7 +14,7 @@ Sindustries is organized as a monorepo with explicit boundaries between product 
 
 ## Direction
 
-Current repo state is **scaffolding + documentation** only.
+Current repo state is **early implementation**: documentation plus Milestone 1 backend foundation in `services/tasks-api`.
 
 Planned product evolution:
 1. Build and prove the focused `tasks` surface.

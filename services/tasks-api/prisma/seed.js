@@ -1,0 +1,64 @@
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+const statuses = ['todo', 'doing', 'done'];
+const priorities = ['low', 'medium', 'high', 'urgent'];
+const assignees = ['Tom', 'Quinn', 'Rowan', null];
+const tagNames = ['ops', 'product', 'finance', 'family', 'health', 'automation', 'backend', 'frontend'];
+
+function daysAgo(days) {
+  const d = new Date();
+  d.setDate(d.getDate() - days);
+  return d;
+}
+
+async function main() {
+  await prisma.taskTag.deleteMany();
+  await prisma.task.deleteMany();
+  await prisma.tag.deleteMany();
+
+  const tags = [];
+  for (const name of tagNames) {
+    tags.push(await prisma.tag.create({ data: { name } }));
+  }
+
+  for (let i = 1; i <= 24; i++) {
+    const status = statuses[i % statuses.length];
+    const priority = priorities[i % priorities.length];
+    const archivedAt = i <= 3 ? daysAgo(i) : null;
+
+    const task = await prisma.task.create({
+      data: {
+        title: `Seed Task ${i}`,
+        description: `Seeded task ${i} for milestone 1 foundation validation`,
+        status,
+        priority,
+        statusChangedAt: daysAgo(i % 10),
+        dueAt: i % 2 === 0 ? daysAgo(-1 * (i % 7)) : null,
+        completedAt: status === 'done' ? daysAgo(i % 5) : null,
+        assignee: assignees[i % assignees.length],
+        archivedAt
+      }
+    });
+
+    await prisma.taskTag.createMany({
+      data: [
+        { taskId: task.id, tagId: tags[i % tags.length].id },
+        { taskId: task.id, tagId: tags[(i + 2) % tags.length].id }
+      ],
+      skipDuplicates: true
+    });
+  }
+
+  console.log('Seed complete: 24 tasks, 8 tags.');
+}
+
+main()
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

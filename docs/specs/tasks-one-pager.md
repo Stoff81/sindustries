@@ -275,3 +275,14 @@ Boundary guidance:
 - Notifications, recurring tasks, and external integrations.
 - CLI interface for tasks management.
 - Production infra/deployment automation beyond local/dev baseline.
+
+### 16.9 M1 implementation status (completed)
+Implemented in `services/tasks-api`:
+- Express skeleton with health endpoints (`/health`, `/api/v1/health`)
+- Prisma schema for `Task`, `Tag`, `TaskTag`
+- Status enum locked to `todo|doing|done`
+- Archive-only support (`archivedAt`) and board ordering support (`statusChangedAt`)
+- Initial SQL migration checked in
+- Seed script checked in
+- `.env.example` + local setup instructions
+- Baseline tests: API health test + Prisma schema validation test
