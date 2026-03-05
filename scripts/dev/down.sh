@@ -6,4 +6,7 @@ cd "$ROOT_DIR"
 
 tilt down --file infra/tilt/Tiltfile || true
 
+# Cleanup any lingering local tasks-api watchers
+pkill -f "tsx watch src/server.js" || true
+
 docker compose -f infra/docker-compose.dev.yml down --remove-orphans

@@ -21,6 +21,55 @@ Planned product evolution:
 2. Evolve `mission-control` into the aggregate shell that hosts cross-app workflows (including `tasks`, collaboration, and future surfaces).
 3. Keep domain boundaries strict so apps can ship independently while sharing stable packages/services.
 
+## Local setup (dev)
+
+### Prerequisites
+- macOS with Homebrew
+- Node.js 22+
+
+### One-time bootstrap
+From repo root:
+
+```bash
+make bootstrap
+```
+
+This installs local tooling (`colima`, `docker` CLI, `tilt`, `node` if missing) and npm deps for current app/service packages.
+
+### Start dev stack
+
+```bash
+make up
+```
+
+This starts the hybrid dev stack (Postgres in Docker/Colima + app/api via Tilt-managed local processes).
+
+### Reset local DB
+
+```bash
+make reset-db
+```
+
+### Stop dev stack
+
+```bash
+make down
+```
+
+### Run tests
+
+```bash
+make test
+```
+
+Or run individually:
+
+```bash
+make test-api
+make test-app
+make test-e2e
+```
+
 ## Working method
 
 For non-trivial work, use spec-first delivery:

@@ -1,36 +1,36 @@
-load('ext://docker_compose', 'docker_compose')
-
 docker_compose('../docker-compose.dev.yml')
 
 dc_resource(
   'postgres',
-  labels=['infra'],
+  labels=['infra', 'db'],
 )
 
 local_resource(
   'tasks-api',
-  cmd='cd services/tasks-api && npm run dev',
+  serve_cmd='cd ../../services/tasks-api && npm run dev',
   deps=[
-    'services/tasks-api/src',
-    'services/tasks-api/prisma',
-    'services/tasks-api/package.json',
-    'services/tasks-api/package-lock.json',
-    'services/tasks-api/.env.example',
+    '../../services/tasks-api/src',
+    '../../services/tasks-api/prisma',
+    '../../services/tasks-api/package.json',
+    '../../services/tasks-api/package-lock.json',
+    '../../services/tasks-api/.env.example',
   ],
   resource_deps=['postgres'],
+  labels=['tasks', 'api'],
   allow_parallel=False,
 )
 
 local_resource(
   'tasks-app',
-  cmd='cd apps/tasks && VITE_TASKS_API_BASE_URL=http://localhost:4000/api/v1 npm run dev -- --host 0.0.0.0 --port 5173',
+  serve_cmd='cd ../../apps/tasks && VITE_TASKS_API_BASE_URL=http://localhost:4000/api/v1 npm run dev -- --host 0.0.0.0 --port 5173',
   deps=[
-    'apps/tasks/src',
-    'apps/tasks/index.html',
-    'apps/tasks/vite.config.js',
-    'apps/tasks/package.json',
-    'apps/tasks/package-lock.json',
+    '../../apps/tasks/src',
+    '../../apps/tasks/index.html',
+    '../../apps/tasks/vite.config.js',
+    '../../apps/tasks/package.json',
+    '../../apps/tasks/package-lock.json',
   ],
   resource_deps=['tasks-api'],
+  labels=['tasks', 'app'],
   allow_parallel=False,
 )
