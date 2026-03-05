@@ -181,8 +181,14 @@ Boundary guidance:
    - `GET /tasks`, `GET /tasks/:id`, `GET /tags` + list UI with filters/sorting.
 3. **M3: Write API + board interactions**
    - `POST /tasks`, `PATCH /tasks/:id`, archive endpoint, drag-and-drop status updates.
-4. **M4: Hardening**
-   - Validation polish, error mapping, observability checks, E2E happy path.
+4. **M4: UI implementation against ACs**
+   - Build `apps/tasks` frontend against `services/tasks-api`.
+   - Deliver backlog list view with required filters + priority sorting.
+   - Deliver kanban board (`todo`/`doing`/`done`) with drag-and-drop status transitions.
+   - Deliver create/update/archive task flows from UI.
+5. **M5: Hardening / integration / CI**
+   - Validation/error handling polish, observability checks, integration hardening.
+   - Complete/maintain test baseline in CI (API integration + FE list/board component tests + one E2E happy path).
 
 ## 15) Acceptance criteria (V1)
 - User can create, update, and archive tasks from UI.
