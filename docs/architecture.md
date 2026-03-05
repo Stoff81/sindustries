@@ -73,17 +73,25 @@ Developer command scripts (source of truth):
 
 ## CI strategy (Phase 1)
 
-GitHub Actions (`.github/workflows/ci.yml`) runs current test suites directly on hosted runners, without full infra spin-up:
+GitHub Actions (`.github/workflows/ci.yml`) runs test suites on hosted runners with a Postgres service container for integration coverage.
 
-- `services/tasks-api`: `npm test`
-- `apps/tasks`: `npm test`
-- `apps/tasks`: Playwright e2e (`npm run test:e2e`, with browser/system deps installed)
+- `tasks-api tests (unit + db integration)`
+  - Runs `npm test` for fast endpoint/schema checks.
+  - Runs `prisma migrate deploy` + `prisma db seed`.
+  - Runs DB-backed API integration tests against runner Postgres.
+- `tasks app tests`
+  - Runs component/unit tests (`npm test`).
+- `tasks app e2e (ui + api + db)`
+  - Boots Postgres service in CI.
+  - Migrates + seeds API schema.
+  - Starts `tasks-api` on the runner.
+  - Runs Playwright e2e against real app -> API -> Postgres flow (no route mocks).
 
 ### CI principles in this phase
 
-- Fast PR feedback over environment parity.
-- Validate existing suites reliably on every PR.
-- Keep infra complexity minimal until DB-backed integration lanes are needed.
+- Catch integration drift in CI, not just locally.
+- Keep runtime reasonable via runner service containers and targeted integration specs.
+- **Tilt is local-only orchestration**; GitHub CI does not require Tilt and does not invoke it.
 
 ## Phased path to cloud/container maturity
 

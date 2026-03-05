@@ -6,8 +6,9 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "start": "tsx src/server.ts",
-    "test": "vitest run",
+    "test": "vitest run --exclude test/db-integration.test.ts",
     "test:watch": "vitest",
+    "test:integration": "vitest run test/db-integration.test.ts",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate deploy",
     "prisma:migrate:dev": "prisma migrate dev",
