@@ -1,5 +1,9 @@
 # Tasks App One-Pager Spec
 
+> Canonical source of truth for Tasks App scope and milestones.
+> Any derived docs (handoffs, status summaries, PR notes) must reference this file and must not redefine milestones.
+
+
 ## 1) Problem / Why now
 Tom needs a focused, low-friction task management surface that helps him and future collaborators capture, prioritize, and complete work without getting trapped in heavyweight project tooling. Right now, the repo has architecture scaffolding but no implemented product surface. Building `apps/tasks` as the first concrete surface creates immediate utility and validates the monorepo architecture early.
 
