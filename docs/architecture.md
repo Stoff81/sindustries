@@ -30,9 +30,15 @@ We use a **hybrid local model** to optimize inner-loop speed while staying conta
 
 ### Why hybrid now
 
-- Faster code/test iteration for JS services and UI than fully containerized hot-reload loops.
+- Faster code/test iteration for TypeScript services and UI than fully containerized hot-reload loops.
 - Reduced local setup overhead and fewer manually managed terminals.
 - Preserves a clean path to containerized cloud deployment later.
+
+## Language and implementation standards
+
+- TypeScript is the repository standard for application and service code.
+- `services/tasks-api` is implemented in TypeScript and executed via `tsx` in development/runtime scripts.
+- JavaScript may remain only for tooling/bootstrap scripts where migration provides no product value (for example, Prisma seed scripts), unless explicitly promoted into app/service runtime paths.
 
 ## Data ownership and schema boundaries
 
