@@ -3,11 +3,30 @@ import { healthRouter } from './routes/health.ts';
 import { tasksRouter } from './routes/tasks.ts';
 import { tagsRouter } from './routes/tags.ts';
 
+function getAllowedOrigins() {
+  const configured = process.env.CORS_ALLOWED_ORIGINS?.split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
+  if (configured && configured.length > 0) {
+    return new Set(configured);
+  }
+
+  return new Set(['http://localhost:5173', 'http://127.0.0.1:5173', 'http://127.0.0.1:4173']);
+}
+
 export function createApp() {
   const app = express();
+  const allowedOrigins = getAllowedOrigins();
 
   app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    const origin = req.headers.origin;
+
+    if (origin && allowedOrigins.has(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Vary', 'Origin');
+    }
+
     res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PATCH,DELETE,OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 

@@ -20,9 +20,8 @@ if ! command -v docker >/dev/null 2>&1; then
   exit 1
 fi
 
-if ! command -v docker-compose >/dev/null 2>&1; then
-  echo "docker-compose is required but not installed." >&2
-  echo "Run: brew install docker-compose" >&2
+if ! docker compose version >/dev/null 2>&1 && ! command -v docker-compose >/dev/null 2>&1; then
+  echo "docker compose (plugin) or docker-compose is required but not installed." >&2
   exit 1
 fi
 
@@ -32,9 +31,9 @@ if ! colima status >/dev/null 2>&1; then
 fi
 
 # Preflight: clear stale local tasks-api watchers to avoid EADDRINUSE on :4000
-if pgrep -f "tsx watch src/server.js" >/dev/null 2>&1; then
+if pgrep -f "tsx watch src/server.ts" >/dev/null 2>&1; then
   echo "Found stale tasks-api dev process(es). Stopping them..."
-  pkill -f "tsx watch src/server.js" || true
+  pkill -f "tsx watch src/server.ts" || true
   sleep 1
 fi
 

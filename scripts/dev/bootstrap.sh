@@ -28,7 +28,9 @@ else
   echo "✅ docker already installed"
 fi
 
-if ! need_cmd docker-compose; then
+if docker compose version >/dev/null 2>&1; then
+  echo "✅ docker compose plugin already available"
+elif ! need_cmd docker-compose; then
   echo "➡️  Installing docker-compose..."
   brew install docker-compose
 else

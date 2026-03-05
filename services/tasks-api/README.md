@@ -13,6 +13,8 @@ cp .env.example .env
 npm install
 ```
 
+CORS defaults to local dev origins. For non-default clients, set `CORS_ALLOWED_ORIGINS` in `.env`.
+
 ## Run locally
 ```bash
 npm run dev
