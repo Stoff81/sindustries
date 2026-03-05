@@ -1,7 +1,7 @@
 import express from 'express';
-import { healthRouter } from './routes/health.js';
-import { tasksRouter } from './routes/tasks.js';
-import { tagsRouter } from './routes/tags.js';
+import { healthRouter } from './routes/health.ts';
+import { tasksRouter } from './routes/tasks.ts';
+import { tagsRouter } from './routes/tags.ts';
 
 export function createApp() {
   const app = express();

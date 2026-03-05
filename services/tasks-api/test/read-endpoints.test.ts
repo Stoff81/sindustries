@@ -18,11 +18,11 @@ const prismaMock = {
   }
 };
 
-vi.mock('../src/lib/prisma.js', () => ({
+vi.mock('../src/lib/prisma.ts', () => ({
   prisma: prismaMock
 }));
 
-const { createApp } = await import('../src/app.js');
+const { createApp } = await import('../src/app.ts');
 
 function task(overrides = {}) {
   return {
