@@ -35,6 +35,14 @@ else
   echo "✅ docker-compose already installed"
 fi
 
+if ! need_cmd psql; then
+  echo "➡️  Installing PostgreSQL client tools (psql)..."
+  brew install libpq
+  brew link --force libpq || true
+else
+  echo "✅ psql already installed"
+fi
+
 if ! need_cmd tilt; then
   echo "➡️  Installing tilt..."
   brew install tilt-dev/tap/tilt

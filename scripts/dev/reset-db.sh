@@ -22,8 +22,11 @@ if [[ -z "${DATABASE_URL:-}" ]]; then
   exit 1
 fi
 
+# psql doesn't accept Prisma-style query params (e.g. ?schema=tasks_api)
+PSQL_DATABASE_URL="${DATABASE_URL%%\?*}"
+
 echo "Resetting Postgres schemas for local services..."
-psql "$DATABASE_URL" -v ON_ERROR_STOP=1 <<'SQL'
+psql "$PSQL_DATABASE_URL" -v ON_ERROR_STOP=1 <<'SQL'
 DROP SCHEMA IF EXISTS tasks_api CASCADE;
 CREATE SCHEMA tasks_api;
 DROP SCHEMA IF EXISTS tasks_app CASCADE;
