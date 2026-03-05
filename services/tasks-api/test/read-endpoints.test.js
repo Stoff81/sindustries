@@ -75,7 +75,9 @@ describe('tasks api endpoints', () => {
     const response = await request(app).get('/api/v1/tasks').query({ status: 'blocked' });
 
     expect(response.status).toBe(400);
-    expect(response.body).toEqual({ error: 'Invalid status filter' });
+    expect(response.body).toEqual({
+      error: { code: 'INVALID_STATUS_FILTER', message: 'Invalid status filter' }
+    });
     expect(prismaMock.task.findMany).not.toHaveBeenCalled();
   });
 
@@ -152,7 +154,9 @@ describe('tasks api endpoints', () => {
     const response = await request(app).get('/api/v1/tasks/missing');
 
     expect(response.status).toBe(404);
-    expect(response.body).toEqual({ error: 'Task not found' });
+    expect(response.body).toEqual({
+      error: { code: 'TASK_NOT_FOUND', message: 'Task not found' }
+    });
   });
 
   it('GET /api/v1/tags returns tags in name order', async () => {

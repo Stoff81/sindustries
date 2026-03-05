@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { prisma } from '../lib/prisma.js';
+import { badRequest } from '../lib/http.js';
 
 function normalizeString(value) {
   return typeof value === 'string' ? value.trim() : value;
@@ -23,7 +24,7 @@ tagsRouter.post('/tags', async (req, res, next) => {
   try {
     const name = normalizeString(req.body?.name)?.toLowerCase();
     if (!name) {
-      return res.status(400).json({ error: 'name is required' });
+      return badRequest(res, 'NAME_REQUIRED', 'name is required');
     }
 
     const tag = await prisma.tag.upsert({

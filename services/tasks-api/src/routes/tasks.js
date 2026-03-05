@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { prisma } from '../lib/prisma.js';
+import { badRequest, notFound } from '../lib/http.js';
 
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 100;
@@ -113,30 +114,30 @@ tasksRouter.get('/tasks', async (req, res, next) => {
     } = req.query;
 
     if (status && !validStatuses.has(status)) {
-      return res.status(400).json({ error: 'Invalid status filter' });
+      return badRequest(res, 'INVALID_STATUS_FILTER', 'Invalid status filter');
     }
 
     if (priority && !validPriorities.has(priority)) {
-      return res.status(400).json({ error: 'Invalid priority filter' });
+      return badRequest(res, 'INVALID_PRIORITY_FILTER', 'Invalid priority filter');
     }
 
     if (sort && !validSorts.has(sort)) {
-      return res.status(400).json({ error: 'Invalid sort value' });
+      return badRequest(res, 'INVALID_SORT_VALUE', 'Invalid sort value');
     }
 
     const dueBeforeDate = parseDate(dueBefore);
     if (dueBefore && !dueBeforeDate) {
-      return res.status(400).json({ error: 'Invalid dueBefore value' });
+      return badRequest(res, 'INVALID_DUE_BEFORE', 'Invalid dueBefore value');
     }
 
     const dueAfterDate = parseDate(dueAfter);
     if (dueAfter && !dueAfterDate) {
-      return res.status(400).json({ error: 'Invalid dueAfter value' });
+      return badRequest(res, 'INVALID_DUE_AFTER', 'Invalid dueAfter value');
     }
 
     const decodedCursor = decodeCursor(cursor);
     if (cursor && !decodedCursor) {
-      return res.status(400).json({ error: 'Invalid cursor value' });
+      return badRequest(res, 'INVALID_CURSOR', 'Invalid cursor value');
     }
 
     const limit = parseLimit(rawLimit);
@@ -264,7 +265,7 @@ tasksRouter.get('/tasks/:id', async (req, res, next) => {
     });
 
     if (!task) {
-      return res.status(404).json({ error: 'Task not found' });
+      return notFound(res, 'TASK_NOT_FOUND', 'Task not found');
     }
 
     return res.status(200).json({ data: mapTask(task) });
@@ -283,11 +284,11 @@ tasksRouter.post('/tasks', async (req, res, next) => {
     const dueAt = req.body?.dueAt ? parseDate(req.body.dueAt) : null;
     const tags = normalizeTags(req.body?.tags);
 
-    if (!title) return res.status(400).json({ error: 'title is required' });
-    if (!validStatuses.has(status)) return res.status(400).json({ error: 'Invalid status value' });
-    if (!validPriorities.has(priority)) return res.status(400).json({ error: 'Invalid priority value' });
-    if (req.body?.dueAt && !dueAt) return res.status(400).json({ error: 'Invalid dueAt value' });
-    if (req.body?.tags && !tags) return res.status(400).json({ error: 'tags must be an array of strings' });
+    if (!title) return badRequest(res, 'TITLE_REQUIRED', 'title is required');
+    if (!validStatuses.has(status)) return badRequest(res, 'INVALID_STATUS_VALUE', 'Invalid status value');
+    if (!validPriorities.has(priority)) return badRequest(res, 'INVALID_PRIORITY_VALUE', 'Invalid priority value');
+    if (req.body?.dueAt && !dueAt) return badRequest(res, 'INVALID_DUE_AT', 'Invalid dueAt value');
+    if (req.body?.tags && !tags) return badRequest(res, 'INVALID_TAGS', 'tags must be an array of strings');
 
     const tagRecords = await connectTags(tags);
     const now = new Date();
@@ -325,7 +326,7 @@ tasksRouter.patch('/tasks/:id', async (req, res, next) => {
   try {
     const { id } = req.params;
     const existing = await prisma.task.findFirst({ where: { id, archivedAt: null } });
-    if (!existing) return res.status(404).json({ error: 'Task not found' });
+    if (!existing) return notFound(res, 'TASK_NOT_FOUND', 'Task not found');
 
     const updates = {};
     const title = normalizeString(req.body?.title);
@@ -333,7 +334,7 @@ tasksRouter.patch('/tasks/:id', async (req, res, next) => {
     const assignee = req.body?.assignee === undefined ? undefined : normalizeString(req.body.assignee);
 
     if (req.body?.title !== undefined) {
-      if (!title) return res.status(400).json({ error: 'title cannot be empty' });
+      if (!title) return badRequest(res, 'TITLE_EMPTY', 'title cannot be empty');
       updates.title = title;
     }
 
@@ -342,14 +343,14 @@ tasksRouter.patch('/tasks/:id', async (req, res, next) => {
 
     if (req.body?.priority !== undefined) {
       if (!validPriorities.has(req.body.priority)) {
-        return res.status(400).json({ error: 'Invalid priority value' });
+        return badRequest(res, 'INVALID_PRIORITY_VALUE', 'Invalid priority value');
       }
       updates.priority = req.body.priority;
     }
 
     if (req.body?.status !== undefined) {
       if (!validStatuses.has(req.body.status)) {
-        return res.status(400).json({ error: 'Invalid status value' });
+        return badRequest(res, 'INVALID_STATUS_VALUE', 'Invalid status value');
       }
       updates.status = req.body.status;
       updates.statusChangedAt = new Date();
@@ -361,7 +362,7 @@ tasksRouter.patch('/tasks/:id', async (req, res, next) => {
         updates.dueAt = null;
       } else {
         const dueAt = parseDate(req.body.dueAt);
-        if (!dueAt) return res.status(400).json({ error: 'Invalid dueAt value' });
+        if (!dueAt) return badRequest(res, 'INVALID_DUE_AT', 'Invalid dueAt value');
         updates.dueAt = dueAt;
       }
     }
@@ -380,7 +381,7 @@ tasksRouter.patch('/tasks/:id', async (req, res, next) => {
 
     if (req.body?.tags !== undefined) {
       const tags = normalizeTags(req.body.tags);
-      if (!tags) return res.status(400).json({ error: 'tags must be an array of strings' });
+      if (!tags) return badRequest(res, 'INVALID_TAGS', 'tags must be an array of strings');
       const tagRecords = await connectTags(tags);
       await prisma.taskTag.deleteMany({ where: { taskId: id } });
       if (tagRecords.length > 0) {
@@ -407,7 +408,7 @@ tasksRouter.delete('/tasks/:id', async (req, res, next) => {
     const { id } = req.params;
 
     const existing = await prisma.task.findFirst({ where: { id, archivedAt: null } });
-    if (!existing) return res.status(404).json({ error: 'Task not found' });
+    if (!existing) return notFound(res, 'TASK_NOT_FOUND', 'Task not found');
 
     const archived = await prisma.task.update({
       where: { id },
