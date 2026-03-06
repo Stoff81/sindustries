@@ -78,4 +78,4 @@ For non-trivial work, use spec-first delivery:
 - validate before merge
 - document risks and mitigations
 
-See `CONTRIBUTING.md` for the full Definition of Done.
+See `CONTRIBUTING.md` for the full Definition of Done. Have fun!
