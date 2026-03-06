@@ -44,18 +44,18 @@ function TaskEditor({ task, onSave, onArchive, onClose }) {
     <div className="editor">
       <label>
         <span className="small">Title</span>
-        <input aria-label="Detail title" value={draft.title} onChange={(e) => update('title', e.target.value)} />
+        <input className="edit-control" aria-label="Detail title" value={draft.title} onChange={(e) => update('title', e.target.value)} />
       </label>
 
       <label>
         <span className="small">Description</span>
-        <textarea value={draft.description} rows={4} onChange={(e) => update('description', e.target.value)} />
+        <textarea className="edit-control" value={draft.description} rows={4} onChange={(e) => update('description', e.target.value)} />
       </label>
 
       <div className="editor-grid">
         <label>
           <span className="small">Status</span>
-          <select aria-label="Detail status" value={draft.status} onChange={(e) => update('status', e.target.value)}>
+          <select className="edit-control" aria-label="Detail status" value={draft.status} onChange={(e) => update('status', e.target.value)}>
             {STATUSES.map((status) => (
               <option key={status} value={status}>{status}</option>
             ))}
@@ -64,7 +64,7 @@ function TaskEditor({ task, onSave, onArchive, onClose }) {
 
         <label>
           <span className="small">Priority</span>
-          <select aria-label="Detail priority" value={draft.priority} onChange={(e) => update('priority', e.target.value)}>
+          <select className="edit-control" aria-label="Detail priority" value={draft.priority} onChange={(e) => update('priority', e.target.value)}>
             {PRIORITIES.map((priority) => (
               <option key={priority} value={priority}>{priority}</option>
             ))}
@@ -73,18 +73,18 @@ function TaskEditor({ task, onSave, onArchive, onClose }) {
 
         <label>
           <span className="small">Assignee</span>
-          <input value={draft.assignee} onChange={(e) => update('assignee', e.target.value)} />
+          <input className="edit-control" value={draft.assignee} onChange={(e) => update('assignee', e.target.value)} />
         </label>
 
         <label>
           <span className="small">Due date</span>
-          <input type="date" value={draft.dueAt} onChange={(e) => update('dueAt', e.target.value)} />
+          <input className="edit-control" type="date" value={draft.dueAt} onChange={(e) => update('dueAt', e.target.value)} />
         </label>
       </div>
 
       <label>
         <span className="small">Tags (comma separated)</span>
-        <input value={draft.tagsText} onChange={(e) => update('tagsText', e.target.value)} placeholder="api, ui, urgent" />
+        <input className="edit-control" value={draft.tagsText} onChange={(e) => update('tagsText', e.target.value)} placeholder="api, ui, urgent" />
       </label>
 
       <div className="actions">
@@ -112,12 +112,6 @@ function TaskEditor({ task, onSave, onArchive, onClose }) {
       </div>
     </div>
   );
-}
-
-function priorityIcon(priority) {
-  if (priority === 'urgent') return '🔥';
-  if (priority === 'high') return '⚡';
-  return '';
 }
 
 function assigneeInitial(assignee) {
@@ -218,7 +212,7 @@ export function App() {
           </div>
           <div className="hero-controls">
             <label className="search-wrap" aria-label="Search tasks">
-              <span>⌕</span>
+              <span className="search-icon">⌕</span>
               <input
                 aria-label="Search"
                 placeholder="Search title or description"
@@ -284,6 +278,7 @@ export function App() {
               <label style={{ gridColumn: '1 / -1' }}>
                 <span className="small">Title</span>
                 <input
+                  className="edit-control"
                   aria-label="New task title"
                   value={newTask.title}
                   onChange={(e) => setNewTask((current) => ({ ...current, title: e.target.value }))}
@@ -292,11 +287,11 @@ export function App() {
               </label>
               <label style={{ gridColumn: '1 / -1' }}>
                 <span className="small">Description</span>
-                <input value={newTask.description} onChange={(e) => setNewTask((current) => ({ ...current, description: e.target.value }))} />
+                <input className="edit-control" value={newTask.description} onChange={(e) => setNewTask((current) => ({ ...current, description: e.target.value }))} />
               </label>
               <label>
                 <span className="small">Priority</span>
-                <select value={newTask.priority} onChange={(e) => setNewTask((current) => ({ ...current, priority: e.target.value }))}>
+                <select className="edit-control" value={newTask.priority} onChange={(e) => setNewTask((current) => ({ ...current, priority: e.target.value }))}>
                   {PRIORITIES.map((priority) => (
                     <option key={priority} value={priority}>{priority}</option>
                   ))}
@@ -304,15 +299,15 @@ export function App() {
               </label>
               <label>
                 <span className="small">Assignee</span>
-                <input value={newTask.assignee} onChange={(e) => setNewTask((current) => ({ ...current, assignee: e.target.value }))} />
+                <input className="edit-control" value={newTask.assignee} onChange={(e) => setNewTask((current) => ({ ...current, assignee: e.target.value }))} />
               </label>
               <label>
                 <span className="small">Due date</span>
-                <input type="date" value={newTask.dueAt} onChange={(e) => setNewTask((current) => ({ ...current, dueAt: e.target.value }))} />
+                <input className="edit-control" type="date" value={newTask.dueAt} onChange={(e) => setNewTask((current) => ({ ...current, dueAt: e.target.value }))} />
               </label>
               <label>
                 <span className="small">Tags</span>
-                <input value={newTask.tagsText} onChange={(e) => setNewTask((current) => ({ ...current, tagsText: e.target.value }))} placeholder="api, pulse" />
+                <input className="edit-control" value={newTask.tagsText} onChange={(e) => setNewTask((current) => ({ ...current, tagsText: e.target.value }))} placeholder="api, pulse" />
               </label>
             </div>
 
@@ -346,7 +341,7 @@ export function App() {
                       </div>
 
                       <div className="badges">
-                        <span className={`pill ${task.priority}`}>{priorityIcon(task.priority)} {task.priority}</span>
+                        <span className={`pill ${task.priority}`}>{task.priority}</span>
                         <span className="pill status">{task.status}</span>
                         {task.dueAt ? <span className="pill">Due {String(task.dueAt).slice(0, 10)}</span> : null}
                         {taskTags.map((tag) => <span key={`${task.id}-${tag}`} className="pill">#{tag}</span>)}
@@ -397,7 +392,7 @@ export function App() {
                           >
                             <button className="task-title-btn" onClick={() => setSelectedId(isSelected ? null : task.id)}>{task.title}</button>
                             <div className="board-card-meta">
-                              <span className={`pill ${task.priority}`}>{priorityIcon(task.priority)} {task.priority}</span>
+                              <span className={`pill ${task.priority}`}>{task.priority}</span>
                               <span className="small">{String(task.statusChangedAt).slice(0, 10)}</span>
                             </div>
                             {isSelected ? (
