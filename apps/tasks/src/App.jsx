@@ -234,8 +234,41 @@ export function App() {
       </header>
 
       <section className="content">
+        <div className="filter-row panel">
+          <label className="select-wrap">
+            <select
+              aria-label="Status filter"
+              value={filters.status}
+              onChange={(e) => setFilters((current) => ({ ...current, status: e.target.value }))}
+            >
+              <option value="">Status: All statuses</option>
+              {STATUSES.map((status) => (
+                <option key={status} value={status}>{`Status: ${status}`}</option>
+              ))}
+            </select>
+          </label>
+          <label className="select-wrap">
+            <select
+              aria-label="Priority filter"
+              value={filters.priority}
+              onChange={(e) => setFilters((current) => ({ ...current, priority: e.target.value }))}
+            >
+              <option value="">Priority: All priorities</option>
+              {PRIORITIES.map((priority) => (
+                <option key={priority} value={priority}>{`Priority: ${priority}`}</option>
+              ))}
+            </select>
+          </label>
+          <button
+            className={`ghost-btn ${filters.includeArchived ? 'archived-active' : ''}`}
+            onClick={() => setFilters((current) => ({ ...current, includeArchived: !current.includeArchived }))}
+          >
+            {filters.includeArchived ? 'Hide archived' : 'Show archived'}
+          </button>
+        </div>
+
         {newTask.expanded ? (
-          <form onSubmit={createTask} className="panel stack create-panel" aria-label="New task form">
+          <form onSubmit={createTask} className="task-card stack create-card" aria-label="New task form">
             <div className="task-create-header">
               <h2>New Task</h2>
               <button
@@ -288,39 +321,6 @@ export function App() {
             </div>
           </form>
         ) : null}
-
-        <div className="filter-row panel">
-          <label className="select-wrap">
-            <select
-              aria-label="Status filter"
-              value={filters.status}
-              onChange={(e) => setFilters((current) => ({ ...current, status: e.target.value }))}
-            >
-              <option value="">Status: All statuses</option>
-              {STATUSES.map((status) => (
-                <option key={status} value={status}>{`Status: ${status}`}</option>
-              ))}
-            </select>
-          </label>
-          <label className="select-wrap">
-            <select
-              aria-label="Priority filter"
-              value={filters.priority}
-              onChange={(e) => setFilters((current) => ({ ...current, priority: e.target.value }))}
-            >
-              <option value="">Priority: All priorities</option>
-              {PRIORITIES.map((priority) => (
-                <option key={priority} value={priority}>{`Priority: ${priority}`}</option>
-              ))}
-            </select>
-          </label>
-          <button
-            className={`ghost-btn ${filters.includeArchived ? 'archived-active' : ''}`}
-            onClick={() => setFilters((current) => ({ ...current, includeArchived: !current.includeArchived }))}
-          >
-            {filters.includeArchived ? 'Hide archived' : 'Show archived'}
-          </button>
-        </div>
 
         {error ? <p role="alert" className="error">{error}</p> : null}
 
