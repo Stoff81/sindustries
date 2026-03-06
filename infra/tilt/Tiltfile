@@ -4,7 +4,7 @@ tasks_app_port = os.getenv('TASKS_APP_PORT', '5173')
 tasks_api_base_url = os.getenv('TASKS_API_BASE_URL', 'http://localhost:4000/api/v1')
 tasks_api_env_file = os.getenv('TASKS_API_ENV_FILE', 'services/tasks-api/.env.dev')
 
-docker_compose('../docker-compose.dev.yml')
+docker_compose('../docker-compose.dev.yml', project_name=os.getenv('COMPOSE_PROJECT_NAME', 'sindustries-' + mode))
 
 dc_resource(
   'postgres',
