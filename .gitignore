@@ -3,3 +3,5 @@ node_modules/
 **/node_modules/
 .env
 **/.env
+services/tasks-api/.env.dev
+services/tasks-api/.env.prodlike

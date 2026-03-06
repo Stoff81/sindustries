@@ -1,16 +1,18 @@
 .PHONY: bootstrap up down reset-db test test-api test-app test-e2e
 
+MODE ?= dev
+
 bootstrap:
 	./scripts/dev/bootstrap.sh
 
 up:
-	./scripts/dev/up.sh
+	MODE=$(MODE) ./scripts/dev/up.sh
 
 down:
-	./scripts/dev/down.sh
+	MODE=$(MODE) ./scripts/dev/down.sh
 
 reset-db:
-	./scripts/dev/reset-db.sh
+	MODE=$(MODE) ./scripts/dev/reset-db.sh
 
 test: test-api test-app test-e2e
 

@@ -1,22 +1,22 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: sindustries-postgres-dev
+    container_name: ${POSTGRES_CONTAINER_NAME:-sindustries-postgres-dev}
     restart: unless-stopped
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     environment:
-      POSTGRES_DB: sindustries
+      POSTGRES_DB: ${POSTGRES_DB:-sindustries_dev}
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     volumes:
-      - sindustries-postgres-data:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d sindustries"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ${POSTGRES_DB:-sindustries_dev}"]
       interval: 5s
       timeout: 5s
       retries: 10
       start_period: 5s
 
 volumes:
-  sindustries-postgres-data:
+  postgres-data:
