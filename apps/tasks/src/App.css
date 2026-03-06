@@ -146,7 +146,7 @@ button {
   cursor: pointer;
 }
 
-.content { padding: 18px 20px 80px; }
+.content { padding: 0 20px 80px; }
 
 .panel {
   margin-top: 14px;
@@ -166,9 +166,31 @@ button {
   gap: 8px;
   align-items: center;
   justify-content: start;
-  margin-top: 12px;
+  margin: 0 -20px;
+  margin-bottom: 0;
+  padding: 12px 20px;
+  border-left: 0;
+  border-right: 0;
+  border-top: 0;
+}
+.create-card {
+  margin-top: 0;
   margin-bottom: 12px;
-  padding: 12px;
+}
+.create-card .small {
+  color: #464236;
+}
+.create-card input,
+.create-card select,
+.create-card textarea {
+  background: #fffaf0;
+  border-color: #151515;
+  color: #151515;
+}
+.create-card .ghost-btn {
+  border-color: #151515;
+  background: #ece3cc;
+  color: #151515;
 }
 .stack { display: grid; gap: 8px; }
 
@@ -210,7 +232,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--cyan); outline: 
 
 .task-list {
   list-style: none;
-  margin: 0;
+  margin: 0 auto;
   padding: 0;
   display: grid;
   gap: 14px;
