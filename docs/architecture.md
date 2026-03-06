@@ -28,6 +28,17 @@ We use a **hybrid local model** to optimize inner-loop speed while staying conta
 - **tasks app** runs on host (`npm run dev` in `apps/tasks`).
 - **Tilt** orchestrates all of the above via `infra/tilt/Tiltfile`.
 
+### Dual local modes
+
+The stack is mode-aware so `dev` and `prodlike` can run concurrently from the same repo.
+
+| Mode | Compose project | Postgres | Postgres DB | API | App | Tilt port | API base URL |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `dev` | `sindustries-dev` | `localhost:5432` | `sindustries_dev` | `localhost:4000` | `localhost:5173` | `10350` | `http://localhost:4000/api/v1` |
+| `prodlike` | `sindustries-prodlike` | `localhost:5433` | `sindustries_prodlike` | `localhost:4001` | `localhost:5174` | `10351` | `http://localhost:4001/api/v1` |
+
+Mode config source of truth: `scripts/dev/mode-env.sh`.
+
 ### Why hybrid now
 
 - Faster code/test iteration for TypeScript services and UI than fully containerized hot-reload loops.
@@ -42,9 +53,8 @@ We use a **hybrid local model** to optimize inner-loop speed while staying conta
 
 ## Data ownership and schema boundaries
 
-Local dev currently uses a **single shared Postgres instance** by default.
-
-Boundary rules:
+Each local mode runs against its own Postgres database (`sindustries_dev` vs `sindustries_prodlike`).
+Within each DB, boundary rules are unchanged:
 
 - Each service owns its own schema and migration lifecycle.
 - Current API ownership schema: `tasks_api`.
@@ -52,7 +62,10 @@ Boundary rules:
 - No cross-service table ownership.
 - Cross-service reads/writes must happen through service APIs/contracts, not direct table access.
 
-`./scripts/dev/reset-db.sh` enforces this baseline by recreating service schemas and rerunning API migrations/seeds.
+`./scripts/dev/reset-db.sh` enforces this baseline by recreating service schemas and rerunning API migrations. Seed behavior is mode-aware:
+
+- `dev`: seed by default
+- `prodlike`: no seed by default (`SEED_DB=true` to opt in)
 
 ## Tilt role in the stack
 
@@ -64,12 +77,13 @@ Responsibilities:
 - Start host-run `tasks-api` after Postgres.
 - Start host-run `tasks-app` after API.
 - Provide unified status/logs with explicit dependency ordering (`db -> api -> app`).
+- Honor mode-specific env (`MODE`, ports, DB URL, API base URL).
 
 Developer command scripts (source of truth):
 
 - `./scripts/dev/up.sh` (starts Colima if required, then runs Tilt)
 - `./scripts/dev/down.sh` (tears down Tilt + compose resources)
-- `./scripts/dev/reset-db.sh` (schema reset + migrate + seed)
+- `./scripts/dev/reset-db.sh` (schema reset + migrate + optional seed)
 
 ## CI strategy (Phase 1)
 
@@ -97,7 +111,7 @@ GitHub Actions (`.github/workflows/ci.yml`) runs test suites on hosted runners w
 
 ### Implemented now (Phase A)
 - Hybrid local runtime with Compose + Tilt + host-run app/api.
-- Shared Postgres with explicit schema ownership boundaries.
+- Dual local modes (`dev`, `prodlike`) with isolated ports and DB targets.
 - CI lanes for current API, app, and app e2e suites.
 
 ### Next (Phase B)

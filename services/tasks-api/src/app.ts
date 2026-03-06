@@ -12,7 +12,13 @@ function getAllowedOrigins() {
     return new Set(configured);
   }
 
-  return new Set(['http://localhost:5173', 'http://127.0.0.1:5173', 'http://127.0.0.1:4173']);
+  return new Set([
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+    'http://127.0.0.1:4173',
+    'http://localhost:5174',
+    'http://127.0.0.1:5174'
+  ]);
 }
 
 export function createApp() {

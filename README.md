@@ -21,7 +21,7 @@ Planned product evolution:
 2. Evolve `mission-control` into the aggregate shell that hosts cross-app workflows (including `tasks`, collaboration, and future surfaces).
 3. Keep domain boundaries strict so apps can ship independently while sharing stable packages/services.
 
-## Local setup (dev)
+## Local setup (dev + prodlike)
 
 ### Prerequisites
 - macOS with Homebrew
@@ -36,25 +36,76 @@ make bootstrap
 
 This installs local tooling (`colima`, `docker` CLI, `tilt`, `node` if missing) and npm deps for current app/service packages.
 
-### Start dev stack
+### Local runtime modes
+
+`make up`, `make down`, and `make reset-db` are mode-aware via `MODE=<dev|prodlike>`.
+
+| Mode | Compose project | Postgres | API | App | Tilt control port | API base URL |
+| --- | --- | --- | --- | --- | --- | --- |
+| `dev` | `sindustries-dev` | `localhost:5432` (`sindustries_dev`) | `localhost:4000` | `localhost:5173` | `10350` | `http://localhost:4000/api/v1` |
+| `prodlike` | `sindustries-prodlike` | `localhost:5433` (`sindustries_prodlike`) | `localhost:4001` | `localhost:5174` | `10351` | `http://localhost:4001/api/v1` |
+
+### Start stacks
+
+Default (dev):
 
 ```bash
 make up
 ```
 
-This starts the hybrid dev stack (Postgres in Docker/Colima + app/api via Tilt-managed local processes).
-
-### Reset local DB
+Prod-like stack:
 
 ```bash
-make reset-db
+make up MODE=prodlike
 ```
 
-### Stop dev stack
+Run both simultaneously from two terminals:
 
 ```bash
-make down
+# Terminal 1
+make up MODE=dev
+
+# Terminal 2
+make up MODE=prodlike
 ```
+
+### Stop stacks
+
+```bash
+make down MODE=dev
+make down MODE=prodlike
+```
+
+### Reset DB (mode-aware)
+
+Dev reset (includes seed by default):
+
+```bash
+make reset-db MODE=dev
+```
+
+Prod-like reset (no seed by default):
+
+```bash
+make reset-db MODE=prodlike
+```
+
+Optional overrides:
+
+```bash
+# Force seed prodlike once
+SEED_DB=true make reset-db MODE=prodlike
+
+# Skip seed in dev once
+SEED_DB=false make reset-db MODE=dev
+```
+
+### Cron/automation targeting
+
+Use explicit API base URLs:
+
+- Dev: `http://localhost:4000/api/v1`
+- Prod-like: `http://localhost:4001/api/v1`
 
 ### Run tests
 
