@@ -114,6 +114,16 @@ function TaskEditor({ task, onSave, onArchive, onClose }) {
   );
 }
 
+function priorityIcon(priority) {
+  if (priority === 'urgent') return '🔥';
+  if (priority === 'high') return '⚡';
+  return '';
+}
+
+function assigneeInitial(assignee) {
+  return assignee?.trim()?.charAt(0)?.toUpperCase() ?? null;
+}
+
 export function App() {
   const [tasks, setTasks] = useState([]);
   const [view, setView] = useState('backlog');
@@ -201,23 +211,31 @@ export function App() {
 
   return (
     <main className="app-shell">
-      <aside className="sidebar">
-        <span className="brand">Pulse</span>
-        <nav>
-          <button className={`nav-btn ${view === 'backlog' ? 'active' : ''}`} onClick={() => setView('backlog')}>Backlog</button>
-          <button className={`nav-btn ${view === 'board' ? 'active' : ''}`} onClick={() => setView('board')}>Kanban</button>
-        </nav>
-      </aside>
+      <header className="hero-header">
+        <div className="hero-pattern" aria-hidden="true" />
+        <div className="hero-content">
+          <div className="brand-wrap">
+            <span className="brand">Pulse</span>
+          </div>
+          <div className="hero-controls">
+            <label className="search-wrap" aria-label="Search tasks">
+              <span>⌕</span>
+              <input
+                aria-label="Search"
+                placeholder="Search title or description"
+                value={filters.q}
+                onChange={(e) => setFilters((current) => ({ ...current, q: e.target.value }))}
+              />
+            </label>
+            <button className={`nav-btn ${view === 'backlog' ? 'active' : ''}`} onClick={() => setView('backlog')}>Backlog</button>
+            <button className={`nav-btn ${view === 'board' ? 'active' : ''}`} onClick={() => setView('board')}>Kanban</button>
+            <button type="button" className="primary-btn" onClick={() => setNewTask((current) => ({ ...current, expanded: true }))}>+ New Task</button>
+          </div>
+        </div>
+      </header>
 
       <section className="content">
-        <header className="topbar">
-          <div>
-            <h1 className="title">{view === 'backlog' ? 'Backlog' : 'Kanban Board'}</h1>
-            <p className="subtitle">Priority-first task flow with inline editing and archive controls.</p>
-          </div>
-        </header>
-
-        <form onSubmit={createTask} className="panel stack">
+        <form onSubmit={createTask} className="panel stack create-panel">
           <div className="form-grid">
             <label>
               <span className="small">Quick capture</span>
@@ -272,16 +290,7 @@ export function App() {
 
         {view === 'backlog' ? (
           <section className="panel">
-            <div className="form-grid" style={{ marginBottom: 12 }}>
-              <label>
-                <span className="small">Search</span>
-                <input
-                  aria-label="Search"
-                  placeholder="Search title or description"
-                  value={filters.q}
-                  onChange={(e) => setFilters((current) => ({ ...current, q: e.target.value }))}
-                />
-              </label>
+            <div className="filter-row" style={{ marginBottom: 12 }}>
               <label>
                 <span className="small">Status</span>
                 <select
@@ -309,7 +318,7 @@ export function App() {
                 </select>
               </label>
               <button
-                className="ghost-btn"
+                className={`ghost-btn ${filters.includeArchived ? 'archived-active' : ''}`}
                 onClick={() => setFilters((current) => ({ ...current, includeArchived: !current.includeArchived }))}
               >
                 {filters.includeArchived ? 'Hide archived' : 'Show archived'}
@@ -317,21 +326,25 @@ export function App() {
             </div>
 
             <ul aria-label="Backlog list" className="task-list">
-              {tasks.map((task) => {
+              {tasks.map((task, index) => {
                 const isSelected = selectedId === task.id;
                 const taskTags = Array.isArray(task.tags) ? task.tags.map((tag) => tag.name ?? String(tag)) : [];
+                const assignee = task.assignee ?? 'Unassigned';
                 return (
                   <li key={task.id}>
-                    <article className={`task-card ${task.archivedAt ? 'archived' : ''}`}>
+                    <article className={`task-card ${task.archivedAt ? 'archived' : ''} card-tilt-${index % 3}`}>
                       <div className="task-row">
                         <button className="task-title-btn" onClick={() => setSelectedId(isSelected ? null : task.id)}>
                           {task.title}
                         </button>
-                        <span className="small">{task.assignee ?? 'Unassigned'}</span>
+                        <div className="assignee-chip">
+                          {assigneeInitial(task.assignee) ? <span className="avatar-dot">{assigneeInitial(task.assignee)}</span> : null}
+                          <span className="small">{assignee}</span>
+                        </div>
                       </div>
 
                       <div className="badges">
-                        <span className={`pill ${task.priority}`}>{task.priority}</span>
+                        <span className={`pill ${task.priority}`}>{priorityIcon(task.priority)} {task.priority}</span>
                         <span className="pill status">{task.status}</span>
                         {task.dueAt ? <span className="pill">Due {String(task.dueAt).slice(0, 10)}</span> : null}
                         {taskTags.map((tag) => <span key={`${task.id}-${tag}`} className="pill">#{tag}</span>)}
@@ -352,36 +365,44 @@ export function App() {
             </ul>
           </section>
         ) : (
-          <section aria-label="Kanban board" className="panel board">
-            {STATUSES.map((status) => (
-              <div
-                key={status}
-                data-testid={`column-${status}`}
-                className="column"
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={(e) => {
-                  const id = e.dataTransfer.getData('text/plain');
-                  if (id) patchTask(id, { status });
-                }}
-              >
-                <h3>{status} ({boardColumns[status].length})</h3>
-                <ol>
-                  {boardColumns[status].map((task) => (
-                    <li key={task.id}>
-                      <article
-                        data-testid={`card-${task.id}`}
-                        className="board-card"
-                        draggable
-                        onDragStart={(e) => e.dataTransfer.setData('text/plain', task.id)}
-                      >
-                        <button className="task-title-btn" onClick={() => setSelectedId(task.id)}>{task.title}</button>
-                        <div className="small">{task.priority} · in status since {String(task.statusChangedAt).slice(0, 10)}</div>
-                      </article>
-                    </li>
-                  ))}
-                </ol>
-              </div>
-            ))}
+          <section aria-label="Kanban board" className="panel board-wrap">
+            <div className="board">
+              {STATUSES.map((status) => (
+                <div
+                  key={status}
+                  data-testid={`column-${status}`}
+                  className="column"
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => {
+                    const id = e.dataTransfer.getData('text/plain');
+                    if (id) patchTask(id, { status });
+                  }}
+                >
+                  <div className="column-head">
+                    <h3>{status}</h3>
+                    <span className="count-pill">{boardColumns[status].length}</span>
+                  </div>
+                  <ol>
+                    {boardColumns[status].map((task, index) => (
+                      <li key={task.id}>
+                        <article
+                          data-testid={`card-${task.id}`}
+                          className={`board-card card-tilt-${index % 3}`}
+                          draggable
+                          onDragStart={(e) => e.dataTransfer.setData('text/plain', task.id)}
+                        >
+                          <button className="task-title-btn" onClick={() => setSelectedId(task.id)}>{task.title}</button>
+                          <div className="board-card-meta">
+                            <span className={`pill ${task.priority}`}>{priorityIcon(task.priority)} {task.priority}</span>
+                            <span className="small">{String(task.statusChangedAt).slice(0, 10)}</span>
+                          </div>
+                        </article>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              ))}
+            </div>
           </section>
         )}
 
@@ -397,6 +418,12 @@ export function App() {
           </section>
         ) : null}
       </section>
+
+      <nav className="mobile-nav" aria-label="Primary">
+        <button className={view === 'backlog' ? 'active' : ''} onClick={() => setView('backlog')}>List</button>
+        <button className="fab" onClick={() => setNewTask((current) => ({ ...current, expanded: true }))}>＋</button>
+        <button className={view === 'board' ? 'active' : ''} onClick={() => setView('board')}>Board</button>
+      </nav>
     </main>
   );
 }
