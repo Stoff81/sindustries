@@ -76,4 +76,23 @@ describe('tasks ui', () => {
 
     await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining('/tasks/created'), expect.objectContaining({ method: 'DELETE' })));
   });
+
+  it('toggles archived filter and updates query', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ data: [mockTask()] }) })
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ data: [mockTask({ archivedAt: '2026-03-01T00:00:00.000Z' })] }) });
+
+    vi.stubGlobal('fetch', fetchMock);
+
+    render(<App />);
+
+    await screen.findByRole('list', { name: 'Backlog list' });
+    fireEvent.click(screen.getByRole('button', { name: 'Show archived' }));
+
+    await waitFor(() => {
+      const callUrl = fetchMock.mock.calls[1][0];
+      expect(callUrl).toContain('includeArchived=true');
+    });
+  });
 });
