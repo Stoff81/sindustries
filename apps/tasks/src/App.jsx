@@ -132,7 +132,6 @@ export function App() {
   const [newTask, setNewTask] = useState({ title: '', expanded: false, description: '', priority: 'medium', assignee: '', dueAt: '', tagsText: '' });
   const [error, setError] = useState('');
 
-  const selectedTask = tasks.find((task) => task.id === selectedId) ?? null;
 
   async function loadTasks() {
     const query = new URLSearchParams({ sort: 'priority' });
@@ -235,30 +234,30 @@ export function App() {
       </header>
 
       <section className="content">
-        <form onSubmit={createTask} className="panel stack create-panel">
-          <div className="form-grid">
-            <label>
-              <span className="small">Quick capture</span>
-              <input
-                aria-label="New task title"
-                value={newTask.title}
-                onChange={(e) => setNewTask((current) => ({ ...current, title: e.target.value }))}
-                required
-              />
-            </label>
-            <button type="submit" className="primary-btn">New Task</button>
-            <button
-              type="button"
-              className="ghost-btn"
-              onClick={() => setNewTask((current) => ({ ...current, expanded: !current.expanded }))}
-            >
-              {newTask.expanded ? 'Hide details' : 'Add details'}
-            </button>
-          </div>
+        {newTask.expanded ? (
+          <form onSubmit={createTask} className="panel stack create-panel" aria-label="New task form">
+            <div className="task-create-header">
+              <h2>New Task</h2>
+              <button
+                type="button"
+                className="ghost-btn"
+                onClick={() => setNewTask((current) => ({ ...current, expanded: false }))}
+              >
+                Cancel
+              </button>
+            </div>
 
-          {newTask.expanded ? (
             <div className="editor-grid">
-              <label>
+              <label style={{ gridColumn: '1 / -1' }}>
+                <span className="small">Title</span>
+                <input
+                  aria-label="New task title"
+                  value={newTask.title}
+                  onChange={(e) => setNewTask((current) => ({ ...current, title: e.target.value }))}
+                  required
+                />
+              </label>
+              <label style={{ gridColumn: '1 / -1' }}>
                 <span className="small">Description</span>
                 <input value={newTask.description} onChange={(e) => setNewTask((current) => ({ ...current, description: e.target.value }))} />
               </label>
@@ -278,52 +277,57 @@ export function App() {
                 <span className="small">Due date</span>
                 <input type="date" value={newTask.dueAt} onChange={(e) => setNewTask((current) => ({ ...current, dueAt: e.target.value }))} />
               </label>
-              <label style={{ gridColumn: '1 / -1' }}>
+              <label>
                 <span className="small">Tags</span>
                 <input value={newTask.tagsText} onChange={(e) => setNewTask((current) => ({ ...current, tagsText: e.target.value }))} placeholder="api, pulse" />
               </label>
             </div>
-          ) : null}
-        </form>
+
+            <div className="actions">
+              <button type="submit" className="primary-btn">Create task</button>
+            </div>
+          </form>
+        ) : null}
+
+        <div className="filter-row">
+          <label>
+            <span className="small">Status</span>
+            <select
+              aria-label="Status filter"
+              value={filters.status}
+              onChange={(e) => setFilters((current) => ({ ...current, status: e.target.value }))}
+            >
+              <option value="">All statuses</option>
+              {STATUSES.map((status) => (
+                <option key={status} value={status}>{status}</option>
+              ))}
+            </select>
+          </label>
+          <label>
+            <span className="small">Priority</span>
+            <select
+              aria-label="Priority filter"
+              value={filters.priority}
+              onChange={(e) => setFilters((current) => ({ ...current, priority: e.target.value }))}
+            >
+              <option value="">All priorities</option>
+              {PRIORITIES.map((priority) => (
+                <option key={priority} value={priority}>{priority}</option>
+              ))}
+            </select>
+          </label>
+          <button
+            className={`ghost-btn ${filters.includeArchived ? 'archived-active' : ''}`}
+            onClick={() => setFilters((current) => ({ ...current, includeArchived: !current.includeArchived }))}
+          >
+            {filters.includeArchived ? 'Hide archived' : 'Show archived'}
+          </button>
+        </div>
 
         {error ? <p role="alert" className="error">{error}</p> : null}
 
         {view === 'backlog' ? (
-          <section className="panel">
-            <div className="filter-row" style={{ marginBottom: 12 }}>
-              <label>
-                <span className="small">Status</span>
-                <select
-                  aria-label="Status filter"
-                  value={filters.status}
-                  onChange={(e) => setFilters((current) => ({ ...current, status: e.target.value }))}
-                >
-                  <option value="">All statuses</option>
-                  {STATUSES.map((status) => (
-                    <option key={status} value={status}>{status}</option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                <span className="small">Priority</span>
-                <select
-                  aria-label="Priority filter"
-                  value={filters.priority}
-                  onChange={(e) => setFilters((current) => ({ ...current, priority: e.target.value }))}
-                >
-                  <option value="">All priorities</option>
-                  {PRIORITIES.map((priority) => (
-                    <option key={priority} value={priority}>{priority}</option>
-                  ))}
-                </select>
-              </label>
-              <button
-                className={`ghost-btn ${filters.includeArchived ? 'archived-active' : ''}`}
-                onClick={() => setFilters((current) => ({ ...current, includeArchived: !current.includeArchived }))}
-              >
-                {filters.includeArchived ? 'Hide archived' : 'Show archived'}
-              </button>
-            </div>
+          <section>
 
             <ul aria-label="Backlog list" className="task-list">
               {tasks.map((task, index) => {
@@ -365,7 +369,7 @@ export function App() {
             </ul>
           </section>
         ) : (
-          <section aria-label="Kanban board" className="panel board-wrap">
+          <section aria-label="Kanban board" className="board-wrap">
             <div className="board">
               {STATUSES.map((status) => (
                 <div
@@ -383,40 +387,39 @@ export function App() {
                     <span className="count-pill">{boardColumns[status].length}</span>
                   </div>
                   <ol>
-                    {boardColumns[status].map((task, index) => (
-                      <li key={task.id}>
-                        <article
-                          data-testid={`card-${task.id}`}
-                          className={`board-card card-tilt-${index % 3}`}
-                          draggable
-                          onDragStart={(e) => e.dataTransfer.setData('text/plain', task.id)}
-                        >
-                          <button className="task-title-btn" onClick={() => setSelectedId(task.id)}>{task.title}</button>
-                          <div className="board-card-meta">
-                            <span className={`pill ${task.priority}`}>{priorityIcon(task.priority)} {task.priority}</span>
-                            <span className="small">{String(task.statusChangedAt).slice(0, 10)}</span>
-                          </div>
-                        </article>
-                      </li>
-                    ))}
+                    {boardColumns[status].map((task, index) => {
+                      const isSelected = selectedId === task.id;
+                      return (
+                        <li key={task.id}>
+                          <article
+                            data-testid={`card-${task.id}`}
+                            className={`board-card card-tilt-${index % 3}`}
+                            draggable
+                            onDragStart={(e) => e.dataTransfer.setData('text/plain', task.id)}
+                          >
+                            <button className="task-title-btn" onClick={() => setSelectedId(isSelected ? null : task.id)}>{task.title}</button>
+                            <div className="board-card-meta">
+                              <span className={`pill ${task.priority}`}>{priorityIcon(task.priority)} {task.priority}</span>
+                              <span className="small">{String(task.statusChangedAt).slice(0, 10)}</span>
+                            </div>
+                            {isSelected ? (
+                              <TaskEditor
+                                task={task}
+                                onSave={(patch) => patchTask(task.id, patch)}
+                                onArchive={() => archiveTask(task.id)}
+                                onClose={() => setSelectedId(null)}
+                              />
+                            ) : null}
+                          </article>
+                        </li>
+                      );
+                    })}
                   </ol>
                 </div>
               ))}
             </div>
           </section>
         )}
-
-        {selectedTask && view === 'board' ? (
-          <section aria-label="Task detail" className="panel" style={{ marginTop: 14 }}>
-            <h2 style={{ marginTop: 0 }}>{selectedTask.title}</h2>
-            <TaskEditor
-              task={selectedTask}
-              onSave={(patch) => patchTask(selectedTask.id, patch)}
-              onArchive={() => archiveTask(selectedTask.id)}
-              onClose={() => setSelectedId(null)}
-            />
-          </section>
-        ) : null}
       </section>
 
       <nav className="mobile-nav" aria-label="Primary">

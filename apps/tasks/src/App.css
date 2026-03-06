@@ -152,10 +152,20 @@ button {
   padding: 12px;
 }
 
-.create-panel { margin-top: 16px; }
+.create-panel { margin-top: 0; }
+.task-create-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.task-create-header h2 { margin: 0; font-size: 1.05rem; text-transform: uppercase; }
 
 .form-grid { display: grid; grid-template-columns: 1.2fr repeat(4, minmax(120px, 1fr)); gap: 8px; align-items: end; }
-.filter-row { display: grid; grid-template-columns: repeat(3, minmax(120px, auto)); gap: 8px; align-items: end; }
+.filter-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(120px, auto));
+  gap: 8px;
+  align-items: end;
+  justify-content: start;
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
 .stack { display: grid; gap: 8px; }
 
 input, select, textarea {
@@ -170,7 +180,14 @@ input:focus, select:focus, textarea:focus { border-color: var(--cyan); outline: 
 .small { font-size: 0.82rem; color: var(--muted); }
 .error { color: #ffd1d1; background: #4c1d1d; border: 1px solid #7f2d2d; padding: 8px; }
 
-.task-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.task-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+  max-width: 1080px;
+}
 .task-card,
 .board-card {
   border: 3px solid #000;
@@ -219,22 +236,19 @@ input:focus, select:focus, textarea:focus { border-color: var(--cyan); outline: 
 .editor-grid { display: grid; gap: 8px; grid-template-columns: repeat(4, minmax(120px, 1fr)); }
 .actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
-.board-wrap { overflow: hidden; }
-.board { display: grid; grid-template-columns: repeat(3, minmax(260px, 1fr)); gap: 12px; overflow-x: auto; }
-.column { border: 2px solid var(--line); background: #2a2a2a; min-height: 260px; }
+.board-wrap { overflow-x: auto; margin-top: 8px; }
+.board { display: grid; grid-template-columns: repeat(3, minmax(280px, 1fr)); gap: 12px; }
+.column { min-height: 260px; }
 .column-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
-  border-bottom: 2px solid #555;
-  background: #1d1d1d;
-  position: sticky;
-  top: 0;
+  padding: 0 0 8px;
+  margin-bottom: 8px;
 }
 .column h3 { margin: 0; text-transform: uppercase; font-size: 0.95rem; }
 .count-pill { border-radius: 20px; background: #555; padding: 2px 8px; font-size: 0.75rem; font-weight: 700; }
-.column ol { margin: 0; padding: 10px; list-style: none; }
+.column ol { margin: 0; padding: 0; list-style: none; }
 .board-card { margin-bottom: 10px; }
 .board-card-meta { margin-top: 8px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
 

@@ -66,8 +66,9 @@ describe('tasks ui', () => {
     render(<App />);
 
     await screen.findByRole('list', { name: 'Backlog list' });
+    fireEvent.click(screen.getByRole('button', { name: '+ New Task' }));
     fireEvent.change(screen.getByLabelText('New task title'), { target: { value: 'Created' } });
-    fireEvent.click(screen.getByRole('button', { name: 'New Task' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Create task' }));
 
     await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining('/tasks'), expect.objectContaining({ method: 'POST' })));
 
