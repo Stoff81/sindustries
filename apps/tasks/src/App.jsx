@@ -289,30 +289,28 @@ export function App() {
           </form>
         ) : null}
 
-        <div className="filter-row">
-          <label>
-            <span className="small">Status</span>
+        <div className="filter-row panel">
+          <label className="select-wrap">
             <select
               aria-label="Status filter"
               value={filters.status}
               onChange={(e) => setFilters((current) => ({ ...current, status: e.target.value }))}
             >
-              <option value="">All statuses</option>
+              <option value="">Status: All statuses</option>
               {STATUSES.map((status) => (
-                <option key={status} value={status}>{status}</option>
+                <option key={status} value={status}>{`Status: ${status}`}</option>
               ))}
             </select>
           </label>
-          <label>
-            <span className="small">Priority</span>
+          <label className="select-wrap">
             <select
               aria-label="Priority filter"
               value={filters.priority}
               onChange={(e) => setFilters((current) => ({ ...current, priority: e.target.value }))}
             >
-              <option value="">All priorities</option>
+              <option value="">Priority: All priorities</option>
               {PRIORITIES.map((priority) => (
-                <option key={priority} value={priority}>{priority}</option>
+                <option key={priority} value={priority}>{`Priority: ${priority}`}</option>
               ))}
             </select>
           </label>
