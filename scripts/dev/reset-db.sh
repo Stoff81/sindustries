@@ -14,8 +14,43 @@ fi
 
 # psql doesn't accept Prisma-style query params (e.g. ?schema=tasks_api)
 PSQL_DATABASE_URL="${DATABASE_URL%%\?*}"
+PSQL_ADMIN_URL="${PSQL_DATABASE_URL%/*}/postgres"
 
 SEED_DB="${SEED_DB:-$RESET_DB_SEED_DEFAULT}"
+
+compose_cmd() {
+  if docker compose version >/dev/null 2>&1; then
+    docker compose "$@"
+  elif command -v docker-compose >/dev/null 2>&1; then
+    docker-compose "$@"
+  else
+    echo "docker compose (plugin) or docker-compose is required." >&2
+    exit 1
+  fi
+}
+
+echo "Ensuring Postgres is running for MODE=$MODE..."
+if ! compose_cmd -f "$ROOT_DIR/infra/docker-compose.dev.yml" up -d postgres >/dev/null 2>&1; then
+  echo "Warning: compose up reported an error; continuing to probe DB availability..." >&2
+fi
+
+# Wait until postgres socket is accepting connections.
+for i in {1..30}; do
+  if psql "$PSQL_ADMIN_URL" -c 'SELECT 1' >/dev/null 2>&1; then
+    break
+  fi
+  sleep 1
+  if [[ "$i" -eq 30 ]]; then
+    echo "Postgres not ready on $PSQL_ADMIN_URL after 30s" >&2
+    exit 1
+  fi
+done
+
+# Ensure target DB exists before schema reset.
+DB_EXISTS=$(psql "$PSQL_ADMIN_URL" -tAc "SELECT 1 FROM pg_database WHERE datname='${POSTGRES_DB}'" || true)
+if [[ "$DB_EXISTS" != "1" ]]; then
+  psql "$PSQL_ADMIN_URL" -v ON_ERROR_STOP=1 -c "CREATE DATABASE \"${POSTGRES_DB}\";"
+fi
 
 echo "Resetting Postgres schemas for MODE=$MODE (${POSTGRES_DB})..."
 psql "$PSQL_DATABASE_URL" -v ON_ERROR_STOP=1 <<'SQL'
