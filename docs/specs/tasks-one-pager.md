@@ -1,5 +1,9 @@
 # Tasks App One-Pager Spec
 
+> Canonical source of truth for Tasks App scope and milestones.
+> Any derived docs (handoffs, status summaries, PR notes) must reference this file and must not redefine milestones.
+
+
 ## 1) Problem / Why now
 Tom needs a focused, low-friction task management surface that helps him and future collaborators capture, prioritize, and complete work without getting trapped in heavyweight project tooling. Right now, the repo has architecture scaffolding but no implemented product surface. Building `apps/tasks` as the first concrete surface creates immediate utility and validates the monorepo architecture early.
 
@@ -177,8 +181,14 @@ Boundary guidance:
    - `GET /tasks`, `GET /tasks/:id`, `GET /tags` + list UI with filters/sorting.
 3. **M3: Write API + board interactions**
    - `POST /tasks`, `PATCH /tasks/:id`, archive endpoint, drag-and-drop status updates.
-4. **M4: Hardening**
-   - Validation polish, error mapping, observability checks, E2E happy path.
+4. **M4: UI implementation against ACs**
+   - Build `apps/tasks` frontend against `services/tasks-api`.
+   - Deliver backlog list view with required filters + priority sorting.
+   - Deliver kanban board (`todo`/`doing`/`done`) with drag-and-drop status transitions.
+   - Deliver create/update/archive task flows from UI.
+5. **M5: Hardening / integration / CI**
+   - Validation/error handling polish, observability checks, integration hardening.
+   - Complete/maintain test baseline in CI (API integration + FE list/board component tests + one E2E happy path).
 
 ## 15) Acceptance criteria (V1)
 - User can create, update, and archive tasks from UI.
@@ -275,3 +285,14 @@ Boundary guidance:
 - Notifications, recurring tasks, and external integrations.
 - CLI interface for tasks management.
 - Production infra/deployment automation beyond local/dev baseline.
+
+### 16.9 M1 implementation status (completed)
+Implemented in `services/tasks-api`:
+- Express skeleton with health endpoints (`/health`, `/api/v1/health`)
+- Prisma schema for `Task`, `Tag`, `TaskTag`
+- Status enum locked to `todo|doing|done`
+- Archive-only support (`archivedAt`) and board ordering support (`statusChangedAt`)
+- Initial SQL migration checked in
+- Seed script checked in
+- `.env.example` + local setup instructions
+- Baseline tests: API health test + Prisma schema validation test

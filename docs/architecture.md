@@ -12,51 +12,102 @@
 - `packages/`
   - Shared code: types, domain libraries, UI primitives, tooling/config.
 - `infra/`
-  - Deployment/runtime environment definitions and infrastructure concerns.
+  - Runtime and environment orchestration definitions.
+  - Includes:
+    - `infra/docker-compose.dev.yml` for local Postgres
+    - `infra/tilt/Tiltfile` for local process orchestration
 - `docs/`
   - Specifications, architecture docs, and decision records.
 
-## Architectural intent
+## Local development runtime model (Phase 1)
 
-Separate concerns by runtime and ownership boundary:
-- **apps** optimize for user experience and product iteration,
-- **services** optimize for backend correctness and operability,
-- **packages** optimize for reuse and consistency,
-- **infra** captures environment/deployment concerns as code,
-- **docs** preserve rationale and execution context.
+We use a **hybrid local model** to optimize inner-loop speed while staying container-aligned:
 
-This keeps scaling predictable as more surfaces and teams are added.
+- **Postgres** runs in Docker (`infra/docker-compose.dev.yml`).
+- **tasks-api** runs on host (`npm run dev` in `services/tasks-api`).
+- **tasks app** runs on host (`npm run dev` in `apps/tasks`).
+- **Tilt** orchestrates all of the above via `infra/tilt/Tiltfile`.
 
-## Product trajectory
+### Why hybrid now
 
-### Phase 1: Focused surface (`tasks`)
-Deliver value quickly with a dedicated app surface and clear boundaries.
+- Faster code/test iteration for TypeScript services and UI than fully containerized hot-reload loops.
+- Reduced local setup overhead and fewer manually managed terminals.
+- Preserves a clean path to containerized cloud deployment later.
 
-### Phase 2: Aggregate shell (`mission-control`)
-Grow `apps/mission-control` into a unifying shell for cross-app workflows.
-`tasks` remains a first-class surface and can be embedded/linked/orchestrated by mission-control.
+## Language and implementation standards
 
-### Phase 3: Additional surfaces
-Add new app surfaces without collapsing boundaries; share capabilities via `packages` and `services`.
+- TypeScript is the repository standard for application and service code.
+- `services/tasks-api` is implemented in TypeScript and executed via `tsx` in development/runtime scripts.
+- JavaScript may remain only for tooling/bootstrap scripts where migration provides no product value (for example, Prisma seed scripts), unless explicitly promoted into app/service runtime paths.
 
-## Default stack policy (current)
+## Data ownership and schema boundaries
 
-For `apps/tasks`, default technology choices are:
-- Frontend: **Vite + React**
-- Backend API: **Express**
-- ORM: **Prisma**
-- Database: **Postgres**
+Local dev currently uses a **single shared Postgres instance** by default.
 
-Deviation policy:
-- Alternatives are allowed only with an explicit tradeoff note (why change, pros/cons, migration impact)
-- Deviation requires Tom's approval before implementation
+Boundary rules:
+
+- Each service owns its own schema and migration lifecycle.
+- Current API ownership schema: `tasks_api`.
+- Reserved app-side schema boundary: `tasks_app`.
+- No cross-service table ownership.
+- Cross-service reads/writes must happen through service APIs/contracts, not direct table access.
+
+`./scripts/dev/reset-db.sh` enforces this baseline by recreating service schemas and rerunning API migrations/seeds.
+
+## Tilt role in the stack
+
+`infra/tilt/Tiltfile` is the local orchestration entrypoint for developer UX.
+
+Responsibilities:
+
+- Bring up Postgres through Docker Compose.
+- Start host-run `tasks-api` after Postgres.
+- Start host-run `tasks-app` after API.
+- Provide unified status/logs with explicit dependency ordering (`db -> api -> app`).
+
+Developer command scripts (source of truth):
+
+- `./scripts/dev/up.sh` (starts Colima if required, then runs Tilt)
+- `./scripts/dev/down.sh` (tears down Tilt + compose resources)
+- `./scripts/dev/reset-db.sh` (schema reset + migrate + seed)
+
+## CI strategy (Phase 1)
+
+GitHub Actions (`.github/workflows/ci.yml`) runs test suites on hosted runners with a Postgres service container for integration coverage.
+
+- `tasks-api tests (unit + db integration)`
+  - Runs `npm test` for fast endpoint/schema checks.
+  - Runs `prisma migrate deploy` + `prisma db seed`.
+  - Runs DB-backed API integration tests against runner Postgres.
+- `tasks app tests`
+  - Runs component/unit tests (`npm test`).
+- `tasks app e2e (ui + api + db)`
+  - Boots Postgres service in CI.
+  - Migrates + seeds API schema.
+  - Starts `tasks-api` on the runner.
+  - Runs Playwright e2e against real app -> API -> Postgres flow (no route mocks).
+
+### CI principles in this phase
+
+- Catch integration drift in CI, not just locally.
+- Keep runtime reasonable via runner service containers and targeted integration specs.
+- **Tilt is local-only orchestration**; GitHub CI does not require Tilt and does not invoke it.
+
+## Phased path to cloud/container maturity
+
+### Implemented now (Phase A)
+- Hybrid local runtime with Compose + Tilt + host-run app/api.
+- Shared Postgres with explicit schema ownership boundaries.
+- CI lanes for current API, app, and app e2e suites.
+
+### Next (Phase B)
+- Build/publish container images for services/apps.
+- Add DB-backed integration lane(s) in CI where tests require it.
+- Add baseline deployment manifests/charts (k8s/helm) for cloud path.
 
 ## Guardrails
 
 - Keep this repository spec-first for non-trivial work.
 - Avoid coupling app-specific logic into shared packages unless genuinely reusable.
 - Prefer independently deployable surfaces and services where practical.
-
-## Current state
-
-This repo currently contains scaffolding and documentation only; implementation is intentionally deferred.
+- Keep `scripts/dev/*` as operational source of truth; wrappers (e.g., Makefile aliases) must call scripts rather than duplicate logic.
