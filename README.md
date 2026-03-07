@@ -42,8 +42,8 @@ This installs local tooling (`colima`, `docker` CLI, `tilt`, `node` if missing) 
 
 | Mode | Compose project | Postgres | API | App | Tilt control port | API base URL |
 | --- | --- | --- | --- | --- | --- | --- |
-| `dev` | `sindustries-dev` | `localhost:5432` (`sindustries_dev`) | `localhost:4000` | `localhost:5173` | `10350` | `http://localhost:4000/api/v1` |
-| `prodlike` | `sindustries-prodlike` | `localhost:5433` (`sindustries_prodlike`) | `localhost:4001` | `localhost:5174` | `10351` | `http://localhost:4001/api/v1` |
+| `dev` | `sindustries-dev` | `localhost:6432` (`sindustries_dev`) | `localhost:4000` | `localhost:5173` | `10350` | `http://localhost:4000/api/v1` |
+| `prodlike` | `sindustries-prodlike` | `localhost:7432` (`sindustries_prodlike`) | `localhost:4001` | `localhost:5174` | `10351` | `http://localhost:4001/api/v1` |
 
 ### Start stacks
 

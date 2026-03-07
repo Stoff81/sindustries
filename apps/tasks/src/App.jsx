@@ -39,7 +39,9 @@ function normalizeTaskForEditor(task) {
     priority: task.priority ?? 'medium',
     assignee: task.assignee ?? '',
     dueAt: task.dueAt ? String(task.dueAt).slice(0, 10) : '',
-    tagsText: Array.isArray(task.tags) ? task.tags.map((tag) => tag.name ?? tag).join(', ') : ''
+    tagsText: Array.isArray(task.tags) ? task.tags.map((tag) => tag.name ?? tag).join(', ') : '',
+    blocked: task.blocked ?? false,
+    ready: task.ready ?? false
   };
 }
 
@@ -115,6 +117,25 @@ function TaskEditor({ task, onSave, onArchive, onClose }) {
           <span className="small">Tags (comma separated)</span>
           <input className="edit-control" value={draft.tagsText} onChange={(e) => update('tagsText', e.target.value)} placeholder="api, ui, urgent" />
         </label>
+
+        <div className="editor-toggles">
+          <label className="toggle-label">
+            <input
+              type="checkbox"
+              checked={draft.blocked}
+              onChange={(e) => update('blocked', e.target.checked)}
+            />
+            <span>Blocked</span>
+          </label>
+          <label className="toggle-label">
+            <input
+              type="checkbox"
+              checked={draft.ready}
+              onChange={(e) => update('ready', e.target.checked)}
+            />
+            <span>Ready</span>
+          </label>
+        </div>
       </div>
 
       <div className="actions editor-actions">
@@ -131,7 +152,9 @@ function TaskEditor({ task, onSave, onArchive, onClose }) {
               tags: draft.tagsText
                 .split(',')
                 .map((tag) => tag.trim())
-                .filter(Boolean)
+                .filter(Boolean),
+              blocked: draft.blocked,
+              ready: draft.ready
             })
           }
         >
@@ -153,7 +176,7 @@ export function App() {
   const [view, setView] = useState('board');
   const [selectedId, setSelectedId] = useState(null);
   const [filters, setFilters] = useState({ q: '', status: '', priority: '', includeArchived: false });
-  const [newTask, setNewTask] = useState({ title: '', expanded: false, description: '', priority: 'medium', assignee: '', dueAt: '', tagsText: '' });
+  const [newTask, setNewTask] = useState({ title: '', expanded: false, description: '', priority: 'medium', assignee: '', dueAt: '', tagsText: '', blocked: false, ready: false });
   const [error, setError] = useState('');
   const [confettiBursts, setConfettiBursts] = useState([]);
   const confettiTimeoutsRef = useRef(new Map());
@@ -215,11 +238,13 @@ export function App() {
           tags: newTask.tagsText
             .split(',')
             .map((tag) => tag.trim())
-            .filter(Boolean)
+            .filter(Boolean),
+          blocked: newTask.blocked,
+          ready: newTask.ready
         })
       });
 
-      setNewTask({ title: '', expanded: false, description: '', priority: 'medium', assignee: '', dueAt: '', tagsText: '' });
+      setNewTask({ title: '', expanded: false, description: '', priority: 'medium', assignee: '', dueAt: '', tagsText: '', blocked: false, ready: false });
       await loadTasks();
     } catch (e) {
       setError(e.message);
@@ -466,6 +491,25 @@ export function App() {
               </label>
             </div>
 
+            <div className="editor-toggles">
+              <label className="toggle-label">
+                <input
+                  type="checkbox"
+                  checked={newTask.blocked}
+                  onChange={(e) => setNewTask((current) => ({ ...current, blocked: e.target.checked }))}
+                />
+                <span>Blocked</span>
+              </label>
+              <label className="toggle-label">
+                <input
+                  type="checkbox"
+                  checked={newTask.ready}
+                  onChange={(e) => setNewTask((current) => ({ ...current, ready: e.target.checked }))}
+                />
+                <span>Ready</span>
+              </label>
+            </div>
+
             <div className="actions">
               <button type="submit" className="primary-btn font-display">Create task</button>
             </div>
@@ -484,7 +528,7 @@ export function App() {
                 const assignee = task.assignee ?? 'Unassigned';
                 return (
                   <li key={task.id}>
-                    <article className={`task-card ${task.archivedAt ? 'archived' : ''} card-tilt-${index % 3}`}>
+                    <article className={`task-card ${task.archivedAt ? 'archived' : ''} ${task.blocked ? 'blocked' : ''} ${task.ready ? 'ready' : ''} card-tilt-${index % 3}`}>
                       <div className="task-row">
                         <button className="task-title-btn" onClick={() => setSelectedId(isSelected ? null : task.id)}>
                           {task.title}
@@ -541,7 +585,7 @@ export function App() {
                         <li key={task.id}>
                           <article
                             data-testid={`card-${task.id}`}
-                            className={`board-card card-tilt-${index % 3}`}
+                            className={`board-card ${task.blocked ? 'blocked' : ''} ${task.ready ? 'ready' : ''} card-tilt-${index % 3}`}
                             draggable
                             onDragStart={(e) => e.dataTransfer.setData('text/plain', task.id)}
                           >

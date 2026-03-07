@@ -6,6 +6,21 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 # shellcheck source=./mode-env.sh
 source "$ROOT_DIR/scripts/dev/mode-env.sh"
 
+expected_db_port_for_api_port() {
+  case "$1" in
+    4000) echo "6432" ;;
+    4001) echo "7432" ;;
+    *) echo "" ;;
+  esac
+}
+
+EXPECTED_DB_PORT="$(expected_db_port_for_api_port "$TASKS_API_PORT")"
+if [[ -n "$EXPECTED_DB_PORT" && "$POSTGRES_PORT" != "$EXPECTED_DB_PORT" ]]; then
+  echo "Unsafe mode configuration: API port $TASKS_API_PORT expects DB port $EXPECTED_DB_PORT, got $POSTGRES_PORT." >&2
+  echo "Check scripts/dev/mode-env.sh before starting the stack." >&2
+  exit 1
+fi
+
 if ! command -v colima >/dev/null 2>&1; then
   echo "colima is required but not installed." >&2
   exit 1

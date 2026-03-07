@@ -18,6 +18,12 @@ PSQL_ADMIN_URL="${PSQL_DATABASE_URL%/*}/postgres"
 
 SEED_DB="${SEED_DB:-$RESET_DB_SEED_DEFAULT}"
 
+if [[ "$MODE" == "prodlike" && "$SEED_DB" == "true" ]]; then
+  echo "Refusing to seed prodlike: SEED_DB=true is blocked for MODE=prodlike." >&2
+  echo "This guard is intentional to prevent destructive data loss." >&2
+  exit 1
+fi
+
 compose_cmd() {
   if docker compose version >/dev/null 2>&1; then
     docker compose "$@"

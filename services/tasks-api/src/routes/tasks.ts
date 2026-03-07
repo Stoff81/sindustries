@@ -62,6 +62,8 @@ function mapTask(task) {
     completedAt: task.completedAt,
     assignee: task.assignee,
     archivedAt: task.archivedAt,
+    blocked: task.blocked ?? false,
+    ready: task.ready ?? false,
     createdAt: task.createdAt,
     updatedAt: task.updatedAt,
     tags: task.tags?.map((taskTag) => taskTag.tag?.name).filter(Boolean) ?? []
@@ -283,6 +285,8 @@ tasksRouter.post('/tasks', async (req, res, next) => {
     const assignee = normalizeString(req.body?.assignee) || null;
     const dueAt = req.body?.dueAt ? parseDate(req.body.dueAt) : null;
     const tags = normalizeTags(req.body?.tags);
+    const blocked = req.body?.blocked ?? false;
+    const ready = req.body?.ready ?? false;
 
     if (!title) return badRequest(res, 'TITLE_REQUIRED', 'title is required');
     if (!validStatuses.has(status)) return badRequest(res, 'INVALID_STATUS_VALUE', 'Invalid status value');
@@ -303,6 +307,8 @@ tasksRouter.post('/tasks', async (req, res, next) => {
         dueAt,
         statusChangedAt: now,
         completedAt: status === 'done' ? now : null,
+        blocked,
+        ready,
         tags: {
           create: tagRecords.map((tag) => ({ tag: { connect: { id: tag.id } } }))
         }
@@ -365,6 +371,14 @@ tasksRouter.patch('/tasks/:id', async (req, res, next) => {
         if (!dueAt) return badRequest(res, 'INVALID_DUE_AT', 'Invalid dueAt value');
         updates.dueAt = dueAt;
       }
+    }
+
+    if (req.body?.blocked !== undefined) {
+      updates.blocked = Boolean(req.body.blocked);
+    }
+
+    if (req.body?.ready !== undefined) {
+      updates.ready = Boolean(req.body.ready);
     }
 
     const updated = await prisma.task.update({
