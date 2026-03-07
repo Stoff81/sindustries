@@ -229,6 +229,11 @@ input, select, textarea {
   color: var(--line);
 }
 
+.auto-grow-textarea {
+  resize: none;
+  overflow: hidden;
+}
+
 .select-wrap {
   position: relative;
   display: block;
@@ -315,13 +320,22 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel); outline:
 
 .editor {
   margin-top: 10px;
-  border-top: 2px dashed var(--muted);
-  padding-top: 10px;
   display: grid;
+  gap: 8px;
+}
+.editor-fields {
+  display: grid;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-top: 2px dashed var(--muted);
+  border-bottom: 2px dashed var(--muted);
   gap: 8px;
 }
 .editor-grid { display: grid; gap: 8px; grid-template-columns: repeat(4, minmax(120px, 1fr)); }
 .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.editor-actions {
+  padding-top: 4px;
+}
 
 .board-wrap { overflow-x: auto; margin-top: 8px; }
 .board {

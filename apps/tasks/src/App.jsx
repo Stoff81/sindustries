@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import './App.css';
 
 const API_BASE = import.meta.env.VITE_TASKS_API_BASE_URL ?? 'http://localhost:3000/api/v1';
@@ -31,10 +31,18 @@ function normalizeTaskForEditor(task) {
 
 function TaskEditor({ task, onSave, onArchive, onClose }) {
   const [draft, setDraft] = useState(() => normalizeTaskForEditor(task));
+  const descriptionRef = useRef(null);
 
   useEffect(() => {
     setDraft(normalizeTaskForEditor(task));
   }, [task]);
+
+  useEffect(() => {
+    const textarea = descriptionRef.current;
+    if (!textarea) return;
+    textarea.style.height = 'auto';
+    textarea.style.height = `${textarea.scrollHeight}px`;
+  }, [draft.description]);
 
   function update(field, value) {
     setDraft((current) => ({ ...current, [field]: value }));
@@ -42,50 +50,58 @@ function TaskEditor({ task, onSave, onArchive, onClose }) {
 
   return (
     <div className="editor">
-      <label>
-        <span className="small">Title</span>
-        <input className="edit-control" aria-label="Detail title" value={draft.title} onChange={(e) => update('title', e.target.value)} />
-      </label>
-
-      <label>
-        <span className="small">Description</span>
-        <textarea className="edit-control" value={draft.description} rows={4} onChange={(e) => update('description', e.target.value)} />
-      </label>
-
-      <div className="editor-grid">
+      <div className="editor-fields">
         <label>
-          <span className="small">Status</span>
-          <select className="edit-control" aria-label="Detail status" value={draft.status} onChange={(e) => update('status', e.target.value)}>
-            {STATUSES.map((status) => (
-              <option key={status} value={status}>{status}</option>
-            ))}
-          </select>
+          <span className="small">Title</span>
+          <input className="edit-control" aria-label="Detail title" value={draft.title} onChange={(e) => update('title', e.target.value)} />
         </label>
 
         <label>
-          <span className="small">Priority</span>
-          <select className="edit-control" aria-label="Detail priority" value={draft.priority} onChange={(e) => update('priority', e.target.value)}>
-            {PRIORITIES.map((priority) => (
-              <option key={priority} value={priority}>{priority}</option>
-            ))}
-          </select>
+          <span className="small">Description</span>
+          <textarea
+            ref={descriptionRef}
+            className="edit-control auto-grow-textarea"
+            value={draft.description}
+            rows={1}
+            onChange={(e) => update('description', e.target.value)}
+          />
         </label>
 
-        <label>
-          <span className="small">Assignee</span>
-          <input className="edit-control" value={draft.assignee} onChange={(e) => update('assignee', e.target.value)} />
-        </label>
+        <div className="editor-grid">
+          <label>
+            <span className="small">Status</span>
+            <select className="edit-control" aria-label="Detail status" value={draft.status} onChange={(e) => update('status', e.target.value)}>
+              {STATUSES.map((status) => (
+                <option key={status} value={status}>{status}</option>
+              ))}
+            </select>
+          </label>
+
+          <label>
+            <span className="small">Priority</span>
+            <select className="edit-control" aria-label="Detail priority" value={draft.priority} onChange={(e) => update('priority', e.target.value)}>
+              {PRIORITIES.map((priority) => (
+                <option key={priority} value={priority}>{priority}</option>
+              ))}
+            </select>
+          </label>
+
+          <label>
+            <span className="small">Assignee</span>
+            <input className="edit-control" value={draft.assignee} onChange={(e) => update('assignee', e.target.value)} />
+          </label>
+
+          <label>
+            <span className="small">Due date</span>
+            <input className="edit-control" type="date" value={draft.dueAt} onChange={(e) => update('dueAt', e.target.value)} />
+          </label>
+        </div>
 
         <label>
-          <span className="small">Due date</span>
-          <input className="edit-control" type="date" value={draft.dueAt} onChange={(e) => update('dueAt', e.target.value)} />
+          <span className="small">Tags (comma separated)</span>
+          <input className="edit-control" value={draft.tagsText} onChange={(e) => update('tagsText', e.target.value)} placeholder="api, ui, urgent" />
         </label>
       </div>
-
-      <label>
-        <span className="small">Tags (comma separated)</span>
-        <input className="edit-control" value={draft.tagsText} onChange={(e) => update('tagsText', e.target.value)} placeholder="api, ui, urgent" />
-      </label>
 
       <div className="actions editor-actions">
         <button
@@ -120,7 +136,7 @@ function assigneeInitial(assignee) {
 
 export function App() {
   const [tasks, setTasks] = useState([]);
-  const [view, setView] = useState('backlog');
+  const [view, setView] = useState('board');
   const [selectedId, setSelectedId] = useState(null);
   const [filters, setFilters] = useState({ q: '', status: '', priority: '', includeArchived: false });
   const [newTask, setNewTask] = useState({ title: '', expanded: false, description: '', priority: 'medium', assignee: '', dueAt: '', tagsText: '' });
