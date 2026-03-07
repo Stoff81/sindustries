@@ -7,6 +7,34 @@ const priorities = ['low', 'medium', 'high', 'urgent'];
 const assignees = ['Tom', 'Quinn', 'Rowan', null];
 const tagNames = ['ops', 'product', 'finance', 'family', 'health', 'automation', 'backend', 'frontend'];
 
+function assertSafeSeedTarget() {
+  const databaseUrl = process.env.DATABASE_URL ?? '';
+  const mode = (process.env.MODE ?? '').toLowerCase();
+
+  if (!databaseUrl) {
+    throw new Error('DATABASE_URL is required to run seed safely.');
+  }
+
+  let parsed = null;
+  try {
+    parsed = new URL(databaseUrl);
+  } catch {
+    throw new Error('DATABASE_URL is invalid; refusing to run seed.');
+  }
+
+  const dbName = parsed.pathname.replace(/^\//, '').toLowerCase();
+  const isProdlikeByName = dbName.includes('prodlike');
+  const isProdlikeByPort = parsed.hostname === 'localhost' && parsed.port === '5433';
+  const isProdlikeByMode = mode === 'prodlike';
+
+  if (isProdlikeByName || isProdlikeByPort || isProdlikeByMode) {
+    throw new Error(
+      `Refusing to seed prodlike database (${dbName || 'unknown'} at ${parsed.host}). ` +
+      'Seeding prodlike is permanently blocked.'
+    );
+  }
+}
+
 function daysAgo(days) {
   const d = new Date();
   d.setDate(d.getDate() - days);
@@ -14,6 +42,8 @@ function daysAgo(days) {
 }
 
 async function main() {
+  assertSafeSeedTarget();
+
   await prisma.taskTag.deleteMany();
   await prisma.task.deleteMany();
   await prisma.tag.deleteMany();
