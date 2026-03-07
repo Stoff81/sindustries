@@ -8,7 +8,7 @@ case "$MODE" in
     export MODE
     export COMPOSE_PROJECT_NAME="sindustries-dev"
     export STACK_LABEL="dev"
-    export POSTGRES_PORT="5432"
+    export POSTGRES_PORT="6432"
     export TASKS_API_PORT="4000"
     export TASKS_APP_PORT="5173"
     export TILT_PORT="10350"
@@ -23,7 +23,7 @@ case "$MODE" in
     export MODE
     export COMPOSE_PROJECT_NAME="sindustries-prodlike"
     export STACK_LABEL="prodlike"
-    export POSTGRES_PORT="5433"
+    export POSTGRES_PORT="7432"
     export TASKS_API_PORT="4001"
     export TASKS_APP_PORT="5174"
     export TILT_PORT="10351"
