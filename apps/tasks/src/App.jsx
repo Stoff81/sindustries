@@ -105,7 +105,7 @@ function TaskEditor({ task, onSave, onArchive, onClose }) {
 
       <div className="actions editor-actions">
         <button
-          className="primary-btn"
+          className="primary-btn font-display"
           onClick={() =>
             onSave({
               title: draft.title.trim(),
@@ -123,7 +123,7 @@ function TaskEditor({ task, onSave, onArchive, onClose }) {
         >
           Save changes
         </button>
-        <button className="secondary-btn" onClick={onArchive}>Archive task</button>
+        <button className="secondary-btn font-display" onClick={onArchive}>Archive task</button>
         <button className="tertiary-btn" onClick={onClose}>Close</button>
       </div>
     </div>
@@ -224,7 +224,7 @@ export function App() {
         <div className="hero-pattern" aria-hidden="true" />
         <div className="hero-content">
           <div className="brand-wrap">
-            <span className="brand">Pulse</span>
+            <span className="brand font-display">Pulse</span>
           </div>
           <div className="hero-controls">
             <label className="search-wrap" aria-label="Search tasks">
@@ -238,7 +238,7 @@ export function App() {
             </label>
             <button className={`nav-btn ${view === 'backlog' ? 'active' : ''}`} onClick={() => setView('backlog')}>Backlog</button>
             <button className={`nav-btn ${view === 'board' ? 'active' : ''}`} onClick={() => setView('board')}>Kanban</button>
-            <button type="button" className="primary-btn" onClick={() => setNewTask((current) => ({ ...current, expanded: true }))}>+ New Task</button>
+            <button type="button" className="primary-btn font-display" onClick={() => setNewTask((current) => ({ ...current, expanded: true }))}>+ New Task</button>
           </div>
         </div>
       </header>
@@ -280,7 +280,7 @@ export function App() {
         {newTask.expanded ? (
           <form onSubmit={createTask} className="task-card stack create-card" aria-label="New task form">
             <div className="task-create-header">
-              <h2>New Task</h2>
+              <h2 className="font-display">New Task</h2>
               <button
                 type="button"
                 className="ghost-btn"
@@ -328,7 +328,7 @@ export function App() {
             </div>
 
             <div className="actions">
-              <button type="submit" className="primary-btn">Create task</button>
+              <button type="submit" className="primary-btn font-display">Create task</button>
             </div>
           </form>
         ) : null}
@@ -392,7 +392,7 @@ export function App() {
                   }}
                 >
                   <div className="column-head">
-                    <h3>{status}</h3>
+                    <h3 className="font-display">{status}</h3>
                     <span className="count-pill">{boardColumns[status].length}</span>
                   </div>
                   <ol>
@@ -433,7 +433,7 @@ export function App() {
 
       <nav className="mobile-nav" aria-label="Primary">
         <button className={view === 'backlog' ? 'active' : ''} onClick={() => setView('backlog')}>List</button>
-        <button className="fab" onClick={() => setNewTask((current) => ({ ...current, expanded: true }))}>＋</button>
+        <button className="fab font-display" onClick={() => setNewTask((current) => ({ ...current, expanded: true }))}>＋</button>
         <button className={view === 'board' ? 'active' : ''} onClick={() => setView('board')}>Board</button>
       </nav>
     </main>
