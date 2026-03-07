@@ -5,6 +5,20 @@ const API_BASE = import.meta.env.VITE_TASKS_API_BASE_URL ?? 'http://localhost:30
 const STATUSES = ['todo', 'doing', 'done'];
 const PRIORITIES = ['urgent', 'high', 'medium', 'low'];
 const PRIORITY_SCORE = { urgent: 0, high: 1, medium: 2, low: 3 };
+const CONFETTI_COLORS = ['#ffc935', '#00d4ff', '#ff3e8a', '#31c76a', '#f3f1ec', '#7d5dff'];
+
+function createConfettiPieces(pieceCount = 120) {
+  return Array.from({ length: pieceCount }, (_, index) => ({
+    id: index,
+    color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
+    startX: 5 + Math.random() * 90,
+    drift: -180 + Math.random() * 360,
+    rotation: -520 + Math.random() * 1040,
+    size: 6 + Math.random() * 8,
+    duration: 1200 + Math.random() * 1300,
+    delay: Math.random() * 220
+  }));
+}
 
 async function api(path, options) {
   const response = await fetch(`${API_BASE}${path}`, {
@@ -141,6 +155,9 @@ export function App() {
   const [filters, setFilters] = useState({ q: '', status: '', priority: '', includeArchived: false });
   const [newTask, setNewTask] = useState({ title: '', expanded: false, description: '', priority: 'medium', assignee: '', dueAt: '', tagsText: '' });
   const [error, setError] = useState('');
+  const [confettiBursts, setConfettiBursts] = useState([]);
+  const confettiTimeoutsRef = useRef(new Map());
+  const audioContextRef = useRef(null);
 
 
   async function loadTasks() {
@@ -157,6 +174,18 @@ export function App() {
   useEffect(() => {
     loadTasks().catch((e) => setError(e.message));
   }, [filters.q, filters.status, filters.priority, filters.includeArchived]);
+
+  useEffect(() => {
+    return () => {
+      for (const timeoutId of confettiTimeoutsRef.current.values()) {
+        window.clearTimeout(timeoutId);
+      }
+      confettiTimeoutsRef.current.clear();
+      if (audioContextRef.current) {
+        audioContextRef.current.close().catch(() => {});
+      }
+    };
+  }, []);
 
   const boardColumns = useMemo(() => {
     const columns = { todo: [], doing: [], done: [] };
@@ -218,13 +247,123 @@ export function App() {
     }
   }
 
+  async function playSalesBell() {
+    try {
+      const AudioContextCtor = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextCtor) return;
+
+      if (!audioContextRef.current) {
+        audioContextRef.current = new AudioContextCtor();
+      }
+
+      const context = audioContextRef.current;
+      if (context.state === 'suspended') {
+        await context.resume();
+      }
+
+      const now = context.currentTime + 0.02;
+      const notes = [523.25, 659.25, 783.99, 1046.5];
+
+      notes.forEach((frequency, index) => {
+        const start = now + index * 0.09;
+        const duration = 0.24;
+
+        const lead = context.createOscillator();
+        const leadGain = context.createGain();
+        lead.type = 'square';
+        lead.frequency.setValueAtTime(frequency, start);
+        leadGain.gain.setValueAtTime(0.001, start);
+        leadGain.gain.exponentialRampToValueAtTime(0.17, start + 0.02);
+        leadGain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+        lead.connect(leadGain);
+        leadGain.connect(context.destination);
+        lead.start(start);
+        lead.stop(start + duration + 0.03);
+
+        const shimmer = context.createOscillator();
+        const shimmerGain = context.createGain();
+        shimmer.type = 'triangle';
+        shimmer.frequency.setValueAtTime(frequency * 2, start);
+        shimmerGain.gain.setValueAtTime(0.001, start);
+        shimmerGain.gain.exponentialRampToValueAtTime(0.06, start + 0.02);
+        shimmerGain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+        shimmer.connect(shimmerGain);
+        shimmerGain.connect(context.destination);
+        shimmer.start(start);
+        shimmer.stop(start + duration + 0.03);
+      });
+    } catch {
+      // No-op on browsers that block or lack Web Audio.
+    }
+  }
+
+  function launchPulseCelebration() {
+    void playSalesBell();
+
+    const id = window.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`;
+    const pieces = createConfettiPieces();
+    setConfettiBursts((current) => [...current, { id, pieces }]);
+
+    const timeoutId = window.setTimeout(() => {
+      setConfettiBursts((current) => current.filter((burst) => burst.id !== id));
+      confettiTimeoutsRef.current.delete(id);
+    }, 2800);
+
+    confettiTimeoutsRef.current.set(id, timeoutId);
+  }
+
+  function updatePulseHoverMotion(event) {
+    const element = event.currentTarget;
+    const bounds = element.getBoundingClientRect();
+    if (!bounds.width || !bounds.height) return;
+
+    const x = Math.min(Math.max((event.clientX - bounds.left) / bounds.width, 0), 1);
+    const y = Math.min(Math.max((event.clientY - bounds.top) / bounds.height, 0), 1);
+    const centerX = x - 0.5;
+    const centerY = y - 0.5;
+    const distance = Math.min(Math.hypot(centerX, centerY), 0.75);
+
+    const sway = centerX * 11;
+    const lift = 3 + Math.abs(centerY) * 7;
+    const speed = 460 + Math.round(distance * 360);
+
+    element.style.setProperty('--pulse-tilt', `${(centerX * 5.5).toFixed(2)}deg`);
+    element.style.setProperty('--pulse-sway-a', `${sway.toFixed(2)}px`);
+    element.style.setProperty('--pulse-sway-b', `${(-sway * 0.72).toFixed(2)}px`);
+    element.style.setProperty('--pulse-up-a', `-${lift.toFixed(2)}px`);
+    element.style.setProperty('--pulse-up-b', `-${(lift + 1.8).toFixed(2)}px`);
+    element.style.setProperty('--pulse-down', `${(centerY * 1.6).toFixed(2)}px`);
+    element.style.setProperty('--pulse-speed', `${speed}ms`);
+  }
+
+  function resetPulseHoverMotion(event) {
+    const element = event.currentTarget;
+    element.style.removeProperty('--pulse-tilt');
+    element.style.removeProperty('--pulse-sway-a');
+    element.style.removeProperty('--pulse-sway-b');
+    element.style.removeProperty('--pulse-up-a');
+    element.style.removeProperty('--pulse-up-b');
+    element.style.removeProperty('--pulse-down');
+    element.style.removeProperty('--pulse-speed');
+  }
+
   return (
     <main className="app-shell">
       <header className="hero-header">
         <div className="hero-pattern" aria-hidden="true" />
         <div className="hero-content">
           <div className="brand-wrap">
-            <span className="brand font-display">Pulse</span>
+            <button
+              type="button"
+              className="brand brand-btn font-display"
+              onClick={launchPulseCelebration}
+              onPointerEnter={updatePulseHoverMotion}
+              onPointerMove={updatePulseHoverMotion}
+              onPointerLeave={resetPulseHoverMotion}
+              aria-label="Ring Pulse sales bell"
+            >
+              Pulse
+            </button>
           </div>
           <div className="hero-controls">
             <label className="search-wrap" aria-label="Search tasks">
@@ -436,6 +575,28 @@ export function App() {
         <button className="fab font-display" onClick={() => setNewTask((current) => ({ ...current, expanded: true }))}>＋</button>
         <button className={view === 'board' ? 'active' : ''} onClick={() => setView('board')}>Board</button>
       </nav>
+
+      <div className="confetti-layer" aria-hidden="true">
+        {confettiBursts.map((burst) => (
+          <div key={burst.id} className="confetti-burst">
+            {burst.pieces.map((piece) => (
+              <span
+                key={`${burst.id}-${piece.id}`}
+                className="confetti-piece"
+                style={{
+                  '--confetti-color': piece.color,
+                  '--confetti-start-x': `${piece.startX}vw`,
+                  '--confetti-drift': `${piece.drift}px`,
+                  '--confetti-rotation': `${piece.rotation}deg`,
+                  '--confetti-size': `${piece.size}px`,
+                  '--confetti-duration': `${piece.duration}ms`,
+                  '--confetti-delay': `${piece.delay}ms`
+                }}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
     </main>
   );
 }
