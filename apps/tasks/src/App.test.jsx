@@ -23,6 +23,9 @@ describe('tasks ui', () => {
 
     render(<App />);
 
+    // Click Backlog button to switch from default Kanban view
+    fireEvent.click(screen.getByRole('button', { name: 'Backlog' }));
+
     expect(await screen.findByRole('list', { name: 'Backlog list' })).toBeInTheDocument();
     expect(screen.getByLabelText('Search')).toBeInTheDocument();
     expect(screen.getByLabelText('Status filter')).toBeInTheDocument();
@@ -65,6 +68,9 @@ describe('tasks ui', () => {
 
     render(<App />);
 
+    // Switch to Backlog view from default Kanban view
+    fireEvent.click(screen.getByRole('button', { name: 'Backlog' }));
+
     await screen.findByRole('list', { name: 'Backlog list' });
     fireEvent.click(screen.getByRole('button', { name: '+ New Task' }));
     fireEvent.change(screen.getByLabelText('New task title'), { target: { value: 'Created' } });
@@ -87,6 +93,9 @@ describe('tasks ui', () => {
     vi.stubGlobal('fetch', fetchMock);
 
     render(<App />);
+
+    // Switch to Backlog view from default Kanban view
+    fireEvent.click(screen.getByRole('button', { name: 'Backlog' }));
 
     await screen.findByRole('list', { name: 'Backlog list' });
     fireEvent.click(screen.getByRole('button', { name: 'Show archived' }));
