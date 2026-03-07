@@ -87,7 +87,7 @@ function TaskEditor({ task, onSave, onArchive, onClose }) {
         <input className="edit-control" value={draft.tagsText} onChange={(e) => update('tagsText', e.target.value)} placeholder="api, ui, urgent" />
       </label>
 
-      <div className="actions">
+      <div className="actions editor-actions">
         <button
           className="primary-btn"
           onClick={() =>
@@ -107,8 +107,8 @@ function TaskEditor({ task, onSave, onArchive, onClose }) {
         >
           Save changes
         </button>
-        <button className="danger-btn" onClick={onArchive}>Archive task</button>
-        <button className="ghost-btn" onClick={onClose}>Close</button>
+        <button className="secondary-btn" onClick={onArchive}>Archive task</button>
+        <button className="tertiary-btn" onClick={onClose}>Close</button>
       </div>
     </div>
   );
