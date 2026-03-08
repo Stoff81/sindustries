@@ -11,4 +11,7 @@ M4 implementation: React/Vite UI for backlog + kanban + create/update/archive fl
 
 ## Env
 
-- `VITE_TASKS_API_BASE_URL` (defaults to `http://localhost:3000/api/v1`)
+- `VITE_TASKS_API_BASE_URL`
+- Without an override, local defaults are inferred from the frontend port:
+- `5173 -> http://localhost:4000/api/v1`
+- `5174 -> http://localhost:4001/api/v1`

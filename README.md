@@ -76,6 +76,8 @@ make down MODE=dev
 make down MODE=prodlike
 ```
 
+`make up` and `make down` also clean up stale listeners on the mode-owned app, API, and Tilt ports before starting or after stopping the stack.
+
 ### Reset DB (mode-aware)
 
 Dev reset (includes seed by default):
