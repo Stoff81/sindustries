@@ -71,6 +71,22 @@ describe('tasks api endpoints', () => {
     expect(prismaMock.task.findMany).toHaveBeenCalledTimes(1);
   });
 
+  it('GET /api/v1/tasks includes archived tasks when requested', async () => {
+    prismaMock.task.findMany.mockResolvedValue([
+      task({ id: 'archived-task', title: 'Archived task', archivedAt: new Date('2026-03-03T00:00:00.000Z') })
+    ]);
+
+    const app = createApp();
+    const response = await request(app)
+      .get('/api/v1/tasks')
+      .query({ includeArchived: 'true' });
+
+    expect(response.status).toBe(200);
+    expect(response.body.data[0].archivedAt).toBeDefined();
+    expect(prismaMock.task.findMany).toHaveBeenCalledTimes(1);
+    expect(prismaMock.task.findMany.mock.calls[0][0].where).not.toHaveProperty('archivedAt');
+  });
+
   it('GET /api/v1/tasks validates bad status filter', async () => {
     const app = createApp();
 

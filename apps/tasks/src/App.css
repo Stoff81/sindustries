@@ -349,6 +349,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel); outline:
   will-change: transform;
 }
 .task-card.archived { opacity: 0.55; filter: grayscale(0.7); }
+.board-card.archived { opacity: 0.55; filter: grayscale(0.7); }
 .task-card.blocked { background: var(--pink); }
 .task-card.ready { border-color: var(--green); }
 .task-card.ready::before {
@@ -360,17 +361,18 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel); outline:
 }
 .board-card.blocked { background: var(--pink); }
 .board-card.ready { border-color: var(--green); }
-.board-card.ready::before {
-  content: '✓';
-  display: inline-block;
-  margin-right: 6px;
-  color: var(--green);
-  font-weight: 900;
-}
 .task-card:hover,
 .board-card:hover {
   transform: rotate(var(--card-hover-tilt)) translateY(-1px);
   box-shadow: 5px 5px 0 var(--panel-2);
+}
+.task-card.is-editing,
+.task-card:focus-within,
+.board-card.is-editing,
+.board-card:focus-within {
+  transform: none;
+  box-shadow: 4px 4px 0 var(--panel-2);
+  will-change: auto;
 }
 .card-tilt-0 { --card-tilt: -0.5deg; --card-hover-tilt: -0.9deg; }
 .card-tilt-1 { --card-tilt: 0.6deg; --card-hover-tilt: 1deg; }
@@ -482,8 +484,15 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel); outline:
   min-width: 0;
   overflow: hidden;
 }
+.board-card.is-editing,
+.board-card:focus-within {
+  overflow: visible;
+}
 .board-card .editor-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.board-card-row {
+  align-items: center;
 }
 .board-card-meta {
   margin-top: 8px;
@@ -492,6 +501,24 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel); outline:
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
+}
+.board-card-meta-right {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.ready-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  color: var(--green);
+  font-weight: 900;
+  font-size: 0.95rem;
+  line-height: 1;
 }
 
 .mobile-nav {

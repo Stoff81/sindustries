@@ -189,7 +189,7 @@ export function App() {
   const [tasks, setTasks] = useState([]);
   const [view, setView] = useState('board');
   const [selectedId, setSelectedId] = useState(null);
-  const [filters, setFilters] = useState({ q: '', status: '', priority: '', includeArchived: false, blocked: '', ready: '' });
+  const [filters, setFilters] = useState({ q: '', status: '', priority: '', includeArchived: false });
   const [newTask, setNewTask] = useState({ title: '', expanded: false, description: '', priority: 'medium', assignee: '', dueAt: '', tagsText: '', blocked: false, ready: false });
   const [error, setError] = useState('');
   const [confettiBursts, setConfettiBursts] = useState([]);
@@ -203,8 +203,6 @@ export function App() {
     if (filters.status) query.set('status', filters.status);
     if (filters.priority) query.set('priority', filters.priority);
     if (filters.includeArchived) query.set('includeArchived', 'true');
-    if (filters.blocked) query.set('blocked', filters.blocked);
-    if (filters.ready) query.set('ready', filters.ready);
 
     const response = await api(`/tasks?${query.toString()}`);
     setTasks(response.data);
@@ -212,7 +210,7 @@ export function App() {
 
   useEffect(() => {
     loadTasks().catch((e) => setError(e.message));
-  }, [filters.q, filters.status, filters.priority, filters.includeArchived, filters.blocked, filters.ready]);
+  }, [filters.q, filters.status, filters.priority, filters.includeArchived]);
 
   useEffect(() => {
     return () => {
@@ -449,28 +447,6 @@ export function App() {
               ))}
             </select>
           </label>
-          <label className="select-wrap">
-            <select
-              aria-label="Blocked filter"
-              value={filters.blocked}
-              onChange={(e) => setFilters((current) => ({ ...current, blocked: e.target.value }))}
-            >
-              <option value="">Blocked: Any</option>
-              <option value="true">Blocked: Yes</option>
-              <option value="false">Blocked: No</option>
-            </select>
-          </label>
-          <label className="select-wrap">
-            <select
-              aria-label="Ready filter"
-              value={filters.ready}
-              onChange={(e) => setFilters((current) => ({ ...current, ready: e.target.value }))}
-            >
-              <option value="">Ready: Any</option>
-              <option value="true">Ready: Yes</option>
-              <option value="false">Ready: No</option>
-            </select>
-          </label>
           <button
             className={`ghost-btn ${filters.includeArchived ? 'archived-active' : ''}`}
             onClick={() => setFilters((current) => ({ ...current, includeArchived: !current.includeArchived }))}
@@ -567,7 +543,7 @@ export function App() {
                 return (
                   <li key={task.id}>
                     <article 
-                      className={`task-card ${task.archivedAt ? 'archived' : ''} ${task.blocked ? 'blocked' : ''} ${task.ready ? 'ready' : ''} card-tilt-${index % 3}`}
+                      className={`task-card ${task.archivedAt ? 'archived' : ''} ${task.blocked ? 'blocked' : ''} ${task.ready ? 'ready' : ''} ${isSelected ? 'is-editing' : ''} card-tilt-${index % 3}`}
                       onClick={(e) => {
                         if (!isSelected) setSelectedId(task.id);
                       }}
@@ -633,11 +609,13 @@ export function App() {
                   <ol>
                     {boardColumns[status].map((task, index) => {
                       const isSelected = selectedId === task.id;
+                      const assigneeLetter = assigneeInitial(task.assignee);
+                      const assignee = task.assignee?.trim() || 'Unassigned';
                       return (
                         <li key={task.id}>
                           <article
                             data-testid={`card-${task.id}`}
-                            className={`board-card ${task.blocked ? 'blocked' : ''} ${task.ready ? 'ready' : ''} card-tilt-${index % 3}`}
+                            className={`board-card ${task.archivedAt ? 'archived' : ''} ${task.blocked ? 'blocked' : ''} ${task.ready ? 'ready' : ''} ${isSelected ? 'is-editing' : ''} card-tilt-${index % 3}`}
                             draggable={!isSelected}
                             onDragStart={(e) => {
                               if (!isSelected) e.dataTransfer.setData('text/plain', task.id);
@@ -649,18 +627,24 @@ export function App() {
                               }
                             }}
                           >
-                            <button 
-                              className="task-title-btn" 
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedId(isSelected ? null : task.id);
-                              }}
-                            >
-                              {task.title}
-                            </button>
+                            <div className="task-row board-card-row">
+                              <button 
+                                className="task-title-btn" 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedId(isSelected ? null : task.id);
+                                }}
+                              >
+                                {task.title}
+                              </button>
+                            </div>
                             <div className="board-card-meta">
                               <span className={`pill ${task.priority}`}>{task.priority}</span>
-                              <span className="small">{String(task.statusChangedAt).slice(0, 10)}</span>
+                              <div className="board-card-meta-right">
+                                {task.ready ? <span className="ready-dot" aria-label="Ready">✓</span> : null}
+                                {assigneeLetter ? <span className="avatar-dot" title={assignee} aria-label={`Assignee ${assignee}`}>{assigneeLetter}</span> : null}
+                                <span className="small">{String(task.statusChangedAt).slice(0, 10)}</span>
+                              </div>
                             </div>
                             {isSelected ? (
                               <TaskEditor

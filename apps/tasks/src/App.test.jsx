@@ -55,6 +55,23 @@ describe('tasks ui', () => {
     expect(cards[1]).toHaveTextContent('Newer');
   });
 
+  it('shows assignee avatar on collapsed kanban cards', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          data: [mockTask({ id: 'assigned', title: 'Assigned', assignee: 'Quinn' })]
+        })
+      })
+    );
+
+    render(<App />);
+
+    const card = await screen.findByTestId('card-assigned');
+    expect(within(card).getByLabelText('Assignee Quinn')).toHaveTextContent('Q');
+  });
+
   it('creates and archives a task from the UI', async () => {
     const fetchMock = vi
       .fn()
@@ -104,5 +121,28 @@ describe('tasks ui', () => {
       const callUrl = fetchMock.mock.calls[1][0];
       expect(callUrl).toContain('includeArchived=true');
     });
+  });
+
+  it('shows archived tasks on the kanban board when archived filter is enabled', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ data: [mockTask()] }) })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          data: [mockTask({ id: 'archived-task', title: 'Archived task', archivedAt: '2026-03-01T00:00:00.000Z' })]
+        })
+      });
+
+    vi.stubGlobal('fetch', fetchMock);
+
+    render(<App />);
+
+    await screen.findByTestId('column-todo');
+    fireEvent.click(screen.getByRole('button', { name: 'Show archived' }));
+
+    const archivedCard = await screen.findByTestId('card-archived-task');
+    expect(archivedCard).toHaveClass('archived');
+    expect(within(archivedCard).getByRole('button', { name: 'Archived task' })).toBeInTheDocument();
   });
 });
