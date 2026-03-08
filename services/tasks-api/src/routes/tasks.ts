@@ -112,6 +112,7 @@ tasksRouter.get('/tasks', async (req, res, next) => {
       dueAfter,
       blocked,
       ready,
+      includeArchived,
       limit: rawLimit,
       cursor,
       sort = 'priority'
@@ -147,7 +148,7 @@ tasksRouter.get('/tasks', async (req, res, next) => {
     const limit = parseLimit(rawLimit);
 
     const where = {
-      archivedAt: null,
+      ...(includeArchived === 'true' ? {} : { archivedAt: null }),
       ...(status ? { status } : {}),
       ...(priority ? { priority } : {}),
       ...(assignee ? { assignee: { equals: assignee, mode: 'insensitive' } } : {}),
