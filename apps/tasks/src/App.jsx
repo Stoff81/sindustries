@@ -1,15 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import './App.css';
-
-const DEFAULT_API_BASE_BY_PORT = {
-  '5173': 'http://localhost:4000/api/v1',
-  '5174': 'http://localhost:4001/api/v1'
-};
-
-const API_BASE =
-  import.meta.env.VITE_TASKS_API_BASE_URL
-  ?? DEFAULT_API_BASE_BY_PORT[window.location.port]
-  ?? 'http://localhost:4000/api/v1';
+import { useTasks } from './useTasks.js';
 const STATUSES = ['todo', 'doing', 'done'];
 const PRIORITIES = ['urgent', 'high', 'medium', 'low'];
 const PRIORITY_SCORE = { urgent: 0, high: 1, medium: 2, low: 3 };
@@ -26,17 +17,6 @@ function createConfettiPieces(pieceCount = 120) {
     duration: 1200 + Math.random() * 1300,
     delay: Math.random() * 220
   }));
-}
-
-async function api(path, options) {
-  const response = await fetch(`${API_BASE}${path}`, {
-    headers: { 'content-type': 'application/json', ...(options?.headers ?? {}) },
-    ...options
-  });
-
-  const body = await response.json();
-  if (!response.ok) throw new Error(body?.error?.message ?? 'Request failed');
-  return body;
 }
 
 function normalizeTaskForEditor(task) {
@@ -59,7 +39,7 @@ function TaskEditor({ task, onSave, onArchive, onClose }) {
 
   useEffect(() => {
     setDraft(normalizeTaskForEditor(task));
-  }, [task]);
+  }, [task.id]);
 
   useEffect(() => {
     const textarea = descriptionRef.current;
@@ -186,31 +166,23 @@ function assigneeInitial(assignee) {
 }
 
 export function App() {
-  const [tasks, setTasks] = useState([]);
   const [view, setView] = useState('board');
   const [selectedId, setSelectedId] = useState(null);
   const [filters, setFilters] = useState({ q: '', status: '', priority: '', includeArchived: false });
   const [newTask, setNewTask] = useState({ title: '', expanded: false, description: '', priority: 'medium', assignee: '', dueAt: '', tagsText: '', blocked: false, ready: false });
-  const [error, setError] = useState('');
   const [confettiBursts, setConfettiBursts] = useState([]);
   const confettiTimeoutsRef = useRef(new Map());
   const audioContextRef = useRef(null);
-
-
-  async function loadTasks() {
-    const query = new URLSearchParams({ sort: 'priority', limit: '100' });
-    if (filters.q) query.set('q', filters.q);
-    if (filters.status) query.set('status', filters.status);
-    if (filters.priority) query.set('priority', filters.priority);
-    if (filters.includeArchived) query.set('includeArchived', 'true');
-
-    const response = await api(`/tasks?${query.toString()}`);
-    setTasks(response.data);
-  }
-
-  useEffect(() => {
-    loadTasks().catch((e) => setError(e.message));
-  }, [filters.q, filters.status, filters.priority, filters.includeArchived]);
+  const {
+    tasks,
+    error,
+    createTask: createTaskRequest,
+    updateTask: patchTaskRequest,
+    archiveTask: archiveTaskRequest
+  } = useTasks(filters, {
+    pauseAutoRefresh: selectedId !== null,
+    refreshIntervalMs: 3000
+  });
 
   useEffect(() => {
     return () => {
@@ -239,51 +211,35 @@ export function App() {
 
   async function createTask(event) {
     event.preventDefault();
-    setError('');
     try {
-      await api('/tasks', {
-        method: 'POST',
-        body: JSON.stringify({
-          title: newTask.title.trim(),
-          description: newTask.description.trim() || null,
-          priority: newTask.priority,
-          dueAt: newTask.dueAt ? new Date(`${newTask.dueAt}T00:00:00`).toISOString() : null,
-          assignee: newTask.assignee.trim() || null,
-          tags: newTask.tagsText
-            .split(',')
-            .map((tag) => tag.trim())
-            .filter(Boolean),
-          blocked: newTask.blocked,
-          ready: newTask.ready
-        })
+      await createTaskRequest({
+        title: newTask.title.trim(),
+        description: newTask.description.trim() || null,
+        priority: newTask.priority,
+        dueAt: newTask.dueAt ? new Date(`${newTask.dueAt}T00:00:00`).toISOString() : null,
+        assignee: newTask.assignee.trim() || null,
+        tags: newTask.tagsText
+          .split(',')
+          .map((tag) => tag.trim())
+          .filter(Boolean),
+        blocked: newTask.blocked,
+        ready: newTask.ready
       });
-
       setNewTask({ title: '', expanded: false, description: '', priority: 'medium', assignee: '', dueAt: '', tagsText: '', blocked: false, ready: false });
-      await loadTasks();
-    } catch (e) {
-      setError(e.message);
-    }
+    } catch {}
   }
 
   async function patchTask(id, patch) {
-    setError('');
     try {
-      await api(`/tasks/${id}`, { method: 'PATCH', body: JSON.stringify(patch) });
-      await loadTasks();
-    } catch (e) {
-      setError(e.message);
-    }
+      await patchTaskRequest(id, patch);
+    } catch {}
   }
 
   async function archiveTask(id) {
-    setError('');
     try {
-      await api(`/tasks/${id}`, { method: 'DELETE' });
+      await archiveTaskRequest(id);
       setSelectedId(null);
-      await loadTasks();
-    } catch (e) {
-      setError(e.message);
-    }
+    } catch {}
   }
 
   async function playSalesBell() {

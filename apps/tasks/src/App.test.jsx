@@ -72,6 +72,34 @@ describe('tasks ui', () => {
     expect(within(card).getByLabelText('Assignee Quinn')).toHaveTextContent('Q');
   });
 
+  it('refreshes tasks when the window regains focus', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          data: [mockTask({ id: 'focus-task', title: 'Before refresh' })]
+        })
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          data: [mockTask({ id: 'focus-task', title: 'After refresh' })]
+        })
+      });
+
+    vi.stubGlobal('fetch', fetchMock);
+
+    render(<App />);
+
+    expect(await screen.findByRole('button', { name: 'Before refresh' })).toBeInTheDocument();
+
+    fireEvent(window, new Event('focus'));
+
+    expect(await screen.findByRole('button', { name: 'After refresh' })).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
   it('creates and archives a task from the UI', async () => {
     const fetchMock = vi
       .fn()
