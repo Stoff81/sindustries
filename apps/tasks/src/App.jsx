@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import './App.css';
 import { useTasks } from './useTasks.js';
+import { useTaskDrafts } from './useTaskDrafts.js';
 const STATUSES = ['todo', 'doing', 'done'];
 const PRIORITIES = ['urgent', 'high', 'medium', 'low'];
 const PRIORITY_SCORE = { urgent: 0, high: 1, medium: 2, low: 3 };
@@ -33,13 +34,8 @@ function normalizeTaskForEditor(task) {
   };
 }
 
-function TaskEditor({ task, onSave, onArchive, onClose }) {
-  const [draft, setDraft] = useState(() => normalizeTaskForEditor(task));
+function TaskEditor({ draft, isDirty, onDraftChange, onSave, onArchive, onClose }) {
   const descriptionRef = useRef(null);
-
-  useEffect(() => {
-    setDraft(normalizeTaskForEditor(task));
-  }, [task.id]);
 
   useEffect(() => {
     const textarea = descriptionRef.current;
@@ -49,7 +45,7 @@ function TaskEditor({ task, onSave, onArchive, onClose }) {
   }, [draft.description]);
 
   function update(field, value) {
-    setDraft((current) => ({ ...current, [field]: value }));
+    onDraftChange({ ...draft, [field]: value });
   }
 
   function stopPropagation(e) {
@@ -133,7 +129,7 @@ function TaskEditor({ task, onSave, onArchive, onClose }) {
       </div>
 
       <div className="actions editor-actions">
-        <button
+                <button
           className="primary-btn font-display"
           onClick={() =>
             onSave({
@@ -183,6 +179,13 @@ export function App() {
     pauseAutoRefresh: selectedId !== null,
     refreshIntervalMs: 3000
   });
+  const {
+    getDraft,
+    storeDraft,
+    clearDraft,
+    isTaskDirty,
+    hasUnsavedDrafts
+  } = useTaskDrafts(normalizeTaskForEditor, tasks);
 
   useEffect(() => {
     return () => {
@@ -195,6 +198,18 @@ export function App() {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (!hasUnsavedDrafts) return undefined;
+
+    function handleBeforeUnload(event) {
+      event.preventDefault();
+      event.returnValue = '';
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedDrafts]);
 
   const boardColumns = useMemo(() => {
     const columns = { todo: [], doing: [], done: [] };
@@ -232,14 +247,21 @@ export function App() {
   async function patchTask(id, patch) {
     try {
       await patchTaskRequest(id, patch);
-    } catch {}
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   async function archiveTask(id) {
     try {
       await archiveTaskRequest(id);
+      clearDraft(id);
       setSelectedId(null);
-    } catch {}
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   async function playSalesBell() {
@@ -494,6 +516,8 @@ export function App() {
             <ul aria-label="Backlog list" className="task-list">
               {tasks.map((task, index) => {
                 const isSelected = selectedId === task.id;
+                const draft = getDraft(task);
+                const hasDraft = isTaskDirty(task);
                 const taskTags = Array.isArray(task.tags) ? task.tags.map((tag) => tag.name ?? String(tag)) : [];
                 const assignee = task.assignee ?? 'Unassigned';
                 return (
@@ -523,15 +547,20 @@ export function App() {
                       <div className="badges">
                         <span className={`pill ${task.priority}`}>{task.priority}</span>
                         <span className="pill status">{task.status}</span>
+                        {hasDraft ? <span className="pill draft-pill">Unsaved</span> : null}
                         {task.dueAt ? <span className="pill">Due {String(task.dueAt).slice(0, 10)}</span> : null}
                         {taskTags.map((tag) => <span key={`${task.id}-${tag}`} className="pill">#{tag}</span>)}
                       </div>
 
                       {isSelected ? (
                         <TaskEditor
-                          task={task}
-                          onSave={(patch) => {
-                            patchTask(task.id, patch);
+                          draft={draft}
+                          isDirty={hasDraft}
+                          onDraftChange={(nextDraft) => storeDraft(task, nextDraft)}
+                          onSave={async (patch) => {
+                            const didSave = await patchTask(task.id, patch);
+                            if (!didSave) return;
+                            clearDraft(task.id);
                             setSelectedId(null);
                           }}
                           onArchive={() => archiveTask(task.id)}
@@ -565,6 +594,8 @@ export function App() {
                   <ol>
                     {boardColumns[status].map((task, index) => {
                       const isSelected = selectedId === task.id;
+                      const draft = getDraft(task);
+                      const hasDraft = isTaskDirty(task);
                       const assigneeLetter = assigneeInitial(task.assignee);
                       const assignee = task.assignee?.trim() || 'Unassigned';
                       return (
@@ -597,6 +628,7 @@ export function App() {
                             <div className="board-card-meta">
                               <span className={`pill ${task.priority}`}>{task.priority}</span>
                               <div className="board-card-meta-right">
+                                {hasDraft ? <span className="pill draft-pill">Unsaved</span> : null}
                                 {task.ready ? <span className="ready-dot" aria-label="Ready">✓</span> : null}
                                 {assigneeLetter ? <span className="avatar-dot" title={assignee} aria-label={`Assignee ${assignee}`}>{assigneeLetter}</span> : null}
                                 <span className="small">{String(task.statusChangedAt).slice(0, 10)}</span>
@@ -604,9 +636,13 @@ export function App() {
                             </div>
                             {isSelected ? (
                               <TaskEditor
-                                task={task}
-                                onSave={(patch) => {
-                                  patchTask(task.id, patch);
+                                draft={draft}
+                                isDirty={hasDraft}
+                                onDraftChange={(nextDraft) => storeDraft(task, nextDraft)}
+                                onSave={async (patch) => {
+                                  const didSave = await patchTask(task.id, patch);
+                                  if (!didSave) return;
+                                  clearDraft(task.id);
                                   setSelectedId(null);
                                 }}
                                 onArchive={() => archiveTask(task.id)}

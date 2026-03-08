@@ -16,6 +16,7 @@ function mockTask(overrides = {}) {
 describe('tasks ui', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
+    window.localStorage.clear();
   });
 
   it('renders backlog list and filter controls', async () => {
@@ -98,6 +99,61 @@ describe('tasks ui', () => {
 
     expect(await screen.findByRole('button', { name: 'After refresh' })).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('preserves unsaved task edits when closing and reopening a ticket', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          data: [mockTask({ id: 'draft-task', title: 'Original title' })]
+        })
+      })
+    );
+
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Backlog' }));
+
+    await screen.findByRole('list', { name: 'Backlog list' });
+    fireEvent.click(screen.getByRole('button', { name: 'Original title' }));
+    fireEvent.change(screen.getByLabelText('Detail title'), { target: { value: 'Draft title' } });
+    expect(screen.getByText('Unsaved changes')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+    expect(screen.getByText('Unsaved')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Original title' }));
+    expect(screen.getByLabelText('Detail title')).toHaveValue('Draft title');
+  });
+
+  it('restores unsaved task edits after remounting the page', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          data: [mockTask({ id: 'persisted-task', title: 'Persist me' })]
+        })
+      })
+    );
+
+    const firstRender = render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Backlog' }));
+
+    await screen.findByRole('list', { name: 'Backlog list' });
+    fireEvent.click(screen.getByRole('button', { name: 'Persist me' }));
+    fireEvent.change(screen.getByLabelText('Detail title'), { target: { value: 'Restored draft' } });
+
+    firstRender.unmount();
+
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Backlog' }));
+
+    await screen.findByRole('list', { name: 'Backlog list' });
+    expect(screen.getByText('Unsaved')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Persist me' }));
+    expect(screen.getByLabelText('Detail title')).toHaveValue('Restored draft');
   });
 
   it('creates and archives a task from the UI', async () => {

@@ -413,6 +413,10 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel); outline:
 .pill.medium { background: #9ee9ff; }
 .pill.low { background: #d3d3d3; }
 .pill.status { background: #ddd; }
+.pill.draft-pill {
+  background: var(--pink);
+  color: var(--panel-2);
+}
 
 .editor {
   margin-top: 10px;
@@ -431,6 +435,17 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel); outline:
 .actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .editor-actions {
   padding-top: 4px;
+}
+.draft-status {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--panel-2);
+  background: var(--amber);
+  border: 2px solid var(--panel-2);
+  padding: 6px 8px;
 }
 
 .editor-toggles {
