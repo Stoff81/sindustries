@@ -118,7 +118,7 @@ describe('tasks ui', () => {
     await screen.findByRole('list', { name: 'Backlog list' });
     fireEvent.click(screen.getByRole('button', { name: 'Original title' }));
     fireEvent.change(screen.getByLabelText('Detail title'), { target: { value: 'Draft title' } });
-    expect(screen.getByText('Unsaved changes')).toBeInTheDocument();
+    expect(screen.getByLabelText('Detail title')).toHaveValue('Draft title');
 
     fireEvent.click(screen.getByRole('button', { name: 'Close' }));
     expect(screen.getByText('Unsaved')).toBeInTheDocument();

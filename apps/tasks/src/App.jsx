@@ -129,7 +129,8 @@ function TaskEditor({ draft, isDirty, onDraftChange, onSave, onArchive, onClose 
       </div>
 
       <div className="actions editor-actions">
-                <button
+        {isDirty ? <span className="draft-status">Unsaved changes</span> : null}
+        <button
           className="primary-btn font-display"
           onClick={() =>
             onSave({
