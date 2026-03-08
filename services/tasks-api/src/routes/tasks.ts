@@ -110,6 +110,8 @@ tasksRouter.get('/tasks', async (req, res, next) => {
       q,
       dueBefore,
       dueAfter,
+      blocked,
+      ready,
       limit: rawLimit,
       cursor,
       sort = 'priority'
@@ -175,7 +177,9 @@ tasksRouter.get('/tasks', async (req, res, next) => {
               ...(dueAfterDate ? { gte: dueAfterDate } : {})
             }
           }
-        : {})
+        : {}),
+      ...(blocked !== undefined ? { blocked: blocked === 'true' } : {}),
+      ...(ready !== undefined ? { ready: ready === 'true' } : {})
     };
 
     const queryWhere = decodedCursor

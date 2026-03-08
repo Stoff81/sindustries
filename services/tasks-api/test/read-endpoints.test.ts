@@ -36,6 +36,8 @@ function task(overrides = {}) {
     completedAt: null,
     assignee: null,
     archivedAt: null,
+    blocked: false,
+    ready: false,
     createdAt: new Date('2026-03-01T00:00:00.000Z'),
     updatedAt: new Date('2026-03-01T00:00:00.000Z'),
     tags: [],

@@ -1,7 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import './App.css';
 
-const API_BASE = import.meta.env.VITE_TASKS_API_BASE_URL ?? 'http://localhost:3000/api/v1';
+const DEFAULT_API_BASE_BY_PORT = {
+  '5173': 'http://localhost:4000/api/v1',
+  '5174': 'http://localhost:4001/api/v1'
+};
+
+const API_BASE =
+  import.meta.env.VITE_TASKS_API_BASE_URL
+  ?? DEFAULT_API_BASE_BY_PORT[window.location.port]
+  ?? 'http://localhost:4000/api/v1';
 const STATUSES = ['todo', 'doing', 'done'];
 const PRIORITIES = ['urgent', 'high', 'medium', 'low'];
 const PRIORITY_SCORE = { urgent: 0, high: 1, medium: 2, low: 3 };
@@ -175,7 +183,7 @@ export function App() {
   const [tasks, setTasks] = useState([]);
   const [view, setView] = useState('board');
   const [selectedId, setSelectedId] = useState(null);
-  const [filters, setFilters] = useState({ q: '', status: '', priority: '', includeArchived: false });
+  const [filters, setFilters] = useState({ q: '', status: '', priority: '', includeArchived: false, blocked: '', ready: '' });
   const [newTask, setNewTask] = useState({ title: '', expanded: false, description: '', priority: 'medium', assignee: '', dueAt: '', tagsText: '', blocked: false, ready: false });
   const [error, setError] = useState('');
   const [confettiBursts, setConfettiBursts] = useState([]);
@@ -189,6 +197,8 @@ export function App() {
     if (filters.status) query.set('status', filters.status);
     if (filters.priority) query.set('priority', filters.priority);
     if (filters.includeArchived) query.set('includeArchived', 'true');
+    if (filters.blocked) query.set('blocked', filters.blocked);
+    if (filters.ready) query.set('ready', filters.ready);
 
     const response = await api(`/tasks?${query.toString()}`);
     setTasks(response.data);
@@ -196,7 +206,7 @@ export function App() {
 
   useEffect(() => {
     loadTasks().catch((e) => setError(e.message));
-  }, [filters.q, filters.status, filters.priority, filters.includeArchived]);
+  }, [filters.q, filters.status, filters.priority, filters.includeArchived, filters.blocked, filters.ready]);
 
   useEffect(() => {
     return () => {
@@ -431,6 +441,28 @@ export function App() {
               {PRIORITIES.map((priority) => (
                 <option key={priority} value={priority}>{`Priority: ${priority}`}</option>
               ))}
+            </select>
+          </label>
+          <label className="select-wrap">
+            <select
+              aria-label="Blocked filter"
+              value={filters.blocked}
+              onChange={(e) => setFilters((current) => ({ ...current, blocked: e.target.value }))}
+            >
+              <option value="">Blocked: Any</option>
+              <option value="true">Blocked: Yes</option>
+              <option value="false">Blocked: No</option>
+            </select>
+          </label>
+          <label className="select-wrap">
+            <select
+              aria-label="Ready filter"
+              value={filters.ready}
+              onChange={(e) => setFilters((current) => ({ ...current, ready: e.target.value }))}
+            >
+              <option value="">Ready: Any</option>
+              <option value="true">Ready: Yes</option>
+              <option value="false">Ready: No</option>
             </select>
           </label>
           <button

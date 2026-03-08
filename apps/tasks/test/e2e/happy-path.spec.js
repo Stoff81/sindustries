@@ -11,6 +11,8 @@ test('happy path: create task, move to doing, archive', async ({ page }) => {
       statusChangedAt: now,
       priority: 'medium',
       archivedAt: null,
+      blocked: false,
+      ready: false,
       tags: []
     }
   ];
@@ -40,6 +42,8 @@ test('happy path: create task, move to doing, archive', async ({ page }) => {
         priority: body.priority ?? 'medium',
         assignee: body.assignee ?? null,
         dueAt: body.dueAt ?? null,
+        blocked: body.blocked ?? false,
+        ready: body.ready ?? false,
         tags: (body.tags ?? []).map((tag) => ({ name: tag })),
         archivedAt: null
       };
