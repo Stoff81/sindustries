@@ -72,12 +72,16 @@ function TaskEditor({ task, onSave, onArchive, onClose }) {
     setDraft((current) => ({ ...current, [field]: value }));
   }
 
+  function stopPropagation(e) {
+    e.stopPropagation();
+  }
+
   return (
-    <div className="editor">
+    <div className="editor" onClick={(e) => e.stopPropagation()}>
       <div className="editor-fields">
         <label>
           <span className="small">Title</span>
-          <input className="edit-control" aria-label="Detail title" value={draft.title} onChange={(e) => update('title', e.target.value)} />
+          <input className="edit-control" aria-label="Detail title" value={draft.title} onChange={(e) => update('title', e.target.value)} onMouseDown={stopPropagation} onTouchStart={stopPropagation} autoFocus />
         </label>
 
         <label>
@@ -88,13 +92,15 @@ function TaskEditor({ task, onSave, onArchive, onClose }) {
             value={draft.description}
             rows={1}
             onChange={(e) => update('description', e.target.value)}
+            onMouseDown={stopPropagation}
+            onTouchStart={stopPropagation}
           />
         </label>
 
         <div className="editor-grid">
           <label>
             <span className="small">Status</span>
-            <select className="edit-control" aria-label="Detail status" value={draft.status} onChange={(e) => update('status', e.target.value)}>
+            <select className="edit-control" aria-label="Detail status" value={draft.status} onChange={(e) => update('status', e.target.value)} onMouseDown={stopPropagation} onTouchStart={stopPropagation}>
               {STATUSES.map((status) => (
                 <option key={status} value={status}>{status}</option>
               ))}
@@ -103,7 +109,7 @@ function TaskEditor({ task, onSave, onArchive, onClose }) {
 
           <label>
             <span className="small">Priority</span>
-            <select className="edit-control" aria-label="Detail priority" value={draft.priority} onChange={(e) => update('priority', e.target.value)}>
+            <select className="edit-control" aria-label="Detail priority" value={draft.priority} onChange={(e) => update('priority', e.target.value)} onMouseDown={stopPropagation} onTouchStart={stopPropagation}>
               {PRIORITIES.map((priority) => (
                 <option key={priority} value={priority}>{priority}</option>
               ))}
@@ -112,18 +118,18 @@ function TaskEditor({ task, onSave, onArchive, onClose }) {
 
           <label>
             <span className="small">Assignee</span>
-            <input className="edit-control" value={draft.assignee} onChange={(e) => update('assignee', e.target.value)} />
+            <input className="edit-control" value={draft.assignee} onChange={(e) => update('assignee', e.target.value)} onMouseDown={stopPropagation} onTouchStart={stopPropagation} />
           </label>
 
           <label>
             <span className="small">Due date</span>
-            <input className="edit-control" type="date" value={draft.dueAt} onChange={(e) => update('dueAt', e.target.value)} />
+            <input className="edit-control" type="date" value={draft.dueAt} onChange={(e) => update('dueAt', e.target.value)} onMouseDown={stopPropagation} onTouchStart={stopPropagation} />
           </label>
         </div>
 
         <label>
           <span className="small">Tags (comma separated)</span>
-          <input className="edit-control" value={draft.tagsText} onChange={(e) => update('tagsText', e.target.value)} placeholder="api, ui, urgent" />
+          <input className="edit-control" value={draft.tagsText} onChange={(e) => update('tagsText', e.target.value)} placeholder="api, ui, urgent" onMouseDown={stopPropagation} onTouchStart={stopPropagation} />
         </label>
 
         <div className="editor-toggles">
@@ -192,7 +198,7 @@ export function App() {
 
 
   async function loadTasks() {
-    const query = new URLSearchParams({ sort: 'priority' });
+    const query = new URLSearchParams({ sort: 'priority', limit: '100' });
     if (filters.q) query.set('q', filters.q);
     if (filters.status) query.set('status', filters.status);
     if (filters.priority) query.set('priority', filters.priority);
@@ -560,9 +566,20 @@ export function App() {
                 const assignee = task.assignee ?? 'Unassigned';
                 return (
                   <li key={task.id}>
-                    <article className={`task-card ${task.archivedAt ? 'archived' : ''} ${task.blocked ? 'blocked' : ''} ${task.ready ? 'ready' : ''} card-tilt-${index % 3}`}>
+                    <article 
+                      className={`task-card ${task.archivedAt ? 'archived' : ''} ${task.blocked ? 'blocked' : ''} ${task.ready ? 'ready' : ''} card-tilt-${index % 3}`}
+                      onClick={(e) => {
+                        if (!isSelected) setSelectedId(task.id);
+                      }}
+                    >
                       <div className="task-row">
-                        <button className="task-title-btn" onClick={() => setSelectedId(isSelected ? null : task.id)}>
+                        <button 
+                          className="task-title-btn" 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedId(isSelected ? null : task.id);
+                          }}
+                        >
                           {task.title}
                         </button>
                         <div className="assignee-chip">
@@ -581,7 +598,10 @@ export function App() {
                       {isSelected ? (
                         <TaskEditor
                           task={task}
-                          onSave={(patch) => patchTask(task.id, patch)}
+                          onSave={(patch) => {
+                            patchTask(task.id, patch);
+                            setSelectedId(null);
+                          }}
                           onArchive={() => archiveTask(task.id)}
                           onClose={() => setSelectedId(null)}
                         />
@@ -618,10 +638,26 @@ export function App() {
                           <article
                             data-testid={`card-${task.id}`}
                             className={`board-card ${task.blocked ? 'blocked' : ''} ${task.ready ? 'ready' : ''} card-tilt-${index % 3}`}
-                            draggable
-                            onDragStart={(e) => e.dataTransfer.setData('text/plain', task.id)}
+                            draggable={!isSelected}
+                            onDragStart={(e) => {
+                              if (!isSelected) e.dataTransfer.setData('text/plain', task.id);
+                            }}
+                            onClick={(e) => {
+                              if (!isSelected) {
+                                e.stopPropagation();
+                                setSelectedId(task.id);
+                              }
+                            }}
                           >
-                            <button className="task-title-btn" onClick={() => setSelectedId(isSelected ? null : task.id)}>{task.title}</button>
+                            <button 
+                              className="task-title-btn" 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedId(isSelected ? null : task.id);
+                              }}
+                            >
+                              {task.title}
+                            </button>
                             <div className="board-card-meta">
                               <span className={`pill ${task.priority}`}>{task.priority}</span>
                               <span className="small">{String(task.statusChangedAt).slice(0, 10)}</span>
@@ -629,7 +665,10 @@ export function App() {
                             {isSelected ? (
                               <TaskEditor
                                 task={task}
-                                onSave={(patch) => patchTask(task.id, patch)}
+                                onSave={(patch) => {
+                                  patchTask(task.id, patch);
+                                  setSelectedId(null);
+                                }}
                                 onArchive={() => archiveTask(task.id)}
                                 onClose={() => setSelectedId(null)}
                               />

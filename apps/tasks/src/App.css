@@ -448,7 +448,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel); outline:
   accent-color: var(--amber);
 }
 
-.board-wrap { overflow-x: auto; margin-top: 8px; }
+.board-wrap { overflow-x: auto; margin-top: 8px; position: relative; z-index: 1; }
 .board {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -462,6 +462,8 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel); outline:
   border-radius: 0;
   box-shadow: 0 10px 24px var(--panel-2);
   padding: 0 12px 12px;
+  position: relative;
+  z-index: 2;
 }
 .column-head {
   display: flex;
