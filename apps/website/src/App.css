@@ -1,36 +1,12 @@
 :root {
-  color-scheme: dark;
-  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background:
-    radial-gradient(circle at top, rgba(255, 201, 53, 0.12), transparent 30%),
-    linear-gradient(180deg, #111213 0%, #161a1e 100%);
-  color: #f3f1ec;
-  line-height: 1.5;
-  font-weight: 400;
-}
-
-* {
-  box-sizing: border-box;
+    radial-gradient(circle at top, rgb(255 201 53 / 12%), transparent 30%),
+    linear-gradient(180deg, var(--si-color-bg-canvas) 0%, var(--si-color-bg-canvas-alt) 100%);
 }
 
 body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
-  background: #111213;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-button {
-  font: inherit;
-}
-
-#root {
-  min-height: 100vh;
+  background: var(--si-color-bg-canvas);
+  font-family: var(--si-font-body);
 }
 
 .site-shell {
@@ -43,10 +19,10 @@ button {
 .footer,
 .panel,
 .principle-card {
-  border: 1px solid rgba(143, 150, 158, 0.18);
-  background: rgba(43, 47, 52, 0.68);
+  border: 1px solid var(--si-color-border-subtle);
+  background: var(--si-color-bg-glass);
   backdrop-filter: blur(12px);
-  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.22);
+  box-shadow: var(--si-shadow-soft);
 }
 
 .topbar,
@@ -69,7 +45,7 @@ button {
 
 .brand-kicker,
 .eyebrow {
-  color: #ffc935;
+  color: var(--si-color-brand-500);
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -90,13 +66,13 @@ button {
 .nav-link {
   padding: 10px 14px;
   border-radius: 999px;
-  color: #8f969e;
+  color: var(--si-color-text-muted);
 }
 
 .nav-link:hover,
 .nav-link.active {
-  color: #f3f1ec;
-  background: rgba(255, 201, 53, 0.12);
+  color: var(--si-color-text-primary);
+  background: rgb(255 201 53 / 12%);
 }
 
 main {
@@ -133,19 +109,19 @@ h2 {
 
 p,
 li {
-  color: #d5d3cd;
+  color: var(--si-color-text-secondary);
   font-size: 1.02rem;
 }
 
 .lede {
   max-width: 42rem;
   font-size: 1.15rem;
-  color: #f3f1ec;
+  color: var(--si-color-text-primary);
 }
 
 .muted,
 .footer p {
-  color: #8f969e;
+  color: var(--si-color-text-muted);
 }
 
 .hero-actions,
@@ -174,15 +150,15 @@ li {
 }
 
 .btn.primary {
-  background: #ffc935;
-  color: #111213;
+  background: var(--si-color-brand-500);
+  color: var(--si-color-bg-canvas);
   font-weight: 700;
 }
 
 .btn.secondary {
   background: transparent;
-  border-color: rgba(143, 150, 158, 0.35);
-  color: #f3f1ec;
+  border-color: rgb(143 150 158 / 35%);
+  color: var(--si-color-text-primary);
 }
 
 .two-up {
@@ -200,7 +176,7 @@ li {
   inset: auto -12% -30% auto;
   width: 220px;
   height: 220px;
-  background: radial-gradient(circle, rgba(255, 201, 53, 0.18), transparent 65%);
+  background: radial-gradient(circle, rgb(255 201 53 / 18%), transparent 65%);
 }
 
 ul {
@@ -220,7 +196,7 @@ ul {
 }
 
 .principle-marker {
-  color: #ffc935;
+  color: var(--si-color-brand-500);
   font-weight: 900;
 }
 
@@ -232,7 +208,7 @@ ul {
   display: inline-block;
   margin-top: 6px;
   font-size: 1.35rem;
-  color: #ffc935;
+  color: var(--si-color-brand-500);
   font-weight: 700;
 }
 
