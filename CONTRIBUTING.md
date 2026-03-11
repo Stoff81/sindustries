@@ -2,58 +2,117 @@
 
 ## Working model
 
-This repo follows a **spec-first** workflow for any non-trivial change.
+This repo uses a **spec-first** workflow for any non-trivial change, plus a strict **dev vs prodlike** split for local work.
 
-### Non-trivial means
-A change that alters architecture, introduces/refactors modules, changes behavior across boundaries, or takes more than a tiny isolated edit.
+## Environment rules
 
-## Required flow (non-trivial work)
-1. Pass a **Clarification Gate**
-   - Ask questions if needed, or explicitly state why no clarification is needed.
+### Dev is for implementation
+Use the `dev` stack for active coding, inner-loop testing, and normal local iteration.
+
+- API: `http://localhost:4000/api/v1`
+- App: `http://localhost:5173`
+- Postgres: `localhost:6432` (`sindustries_dev`)
+
+Typical commands:
+
+```bash
+make up MODE=dev
+make test
+```
+
+### Prodlike is for validation
+Use the `prodlike` stack to validate behavior against the production-shaped local environment.
+
+- API: `http://localhost:4001/api/v1`
+- App: `http://localhost:5174`
+- Postgres: `localhost:7432` (`sindustries_prodlike`)
+
+Typical command:
+
+```bash
+make up MODE=prodlike
+```
+
+Use prodlike for final verification, smoke checks, and automation that should target the validation environment.
+
+## NEVER rules
+
+- **Never do implementation work directly on `main`.** Work on a branch and open a PR.
+- **Never treat prodlike as your day-to-day dev environment.** Build and iterate in `dev`; validate in `prodlike`.
+- **Never seed or reset prodlike casually.** `scripts/dev/reset-db.sh` intentionally blocks prodlike seeding to protect the validation dataset.
+- **Never duplicate operational logic in ad-hoc commands when a repo script already exists.** Prefer `scripts/dev/*` and `make` wrappers.
+
+## Non-trivial work
+
+A change is non-trivial if it changes architecture, introduces/refactors modules, crosses service/app boundaries, materially changes behavior, or is more than a tiny isolated edit.
+
+For non-trivial work:
+
+1. Pass a clarification gate
+   - Ask questions if needed, or explicitly note why no clarification is needed.
    - Record assumptions.
-2. Write/update a short **spec** under `docs/specs/` before implementation:
-   - problem
-   - scope
-   - assumptions
-   - non-goals
-   - decisions/tradeoffs
+2. Write or update a short spec in `docs/specs/` before implementation.
 3. Implement in small, mergeable slices.
-4. Validate with appropriate checks/tests and document manual verification where relevant.
-5. Include rollback/mitigation notes for operational safety.
-6. Merge to `main` with follow-up tasks recorded if anything is deferred.
+4. Validate with the right tests/checks and note any manual verification.
+5. Capture rollback, mitigation, or follow-up notes if risk remains.
 
-## Definition of Done (DoD)
-A task is only Done when all are true:
+## Validation expectations
 
-1. **Feature works**
-   - Acceptance criteria are met.
-   - No known regressions introduced.
+Before opening or merging a PR, run the most relevant checks for the change.
 
-2. **Validated**
-   - Appropriate tests/checks executed.
-   - Manual verification steps documented when needed.
+Common commands:
 
-3. **Specification documentation included**
-   - Problem, scope, assumptions, non-goals.
-   - Design decisions and tradeoffs.
+```bash
+make test
+make test-api
+make test-app
+make test-e2e
+```
 
-4. **Operational safety covered**
-   - Rollback/mitigation notes captured.
-   - Risk notes included for unresolved concerns.
+CI currently covers:
+- `services/tasks-api` unit + DB integration tests
+- `apps/tasks` unit/component tests
+- `apps/tasks` Playwright e2e
+- `apps/website` unit tests + build
 
-5. **Merged to `main`**
-   - Work is integrated into `main`.
-   - Any required follow-up tasks are recorded.
+## Pull request standards
 
-6. **Handoff complete**
-   - Short plain-English summary includes:
-     - What changed
-     - How to use it
-     - What to watch
+1. Review feedback belongs on the GitHub PR.
+2. Task acceptance criteria belong to the task.
+3. Each PR must reference the task.
+4. Each PR must make it easy to trace the implementation scope it represents.
+5. Each PR must state which ACs it covers and which ACs remain outside that PR, if any.
+6. The PR summary must include the ACs relevant to that PR.
+7. Tom should not review code until all required checks are passing.
+8. Every AC covered by that PR needs at least one E2E test, unless explicitly marked not possible with a reason.
+9. The PR should be assigned to **`Stoff81`** for review once ready.
+
+## Commit message standard
+
+Use a simple conventional format:
+
+`type(scope): short summary`
+
+Examples:
+- `feat(tasks): add tag filter to header`
+- `fix(tasks): restore scroll position after save`
+- `docs(contributing): clarify review requirements`
+
+Preferred types:
+- `feat`
+- `fix`
+- `docs`
+- `refactor`
+- `test`
+- `chore`
+
+Commits should be meaningful, reviewable slices.
+Avoid vague messages like `wip`, `misc`, `fix`, or `stuff`.
 
 ## Repo conventions
-- `apps/` for user-facing runnable app surfaces.
-- `services/` for backend APIs/workers/processes.
-- `packages/` for shared libraries/types/config.
-- `infra/` for deployment/runtime/infrastructure config.
-- `docs/` for architecture, specs, and design records.
+
+- `apps/` for user-facing runnable app surfaces
+- `services/` for backend APIs, workers, and processes
+- `packages/` for shared libraries, types, and config
+- `infra/` for deployment/runtime/infrastructure config
+- `docs/` for architecture, specs, and decision records

@@ -36,6 +36,14 @@ function normalizeTaskForEditor(task) {
 
 function TaskEditor({ draft, isDirty, onDraftChange, onSave, onArchive, onClose }) {
   const descriptionRef = useRef(null);
+  const titleRef = useRef(null);
+  const statusRef = useRef(null);
+  const priorityRef = useRef(null);
+  const assigneeRef = useRef(null);
+  const dueAtRef = useRef(null);
+  const tagsRef = useRef(null);
+  const blockedRef = useRef(null);
+  const readyRef = useRef(null);
 
   useEffect(() => {
     const textarea = descriptionRef.current;
@@ -52,12 +60,66 @@ function TaskEditor({ draft, isDirty, onDraftChange, onSave, onArchive, onClose 
     e.stopPropagation();
   }
 
+  function buildSavePayload() {
+    return {
+      title: draft.title.trim(),
+      description: draft.description.trim() || null,
+      status: draft.status,
+      priority: draft.priority,
+      assignee: draft.assignee.trim() || null,
+      dueAt: draft.dueAt ? new Date(`${draft.dueAt}T00:00:00`).toISOString() : null,
+      tags: draft.tagsText
+        .split(',')
+        .map((tag) => tag.trim())
+        .filter(Boolean),
+      blocked: draft.blocked,
+      ready: draft.ready
+    };
+  }
+
+  const focusOrder = [
+    titleRef,
+    descriptionRef,
+    statusRef,
+    priorityRef,
+    assigneeRef,
+    dueAtRef,
+    tagsRef,
+    blockedRef,
+    readyRef
+  ];
+
+  function focusNextField(currentRef) {
+    const currentIndex = focusOrder.findIndex((ref) => ref === currentRef);
+    const nextRef = focusOrder[currentIndex + 1];
+    if (nextRef?.current) {
+      nextRef.current.focus();
+      if (typeof nextRef.current.select === 'function') {
+        nextRef.current.select();
+      }
+      return true;
+    }
+    return false;
+  }
+
+  function handleKeyDown(e, currentRef, isMultiLine = false) {
+    if (e.key !== 'Enter' || e.shiftKey) {
+      return;
+    }
+
+    e.preventDefault();
+
+    if (!focusNextField(currentRef)) {
+      onSave(buildSavePayload());
+    }
+  }
+
   return (
     <div className="editor" onClick={(e) => e.stopPropagation()}>
       <div className="editor-fields">
         <label>
           <span className="small">Title</span>
-          <input className="edit-control" aria-label="Detail title" value={draft.title} onChange={(e) => update('title', e.target.value)} onMouseDown={stopPropagation} onTouchStart={stopPropagation} autoFocus />
+          <input ref={titleRef} className="edit-control" aria-label="Detail title" value={draft.title} onChange={(e) => update('title', e.target.value)} onMouseDown={stopPropagation} onTouchStart={stopPropagation} onKeyDown={(e) => handleKeyDown(e, titleRef, false)} autoFocus />
         </label>
 
         <label>
@@ -65,18 +127,20 @@ function TaskEditor({ draft, isDirty, onDraftChange, onSave, onArchive, onClose 
           <textarea
             ref={descriptionRef}
             className="edit-control auto-grow-textarea"
+            aria-label="Detail description"
             value={draft.description}
             rows={1}
             onChange={(e) => update('description', e.target.value)}
             onMouseDown={stopPropagation}
             onTouchStart={stopPropagation}
+            onKeyDown={(e) => handleKeyDown(e, descriptionRef, true)}
           />
         </label>
 
         <div className="editor-grid">
           <label>
             <span className="small">Status</span>
-            <select className="edit-control" aria-label="Detail status" value={draft.status} onChange={(e) => update('status', e.target.value)} onMouseDown={stopPropagation} onTouchStart={stopPropagation}>
+            <select ref={statusRef} className="edit-control" aria-label="Detail status" value={draft.status} onChange={(e) => update('status', e.target.value)} onMouseDown={stopPropagation} onTouchStart={stopPropagation} onKeyDown={(e) => handleKeyDown(e, statusRef)}>
               {STATUSES.map((status) => (
                 <option key={status} value={status}>{status}</option>
               ))}
@@ -85,7 +149,7 @@ function TaskEditor({ draft, isDirty, onDraftChange, onSave, onArchive, onClose 
 
           <label>
             <span className="small">Priority</span>
-            <select className="edit-control" aria-label="Detail priority" value={draft.priority} onChange={(e) => update('priority', e.target.value)} onMouseDown={stopPropagation} onTouchStart={stopPropagation}>
+            <select ref={priorityRef} className="edit-control" aria-label="Detail priority" value={draft.priority} onChange={(e) => update('priority', e.target.value)} onMouseDown={stopPropagation} onTouchStart={stopPropagation} onKeyDown={(e) => handleKeyDown(e, priorityRef)}>
               {PRIORITIES.map((priority) => (
                 <option key={priority} value={priority}>{priority}</option>
               ))}
@@ -94,34 +158,40 @@ function TaskEditor({ draft, isDirty, onDraftChange, onSave, onArchive, onClose 
 
           <label>
             <span className="small">Assignee</span>
-            <input className="edit-control" value={draft.assignee} onChange={(e) => update('assignee', e.target.value)} onMouseDown={stopPropagation} onTouchStart={stopPropagation} />
+            <input ref={assigneeRef} className="edit-control" aria-label="Detail assignee" value={draft.assignee} onChange={(e) => update('assignee', e.target.value)} onMouseDown={stopPropagation} onTouchStart={stopPropagation} onKeyDown={(e) => handleKeyDown(e, assigneeRef, false)} />
           </label>
 
           <label>
             <span className="small">Due date</span>
-            <input className="edit-control" type="date" value={draft.dueAt} onChange={(e) => update('dueAt', e.target.value)} onMouseDown={stopPropagation} onTouchStart={stopPropagation} />
+            <input ref={dueAtRef} className="edit-control" aria-label="Detail due date" type="date" value={draft.dueAt} onChange={(e) => update('dueAt', e.target.value)} onMouseDown={stopPropagation} onTouchStart={stopPropagation} onKeyDown={(e) => handleKeyDown(e, dueAtRef)} />
           </label>
         </div>
 
         <label>
           <span className="small">Tags (comma separated)</span>
-          <input className="edit-control" value={draft.tagsText} onChange={(e) => update('tagsText', e.target.value)} placeholder="api, ui, urgent" onMouseDown={stopPropagation} onTouchStart={stopPropagation} />
+          <input ref={tagsRef} className="edit-control" aria-label="Detail tags" value={draft.tagsText} onChange={(e) => update('tagsText', e.target.value)} placeholder="api, ui, urgent" onMouseDown={stopPropagation} onTouchStart={stopPropagation} onKeyDown={(e) => handleKeyDown(e, tagsRef, false)} />
         </label>
 
         <div className="editor-toggles">
           <label className="toggle-label">
             <input
+              ref={blockedRef}
+              aria-label="Detail blocked"
               type="checkbox"
               checked={draft.blocked}
               onChange={(e) => update('blocked', e.target.checked)}
+              onKeyDown={(e) => handleKeyDown(e, blockedRef)}
             />
             <span>Blocked</span>
           </label>
           <label className="toggle-label">
             <input
+              ref={readyRef}
+              aria-label="Detail ready"
               type="checkbox"
               checked={draft.ready}
               onChange={(e) => update('ready', e.target.checked)}
+              onKeyDown={(e) => handleKeyDown(e, readyRef)}
             />
             <span>Ready</span>
           </label>
@@ -131,22 +201,7 @@ function TaskEditor({ draft, isDirty, onDraftChange, onSave, onArchive, onClose 
       <div className="actions editor-actions">
         <button
           className="primary-btn font-display"
-          onClick={() =>
-            onSave({
-              title: draft.title.trim(),
-              description: draft.description.trim() || null,
-              status: draft.status,
-              priority: draft.priority,
-              assignee: draft.assignee.trim() || null,
-              dueAt: draft.dueAt ? new Date(`${draft.dueAt}T00:00:00`).toISOString() : null,
-              tags: draft.tagsText
-                .split(',')
-                .map((tag) => tag.trim())
-                .filter(Boolean),
-              blocked: draft.blocked,
-              ready: draft.ready
-            })
-          }
+          onClick={() => onSave(buildSavePayload())}
         >
           Save changes
         </button>
@@ -164,11 +219,35 @@ function assigneeInitial(assignee) {
 export function App() {
   const [view, setView] = useState('board');
   const [selectedId, setSelectedId] = useState(null);
-  const [filters, setFilters] = useState({ q: '', status: '', priority: '', includeArchived: false });
+  const [filters, setFilters] = useState({ q: '', status: '', priority: '', tag: '', includeArchived: false });
+  
+  // Default backlog view to Status: Todo
+  useEffect(() => {
+    if (view === 'backlog' && filters.status === '') {
+      setFilters((current) => ({ ...current, status: 'todo' }));
+    }
+  }, [view, filters.status]);
+
   const [newTask, setNewTask] = useState({ title: '', expanded: false, description: '', priority: 'medium', assignee: '', dueAt: '', tagsText: '', blocked: false, ready: false });
   const [confettiBursts, setConfettiBursts] = useState([]);
   const confettiTimeoutsRef = useRef(new Map());
   const audioContextRef = useRef(null);
+  const taskCardRefs = useRef({});
+
+  // Scroll to task card after save/close if needed
+  function scrollToTaskIfNeeded(taskId) {
+    const cardEl = taskCardRefs.current[taskId];
+    if (!cardEl) return;
+    
+    const cardRect = cardEl.getBoundingClientRect();
+    const headerHeight = document.querySelector('header')?.offsetHeight || 0;
+    
+    // If the top of the card is above the visible area (below header), scroll it into view
+    if (cardRect.top < headerHeight) {
+      cardEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
   const {
     tasks,
     error,
@@ -186,6 +265,20 @@ export function App() {
     isTaskDirty,
     hasUnsavedDrafts
   } = useTaskDrafts(normalizeTaskForEditor, tasks);
+
+  // Extract unique tags from all tasks for the filter dropdown
+  const allTags = useMemo(() => {
+    const tagSet = new Set();
+    tasks.forEach((task) => {
+      if (Array.isArray(task.tags)) {
+        task.tags.forEach((tag) => {
+          const tagName = typeof tag === 'string' ? tag : tag.name;
+          if (tagName) tagSet.add(tagName);
+        });
+      }
+    });
+    return Array.from(tagSet).sort();
+  }, [tasks]);
 
   useEffect(() => {
     return () => {
@@ -218,10 +311,22 @@ export function App() {
       columns[status].sort((a, b) => {
         const priorityDiff = (PRIORITY_SCORE[a.priority] ?? 99) - (PRIORITY_SCORE[b.priority] ?? 99);
         if (priorityDiff !== 0) return priorityDiff;
-        return new Date(a.statusChangedAt) - new Date(b.statusChangedAt);
+        // Secondary sort: ready tasks first, then by date created
+        if (a.ready !== b.ready) return a.ready ? -1 : 1;
+        return new Date(a.createdAt) - new Date(b.createdAt);
       });
     }
     return columns;
+  }, [tasks]);
+
+  // Backlog list uses same sort order: priority, readiness, date created
+  const sortedBacklogTasks = useMemo(() => {
+    return [...tasks].sort((a, b) => {
+      const priorityDiff = (PRIORITY_SCORE[a.priority] ?? 99) - (PRIORITY_SCORE[b.priority] ?? 99);
+      if (priorityDiff !== 0) return priorityDiff;
+      if (a.ready !== b.ready) return a.ready ? -1 : 1;
+      return new Date(a.createdAt) - new Date(b.createdAt);
+    });
   }, [tasks]);
 
   async function createTask(event) {
@@ -401,36 +506,54 @@ export function App() {
 
       <section className="content">
         <div className="filter-row panel">
-          <label className="select-wrap">
-            <select
-              aria-label="Status filter"
-              value={filters.status}
-              onChange={(e) => setFilters((current) => ({ ...current, status: e.target.value }))}
+          <div className="filter-controls">
+            <label className="select-wrap">
+              <select
+                aria-label="Status filter"
+                value={filters.status}
+                onChange={(e) => setFilters((current) => ({ ...current, status: e.target.value }))}
+              >
+                <option value="">Status: All statuses</option>
+                {STATUSES.map((status) => (
+                  <option key={status} value={status}>{`Status: ${status}`}</option>
+                ))}
+              </select>
+            </label>
+            <label className="select-wrap">
+              <select
+                aria-label="Priority filter"
+                value={filters.priority}
+                onChange={(e) => setFilters((current) => ({ ...current, priority: e.target.value }))}
+              >
+                <option value="">Priority: All priorities</option>
+                {PRIORITIES.map((priority) => (
+                  <option key={priority} value={priority}>{`Priority: ${priority}`}</option>
+                ))}
+              </select>
+            </label>
+            {allTags.length > 0 && (
+              <label className="select-wrap">
+                <select
+                  aria-label="Tag filter"
+                  value={filters.tag}
+                  onChange={(e) => setFilters((current) => ({ ...current, tag: e.target.value }))}
+                >
+                  <option value="">Tag: All tags</option>
+                  {allTags.map((tag) => (
+                    <option key={tag} value={tag}>{`Tag: ${tag}`}</option>
+                  ))}
+                </select>
+              </label>
+            )}
+          </div>
+          <div className="filter-actions">
+            <button
+              className={`ghost-btn archived-toggle ${filters.includeArchived ? 'archived-active' : ''}`}
+              onClick={() => setFilters((current) => ({ ...current, includeArchived: !current.includeArchived }))}
             >
-              <option value="">Status: All statuses</option>
-              {STATUSES.map((status) => (
-                <option key={status} value={status}>{`Status: ${status}`}</option>
-              ))}
-            </select>
-          </label>
-          <label className="select-wrap">
-            <select
-              aria-label="Priority filter"
-              value={filters.priority}
-              onChange={(e) => setFilters((current) => ({ ...current, priority: e.target.value }))}
-            >
-              <option value="">Priority: All priorities</option>
-              {PRIORITIES.map((priority) => (
-                <option key={priority} value={priority}>{`Priority: ${priority}`}</option>
-              ))}
-            </select>
-          </label>
-          <button
-            className={`ghost-btn ${filters.includeArchived ? 'archived-active' : ''}`}
-            onClick={() => setFilters((current) => ({ ...current, includeArchived: !current.includeArchived }))}
-          >
-            {filters.includeArchived ? 'Hide archived' : 'Show archived'}
-          </button>
+              {filters.includeArchived ? 'Hide archived' : 'Show archived'}
+            </button>
+          </div>
         </div>
 
         {newTask.expanded ? (
@@ -514,7 +637,7 @@ export function App() {
           <section>
 
             <ul aria-label="Backlog list" className="task-list">
-              {tasks.map((task, index) => {
+              {sortedBacklogTasks.map((task, index) => {
                 const isSelected = selectedId === task.id;
                 const draft = getDraft(task);
                 const hasDraft = isTaskDirty(task);
@@ -523,6 +646,7 @@ export function App() {
                 return (
                   <li key={task.id}>
                     <article 
+                      ref={(el) => { taskCardRefs.current[task.id] = el; }}
                       className={`task-card ${task.archivedAt ? 'archived' : ''} ${task.blocked ? 'blocked' : ''} ${task.ready ? 'ready' : ''} ${isSelected ? 'is-editing' : ''} card-tilt-${index % 3}`}
                       onClick={(e) => {
                         if (!isSelected) setSelectedId(task.id);
@@ -562,9 +686,13 @@ export function App() {
                             if (!didSave) return;
                             clearDraft(task.id);
                             setSelectedId(null);
+                            scrollToTaskIfNeeded(task.id);
                           }}
                           onArchive={() => archiveTask(task.id)}
-                          onClose={() => setSelectedId(null)}
+                          onClose={() => {
+                            setSelectedId(null);
+                            scrollToTaskIfNeeded(task.id);
+                          }}
                         />
                       ) : null}
                     </article>
@@ -598,6 +726,7 @@ export function App() {
                       const hasDraft = isTaskDirty(task);
                       const assigneeLetter = assigneeInitial(task.assignee);
                       const assignee = task.assignee?.trim() || 'Unassigned';
+                      const taskTags = Array.isArray(task.tags) ? task.tags.map((tag) => tag.name ?? String(tag)) : [];
                       return (
                         <li key={task.id}>
                           <article
@@ -627,6 +756,7 @@ export function App() {
                             </div>
                             <div className="board-card-meta">
                               <span className={`pill ${task.priority}`}>{task.priority}</span>
+                              {taskTags.map((tag) => <span key={tag} className="pill tag-pill">#{tag}</span>)}
                               <div className="board-card-meta-right">
                                 {hasDraft ? <span className="pill draft-pill">Unsaved</span> : null}
                                 {task.ready ? <span className="ready-dot" aria-label="Ready">✓</span> : null}
@@ -644,9 +774,13 @@ export function App() {
                                   if (!didSave) return;
                                   clearDraft(task.id);
                                   setSelectedId(null);
+                                  scrollToTaskIfNeeded(task.id);
                                 }}
                                 onArchive={() => archiveTask(task.id)}
-                                onClose={() => setSelectedId(null)}
+                                onClose={() => {
+                                  setSelectedId(null);
+                                  scrollToTaskIfNeeded(task.id);
+                                }}
                               />
                             ) : null}
                           </article>

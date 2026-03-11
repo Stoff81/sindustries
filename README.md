@@ -6,6 +6,7 @@ Sindustries is organized as a monorepo with explicit boundaries between product 
 
 - `apps/` — user-facing runnable applications (primarily front-end surfaces)
   - `apps/tasks/` — first product surface (initial focused app)
+  - `apps/website/` — public-facing company website v1
   - `apps/mission-control/` — future aggregate shell/orchestrator UI
 - `services/` — backend APIs, workers, and long-running service processes
 - `packages/` — shared libraries, types, utilities, and cross-cutting configs

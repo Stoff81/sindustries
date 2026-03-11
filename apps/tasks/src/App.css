@@ -1,27 +1,23 @@
-@import url('https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Work+Sans:wght@400;600;700;800;900&display=swap');
-
 :root {
-  --bg: #8F969E;
-  --panel: #2b2f34;
-  --panel-2: #111213;
-  --text: #F3F1EC;
-  --muted: #7A8B7C;
-  --line: #8F969E;
-  --amber: #ffc935;
-
-  --cyan: #00d4ff;
-  --pink: #ff3e8a;
-  --green: #31c76a;
-  --danger: #ff5252;
-  --font-body: 'Work Sans', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --font-display: 'Dela Gothic One', 'Work Sans', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --bg: var(--si-color-border-strong);
+  --panel: var(--si-color-bg-surface);
+  --panel-2: var(--si-color-bg-canvas);
+  --text: var(--si-color-text-primary);
+  --muted: var(--si-color-sage-500);
+  --line: var(--si-color-border-strong);
+  --amber: var(--si-color-brand-500);
+  --cyan: var(--si-color-info-500);
+  --pink: var(--si-color-accent-500);
+  --green: var(--si-color-success-500);
+  --danger: var(--si-color-danger-500);
+  --font-body: var(--si-font-body);
+  --font-display: var(--si-font-display);
 }
 
 * { box-sizing: border-box; }
 body {
-  margin: 0;
   font-family: var(--font-body);
-  background: linear-gradient(180deg, #111, #8F969E 8%, #111213 95%);
+  background: linear-gradient(180deg, var(--si-color-bg-canvas) 0%, var(--bg) 8%, var(--panel-2) 95%);
   color: var(--text);
 }
 
@@ -244,11 +240,10 @@ button {
 
 .form-grid { display: grid; grid-template-columns: 1.2fr repeat(4, minmax(120px, 1fr)); gap: 8px; align-items: end; }
 .filter-row {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(170px, auto));
-  gap: 8px;
+  display: flex;
   align-items: center;
-  justify-content: start;
+  justify-content: space-between;
+  gap: 12px;
   margin: 0 -20px;
   margin-bottom: 0;
   padding: 12px 20px;
@@ -256,6 +251,27 @@ button {
   border-right: 0;
   border-top: 0;
 }
+
+.filter-controls {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(170px, auto));
+  gap: 8px;
+  align-items: center;
+  justify-content: start;
+  flex: 1 1 auto;
+}
+
+.filter-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+.archived-toggle {
+  white-space: nowrap;
+}
+
 .filter-row select,
 .filter-row .ghost-btn {
   font-family: var(--font-body);
@@ -407,15 +423,19 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel); outline:
 }
 
 .badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-.pill { border: 2px solid #000; font-size: 0.72rem; text-transform: uppercase; padding: 2px 7px; background: #ece3cc; font-weight: 700; }
-.pill.urgent { background: #ff8ab4; }
-.pill.high { background: #ffe891; }
-.pill.medium { background: #9ee9ff; }
-.pill.low { background: #d3d3d3; }
-.pill.status { background: #ddd; }
+.pill { border: 2px solid var(--si-color-bg-canvas); font-size: 0.72rem; text-transform: uppercase; padding: 2px 7px; background: var(--si-color-paper-200); font-weight: 700; }
+.pill.urgent { background: var(--si-color-accent-200); }
+.pill.high { background: var(--si-color-brand-200); }
+.pill.medium { background: var(--si-color-info-200); }
+.pill.low { background: var(--si-color-neutral-300); }
+.pill.status { background: var(--si-color-neutral-200); }
 .pill.draft-pill {
   background: var(--pink);
   color: var(--panel-2);
+}
+.pill.tag-pill {
+  background: var(--si-color-neutral-200);
+  color: var(--si-color-text-100);
 }
 
 .editor {
@@ -651,7 +671,19 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel); outline:
   .hero-content { flex-direction: column; align-items: stretch; }
   .hero-controls { width: 100%; }
   .search-wrap { min-width: 0; flex: 1; }
-  .form-grid, .editor-grid, .filter-row { grid-template-columns: 1fr; }
+  .form-grid, .editor-grid { grid-template-columns: 1fr; }
+  .filter-row {
+    flex-wrap: wrap;
+    align-items: stretch;
+  }
+  .filter-controls {
+    flex: 1 1 100%;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  }
+  .filter-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
   .board { display: flex; }
   .column { min-width: 88vw; }
   .mobile-nav { display: flex; }
