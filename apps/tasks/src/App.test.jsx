@@ -206,6 +206,102 @@ describe('tasks ui', () => {
     await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining('/tasks/created'), expect.objectContaining({ method: 'DELETE' })));
   });
 
+  it('moves focus to the next editor field on Enter and saves from the last field', async () => {
+    const fetchMock = vi.fn(async (url, options = {}) => {
+      const method = options.method ?? 'GET';
+      const urlText = String(url);
+
+      if (method === 'GET' && urlText.includes('/tasks?')) {
+        return {
+          ok: true,
+          json: async () => ({
+            data: [mockTask({ id: 'editor-task', title: 'Editor task', description: 'Line one' })]
+          })
+        };
+      }
+
+      if (method === 'PATCH' && urlText.includes('/tasks/editor-task')) {
+        return {
+          ok: true,
+          json: async () => ({
+            data: mockTask({ id: 'editor-task', title: 'Editor task', description: 'Line one', ready: true })
+          })
+        };
+      }
+
+      throw new Error(`Unexpected fetch call: ${method} ${urlText}`);
+    });
+
+    vi.stubGlobal('fetch', fetchMock);
+
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Backlog' }));
+
+    await screen.findByRole('list', { name: 'Backlog list' });
+    fireEvent.click(screen.getByRole('button', { name: 'Editor task' }));
+
+    const titleInput = screen.getByLabelText('Detail title');
+    titleInput.focus();
+    fireEvent.keyDown(titleInput, { key: 'Enter', code: 'Enter', charCode: 13 });
+    expect(screen.getByLabelText('Detail description')).toHaveFocus();
+
+    const descriptionInput = screen.getByLabelText('Detail description');
+    descriptionInput.focus();
+    fireEvent.keyDown(descriptionInput, { key: 'Enter', code: 'Enter', charCode: 13 });
+    expect(screen.getByLabelText('Detail status')).toHaveFocus();
+
+    screen.getByLabelText('Detail blocked').focus();
+    fireEvent.keyDown(screen.getByLabelText('Detail blocked'), { key: 'Enter', code: 'Enter', charCode: 13 });
+    expect(screen.getByLabelText('Detail ready')).toHaveFocus();
+
+    screen.getByLabelText('Detail ready').focus();
+    fireEvent.keyDown(screen.getByLabelText('Detail ready'), { key: 'Enter', code: 'Enter', charCode: 13 });
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining('/tasks/editor-task'), expect.objectContaining({ method: 'PATCH' })));
+  });
+
+  it('allows Shift+Enter to insert a newline in the description without saving', async () => {
+    const fetchMock = vi.fn(async (url, options = {}) => {
+      const method = options.method ?? 'GET';
+      const urlText = String(url);
+
+      if (method === 'GET' && urlText.includes('/tasks?')) {
+        return {
+          ok: true,
+          json: async () => ({
+            data: [mockTask({ id: 'multiline-task', title: 'Multiline task', description: 'Line one' })]
+          })
+        };
+      }
+
+      if (method === 'PATCH' && urlText.includes('/tasks/multiline-task')) {
+        return {
+          ok: true,
+          json: async () => ({ data: mockTask({ id: 'multiline-task', title: 'Multiline task', description: 'Line one\nLine two' }) })
+        };
+      }
+
+      throw new Error(`Unexpected fetch call: ${method} ${urlText}`);
+    });
+
+    vi.stubGlobal('fetch', fetchMock);
+
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Backlog' }));
+
+    await screen.findByRole('list', { name: 'Backlog list' });
+    fireEvent.click(screen.getByRole('button', { name: 'Multiline task' }));
+
+    const descriptionInput = screen.getByLabelText('Detail description');
+    descriptionInput.focus();
+    fireEvent.change(descriptionInput, { target: { value: 'Line one\nLine two' } });
+    fireEvent.keyDown(descriptionInput, { key: 'Enter', code: 'Enter', charCode: 13, shiftKey: true });
+
+    expect(descriptionInput).toHaveFocus();
+    expect(fetchMock).not.toHaveBeenCalledWith(expect.stringContaining('/tasks/multiline-task'), expect.objectContaining({ method: 'PATCH' }));
+    expect(descriptionInput.value).toBe('Line one\nLine two');
+  });
+
   it('toggles archived filter and updates query', async () => {
     const fetchMock = vi
       .fn()
