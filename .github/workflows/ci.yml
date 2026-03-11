@@ -39,6 +39,9 @@ jobs:
       - name: Install workspace dependencies
         run: npm ci
 
+      - name: Ensure Rollup Linux native binary is present
+        run: npm install --no-save @rollup/rollup-linux-x64-gnu@4.59.0 --workspace services/tasks-api
+
       - name: Run unit tests
         run: npm test --workspace services/tasks-api
 
@@ -67,6 +70,9 @@ jobs:
 
       - name: Install workspace dependencies
         run: npm ci
+
+      - name: Ensure Rollup Linux native binary is present
+        run: npm install --no-save @rollup/rollup-linux-x64-gnu@4.59.0 --workspace apps/tasks
 
       - name: Run unit/component tests
         run: npm test --workspace apps/tasks
@@ -101,6 +107,11 @@ jobs:
 
       - name: Install workspace dependencies
         run: npm ci
+
+      - name: Ensure Rollup Linux native binary is present
+        run: |
+          npm install --no-save @rollup/rollup-linux-x64-gnu@4.59.0 --workspace apps/tasks
+          npm install --no-save @rollup/rollup-linux-x64-gnu@4.59.0 --workspace services/tasks-api
 
       - name: Apply DB migrations + seed
         env:
@@ -155,6 +166,9 @@ jobs:
 
       - name: Install workspace dependencies
         run: npm ci
+
+      - name: Ensure Rollup Linux native binary is present
+        run: npm install --no-save @rollup/rollup-linux-x64-gnu@4.59.0 --workspace apps/website
 
       - name: Run unit tests
         run: npm test --workspace apps/website
