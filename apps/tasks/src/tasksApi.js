@@ -24,6 +24,7 @@ export async function fetchTasks(filters) {
   if (filters.q) query.set('q', filters.q);
   if (filters.status) query.set('status', filters.status);
   if (filters.priority) query.set('priority', filters.priority);
+  if (filters.tag) query.set('tag', filters.tag);
   if (filters.includeArchived) query.set('includeArchived', 'true');
 
   const response = await api(`/tasks?${query.toString()}`);
