@@ -36,6 +36,14 @@ function normalizeTaskForEditor(task) {
 
 function TaskEditor({ draft, isDirty, onDraftChange, onSave, onArchive, onClose }) {
   const descriptionRef = useRef(null);
+  const titleRef = useRef(null);
+  const statusRef = useRef(null);
+  const priorityRef = useRef(null);
+  const assigneeRef = useRef(null);
+  const dueAtRef = useRef(null);
+  const tagsRef = useRef(null);
+  const blockedRef = useRef(null);
+  const readyRef = useRef(null);
 
   useEffect(() => {
     const textarea = descriptionRef.current;
@@ -52,46 +60,57 @@ function TaskEditor({ draft, isDirty, onDraftChange, onSave, onArchive, onClose 
     e.stopPropagation();
   }
 
-  function handleKeyDown(e, isMultiLine = false) {
-    if (e.key === 'Enter') {
-      if (isMultiLine) {
-        // Shift+Enter saves for multi-line fields
-        if (e.shiftKey) {
-          e.preventDefault();
-          onSave({
-            title: draft.title.trim(),
-            description: draft.description.trim() || null,
-            status: draft.status,
-            priority: draft.priority,
-            assignee: draft.assignee.trim() || null,
-            dueAt: draft.dueAt ? new Date(`${draft.dueAt}T00:00:00`).toISOString() : null,
-            tags: draft.tagsText
-              .split(',')
-              .map((tag) => tag.trim())
-              .filter(Boolean),
-            blocked: draft.blocked,
-            ready: draft.ready
-          });
-        }
-        // Plain Enter in multi-line does nothing (allows newlines)
-      } else {
-        // Plain Enter saves for single-line fields
-        e.preventDefault();
-        onSave({
-          title: draft.title.trim(),
-          description: draft.description.trim() || null,
-          status: draft.status,
-          priority: draft.priority,
-          assignee: draft.assignee.trim() || null,
-          dueAt: draft.dueAt ? new Date(`${draft.dueAt}T00:00:00`).toISOString() : null,
-          tags: draft.tagsText
-            .split(',')
-            .map((tag) => tag.trim())
-            .filter(Boolean),
-          blocked: draft.blocked,
-          ready: draft.ready
-        });
+  function buildSavePayload() {
+    return {
+      title: draft.title.trim(),
+      description: draft.description.trim() || null,
+      status: draft.status,
+      priority: draft.priority,
+      assignee: draft.assignee.trim() || null,
+      dueAt: draft.dueAt ? new Date(`${draft.dueAt}T00:00:00`).toISOString() : null,
+      tags: draft.tagsText
+        .split(',')
+        .map((tag) => tag.trim())
+        .filter(Boolean),
+      blocked: draft.blocked,
+      ready: draft.ready
+    };
+  }
+
+  const focusOrder = [
+    titleRef,
+    descriptionRef,
+    statusRef,
+    priorityRef,
+    assigneeRef,
+    dueAtRef,
+    tagsRef,
+    blockedRef,
+    readyRef
+  ];
+
+  function focusNextField(currentRef) {
+    const currentIndex = focusOrder.findIndex((ref) => ref === currentRef);
+    const nextRef = focusOrder[currentIndex + 1];
+    if (nextRef?.current) {
+      nextRef.current.focus();
+      if (typeof nextRef.current.select === 'function') {
+        nextRef.current.select();
       }
+      return true;
+    }
+    return false;
+  }
+
+  function handleKeyDown(e, currentRef, isMultiLine = false) {
+    if (e.key !== 'Enter' || e.shiftKey) {
+      return;
+    }
+
+    e.preventDefault();
+
+    if (!focusNextField(currentRef)) {
+      onSave(buildSavePayload());
     }
   }
 
@@ -100,7 +119,7 @@ function TaskEditor({ draft, isDirty, onDraftChange, onSave, onArchive, onClose 
       <div className="editor-fields">
         <label>
           <span className="small">Title</span>
-          <input className="edit-control" aria-label="Detail title" value={draft.title} onChange={(e) => update('title', e.target.value)} onMouseDown={stopPropagation} onTouchStart={stopPropagation} onKeyDown={(e) => handleKeyDown(e, false)} autoFocus />
+          <input ref={titleRef} className="edit-control" aria-label="Detail title" value={draft.title} onChange={(e) => update('title', e.target.value)} onMouseDown={stopPropagation} onTouchStart={stopPropagation} onKeyDown={(e) => handleKeyDown(e, titleRef, false)} autoFocus />
         </label>
 
         <label>
@@ -108,19 +127,20 @@ function TaskEditor({ draft, isDirty, onDraftChange, onSave, onArchive, onClose 
           <textarea
             ref={descriptionRef}
             className="edit-control auto-grow-textarea"
+            aria-label="Detail description"
             value={draft.description}
             rows={1}
             onChange={(e) => update('description', e.target.value)}
             onMouseDown={stopPropagation}
             onTouchStart={stopPropagation}
-            onKeyDown={(e) => handleKeyDown(e, true)}
+            onKeyDown={(e) => handleKeyDown(e, descriptionRef, true)}
           />
         </label>
 
         <div className="editor-grid">
           <label>
             <span className="small">Status</span>
-            <select className="edit-control" aria-label="Detail status" value={draft.status} onChange={(e) => update('status', e.target.value)} onMouseDown={stopPropagation} onTouchStart={stopPropagation}>
+            <select ref={statusRef} className="edit-control" aria-label="Detail status" value={draft.status} onChange={(e) => update('status', e.target.value)} onMouseDown={stopPropagation} onTouchStart={stopPropagation} onKeyDown={(e) => handleKeyDown(e, statusRef)}>
               {STATUSES.map((status) => (
                 <option key={status} value={status}>{status}</option>
               ))}
@@ -129,7 +149,7 @@ function TaskEditor({ draft, isDirty, onDraftChange, onSave, onArchive, onClose 
 
           <label>
             <span className="small">Priority</span>
-            <select className="edit-control" aria-label="Detail priority" value={draft.priority} onChange={(e) => update('priority', e.target.value)} onMouseDown={stopPropagation} onTouchStart={stopPropagation}>
+            <select ref={priorityRef} className="edit-control" aria-label="Detail priority" value={draft.priority} onChange={(e) => update('priority', e.target.value)} onMouseDown={stopPropagation} onTouchStart={stopPropagation} onKeyDown={(e) => handleKeyDown(e, priorityRef)}>
               {PRIORITIES.map((priority) => (
                 <option key={priority} value={priority}>{priority}</option>
               ))}
@@ -138,34 +158,40 @@ function TaskEditor({ draft, isDirty, onDraftChange, onSave, onArchive, onClose 
 
           <label>
             <span className="small">Assignee</span>
-            <input className="edit-control" value={draft.assignee} onChange={(e) => update('assignee', e.target.value)} onMouseDown={stopPropagation} onTouchStart={stopPropagation} onKeyDown={(e) => handleKeyDown(e, false)} />
+            <input ref={assigneeRef} className="edit-control" aria-label="Detail assignee" value={draft.assignee} onChange={(e) => update('assignee', e.target.value)} onMouseDown={stopPropagation} onTouchStart={stopPropagation} onKeyDown={(e) => handleKeyDown(e, assigneeRef, false)} />
           </label>
 
           <label>
             <span className="small">Due date</span>
-            <input className="edit-control" type="date" value={draft.dueAt} onChange={(e) => update('dueAt', e.target.value)} onMouseDown={stopPropagation} onTouchStart={stopPropagation} />
+            <input ref={dueAtRef} className="edit-control" aria-label="Detail due date" type="date" value={draft.dueAt} onChange={(e) => update('dueAt', e.target.value)} onMouseDown={stopPropagation} onTouchStart={stopPropagation} onKeyDown={(e) => handleKeyDown(e, dueAtRef)} />
           </label>
         </div>
 
         <label>
           <span className="small">Tags (comma separated)</span>
-          <input className="edit-control" value={draft.tagsText} onChange={(e) => update('tagsText', e.target.value)} placeholder="api, ui, urgent" onMouseDown={stopPropagation} onTouchStart={stopPropagation} onKeyDown={(e) => handleKeyDown(e, false)} />
+          <input ref={tagsRef} className="edit-control" aria-label="Detail tags" value={draft.tagsText} onChange={(e) => update('tagsText', e.target.value)} placeholder="api, ui, urgent" onMouseDown={stopPropagation} onTouchStart={stopPropagation} onKeyDown={(e) => handleKeyDown(e, tagsRef, false)} />
         </label>
 
         <div className="editor-toggles">
           <label className="toggle-label">
             <input
+              ref={blockedRef}
+              aria-label="Detail blocked"
               type="checkbox"
               checked={draft.blocked}
               onChange={(e) => update('blocked', e.target.checked)}
+              onKeyDown={(e) => handleKeyDown(e, blockedRef)}
             />
             <span>Blocked</span>
           </label>
           <label className="toggle-label">
             <input
+              ref={readyRef}
+              aria-label="Detail ready"
               type="checkbox"
               checked={draft.ready}
               onChange={(e) => update('ready', e.target.checked)}
+              onKeyDown={(e) => handleKeyDown(e, readyRef)}
             />
             <span>Ready</span>
           </label>
@@ -175,22 +201,7 @@ function TaskEditor({ draft, isDirty, onDraftChange, onSave, onArchive, onClose 
       <div className="actions editor-actions">
         <button
           className="primary-btn font-display"
-          onClick={() =>
-            onSave({
-              title: draft.title.trim(),
-              description: draft.description.trim() || null,
-              status: draft.status,
-              priority: draft.priority,
-              assignee: draft.assignee.trim() || null,
-              dueAt: draft.dueAt ? new Date(`${draft.dueAt}T00:00:00`).toISOString() : null,
-              tags: draft.tagsText
-                .split(',')
-                .map((tag) => tag.trim())
-                .filter(Boolean),
-              blocked: draft.blocked,
-              ready: draft.ready
-            })
-          }
+          onClick={() => onSave(buildSavePayload())}
         >
           Save changes
         </button>
