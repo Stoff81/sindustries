@@ -97,3 +97,42 @@ test('happy path: create task, move to doing, archive', async ({ page }) => {
 
   await expect(page.getByRole('button', { name: title })).toHaveCount(0);
 });
+
+test('archived filter stays right-aligned on narrow screens', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.route('**/api/v1/tasks**', async (route) => {
+    await route.fulfill({
+      json: {
+        data: [
+          {
+            id: 'task-1',
+            title: 'Task 1',
+            status: 'todo',
+            statusChangedAt: new Date().toISOString(),
+            priority: 'medium',
+            archivedAt: null,
+            blocked: false,
+            ready: false,
+            tags: []
+          }
+        ]
+      }
+    });
+  });
+
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Backlog' }).click();
+
+  const filterPanel = page.locator('.filter-row');
+  const archivedToggle = page.getByRole('button', { name: 'Show archived' });
+
+  await expect(filterPanel).toBeVisible();
+  await expect(archivedToggle).toBeVisible();
+
+  const panelBox = await filterPanel.boundingBox();
+  const toggleBox = await archivedToggle.boundingBox();
+
+  expect(panelBox).not.toBeNull();
+  expect(toggleBox).not.toBeNull();
+  expect(toggleBox.x + toggleBox.width).toBeGreaterThan(panelBox.x + panelBox.width - 24);
+});
