@@ -506,50 +506,54 @@ export function App() {
 
       <section className="content">
         <div className="filter-row panel">
-          <label className="select-wrap">
-            <select
-              aria-label="Status filter"
-              value={filters.status}
-              onChange={(e) => setFilters((current) => ({ ...current, status: e.target.value }))}
-            >
-              <option value="">Status: All statuses</option>
-              {STATUSES.map((status) => (
-                <option key={status} value={status}>{`Status: ${status}`}</option>
-              ))}
-            </select>
-          </label>
-          <label className="select-wrap">
-            <select
-              aria-label="Priority filter"
-              value={filters.priority}
-              onChange={(e) => setFilters((current) => ({ ...current, priority: e.target.value }))}
-            >
-              <option value="">Priority: All priorities</option>
-              {PRIORITIES.map((priority) => (
-                <option key={priority} value={priority}>{`Priority: ${priority}`}</option>
-              ))}
-            </select>
-          </label>
-          {allTags.length > 0 && (
+          <div className="filter-controls">
             <label className="select-wrap">
               <select
-                aria-label="Tag filter"
-                value={filters.tag}
-                onChange={(e) => setFilters((current) => ({ ...current, tag: e.target.value }))}
+                aria-label="Status filter"
+                value={filters.status}
+                onChange={(e) => setFilters((current) => ({ ...current, status: e.target.value }))}
               >
-                <option value="">Tag: All tags</option>
-                {allTags.map((tag) => (
-                  <option key={tag} value={tag}>{`Tag: ${tag}`}</option>
+                <option value="">Status: All statuses</option>
+                {STATUSES.map((status) => (
+                  <option key={status} value={status}>{`Status: ${status}`}</option>
                 ))}
               </select>
             </label>
-          )}
-          <button
-            className={`ghost-btn ${filters.includeArchived ? 'archived-active' : ''}`}
-            onClick={() => setFilters((current) => ({ ...current, includeArchived: !current.includeArchived }))}
-          >
-            {filters.includeArchived ? 'Hide archived' : 'Show archived'}
-          </button>
+            <label className="select-wrap">
+              <select
+                aria-label="Priority filter"
+                value={filters.priority}
+                onChange={(e) => setFilters((current) => ({ ...current, priority: e.target.value }))}
+              >
+                <option value="">Priority: All priorities</option>
+                {PRIORITIES.map((priority) => (
+                  <option key={priority} value={priority}>{`Priority: ${priority}`}</option>
+                ))}
+              </select>
+            </label>
+            {allTags.length > 0 && (
+              <label className="select-wrap">
+                <select
+                  aria-label="Tag filter"
+                  value={filters.tag}
+                  onChange={(e) => setFilters((current) => ({ ...current, tag: e.target.value }))}
+                >
+                  <option value="">Tag: All tags</option>
+                  {allTags.map((tag) => (
+                    <option key={tag} value={tag}>{`Tag: ${tag}`}</option>
+                  ))}
+                </select>
+              </label>
+            )}
+          </div>
+          <div className="filter-actions">
+            <button
+              className={`ghost-btn archived-toggle ${filters.includeArchived ? 'archived-active' : ''}`}
+              onClick={() => setFilters((current) => ({ ...current, includeArchived: !current.includeArchived }))}
+            >
+              {filters.includeArchived ? 'Hide archived' : 'Show archived'}
+            </button>
+          </div>
         </div>
 
         {newTask.expanded ? (

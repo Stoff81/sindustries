@@ -240,11 +240,10 @@ button {
 
 .form-grid { display: grid; grid-template-columns: 1.2fr repeat(4, minmax(120px, 1fr)); gap: 8px; align-items: end; }
 .filter-row {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(170px, auto));
-  gap: 8px;
+  display: flex;
   align-items: center;
-  justify-content: start;
+  justify-content: space-between;
+  gap: 12px;
   margin: 0 -20px;
   margin-bottom: 0;
   padding: 12px 20px;
@@ -252,6 +251,27 @@ button {
   border-right: 0;
   border-top: 0;
 }
+
+.filter-controls {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(170px, auto));
+  gap: 8px;
+  align-items: center;
+  justify-content: start;
+  flex: 1 1 auto;
+}
+
+.filter-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+.archived-toggle {
+  white-space: nowrap;
+}
+
 .filter-row select,
 .filter-row .ghost-btn {
   font-family: var(--font-body);
