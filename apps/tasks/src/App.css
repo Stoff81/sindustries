@@ -413,6 +413,10 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel); outline:
   background: var(--pink);
   color: var(--panel-2);
 }
+.pill.tag-pill {
+  background: var(--si-color-neutral-200);
+  color: var(--si-color-text-100);
+}
 
 .editor {
   margin-top: 10px;
