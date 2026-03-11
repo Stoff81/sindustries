@@ -671,7 +671,19 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel); outline:
   .hero-content { flex-direction: column; align-items: stretch; }
   .hero-controls { width: 100%; }
   .search-wrap { min-width: 0; flex: 1; }
-  .form-grid, .editor-grid, .filter-row { grid-template-columns: 1fr; }
+  .form-grid, .editor-grid { grid-template-columns: 1fr; }
+  .filter-row {
+    flex-wrap: wrap;
+    align-items: stretch;
+  }
+  .filter-controls {
+    flex: 1 1 100%;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  }
+  .filter-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
   .board { display: flex; }
   .column { min-width: 88vw; }
   .mobile-nav { display: flex; }
