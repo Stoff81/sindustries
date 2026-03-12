@@ -79,9 +79,26 @@ async function main() {
       ],
       skipDuplicates: true
     });
+
+    if (i === 15) {
+      await prisma.taskComment.createMany({
+        data: [
+          {
+            taskId: task.id,
+            author: 'Tom',
+            body: 'Seeded follow-up: please make sure the comments flow is easy to demo.'
+          },
+          {
+            taskId: task.id,
+            author: 'Rowan',
+            body: 'Added backend + UI coverage for comments and left room for richer thread features later.'
+          }
+        ]
+      });
+    }
   }
 
-  console.log('Seed complete: 24 tasks, 8 tags.');
+  console.log('Seed complete: 24 tasks, 8 tags, Seed Task 15 comments.');
 }
 
 main()

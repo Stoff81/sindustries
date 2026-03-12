@@ -509,6 +509,10 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel); outline:
   gap: 8px;
 }
 
+.comment-composer-card {
+  margin-top: 2px;
+}
+
 .comments-empty {
   margin: 0;
 }

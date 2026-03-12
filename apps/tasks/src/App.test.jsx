@@ -104,7 +104,10 @@ describe('tasks ui', () => {
     fireEvent.change(screen.getByLabelText('Comment author'), { target: { value: 'Rowan' } });
     fireEvent.change(screen.getByLabelText('Comment text'), { target: { value: 'UI slice landed.' } });
 
+    const closeButton = screen.getByRole('button', { name: 'Close' });
     const addCommentButton = screen.getByRole('button', { name: 'Add comment' });
+    expect(closeButton.compareDocumentPosition(addCommentButton) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+
     fireEvent.click(addCommentButton);
 
     await waitFor(() => expect(screen.getByRole('button', { name: 'Adding…' })).toBeDisabled());

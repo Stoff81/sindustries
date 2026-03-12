@@ -226,27 +226,19 @@ function TaskEditor({ draft, task, isDirty, onDraftChange, onSave, onArchive, on
       </div>
 
       <div className="actions editor-actions">
-        <div className="comments-section">
-          <div className="comments-header">
-            <h4 className="font-display">Comments</h4>
-            <span className="small">{comments.length === 0 ? 'No comments yet' : `${comments.length} comment${comments.length === 1 ? '' : 's'}`}</span>
-          </div>
+        <button
+          className="primary-btn font-display"
+          onClick={() => onSave(buildSavePayload())}
+        >
+          Save changes
+        </button>
+        <button className="secondary-btn font-display" onClick={onArchive}>Archive task</button>
+        <button className="tertiary-btn" onClick={onClose}>Close</button>
 
-          {comments.length > 0 ? (
-            <ol className="comments-list" aria-label="Task comments">
-              {comments.map((comment) => (
-                <li key={comment.id} className="comment-card">
-                  <div className="comment-meta">
-                    <strong>{comment.author}</strong>
-                    <time className="small" dateTime={comment.createdAt}>{formatCommentTimestamp(comment.createdAt)}</time>
-                  </div>
-                  <p>{comment.text}</p>
-                </li>
-              ))}
-            </ol>
-          ) : (
-            <p className="small comments-empty">Add the first note on this task.</p>
-          )}
+        <div className="comments-section comment-composer-card">
+          <div className="comments-header">
+            <h4 className="font-display">New comment</h4>
+          </div>
 
           <div className="comment-composer">
             <label>
@@ -285,14 +277,28 @@ function TaskEditor({ draft, task, isDirty, onDraftChange, onSave, onArchive, on
           </div>
         </div>
 
-        <button
-          className="primary-btn font-display"
-          onClick={() => onSave(buildSavePayload())}
-        >
-          Save changes
-        </button>
-        <button className="secondary-btn font-display" onClick={onArchive}>Archive task</button>
-        <button className="tertiary-btn" onClick={onClose}>Close</button>
+        <div className="comments-section">
+          <div className="comments-header">
+            <h4 className="font-display">Comments</h4>
+            <span className="small">{comments.length === 0 ? 'No comments yet' : `${comments.length} comment${comments.length === 1 ? '' : 's'}`}</span>
+          </div>
+
+          {comments.length > 0 ? (
+            <ol className="comments-list" aria-label="Task comments">
+              {comments.map((comment) => (
+                <li key={comment.id} className="comment-card">
+                  <div className="comment-meta">
+                    <strong>{comment.author}</strong>
+                    <time className="small" dateTime={comment.createdAt}>{formatCommentTimestamp(comment.createdAt)}</time>
+                  </div>
+                  <p>{comment.text}</p>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className="small comments-empty">Add the first note on this task.</p>
+          )}
+        </div>
       </div>
     </div>
   );
