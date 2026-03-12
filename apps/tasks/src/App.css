@@ -455,6 +455,62 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel); outline:
 .actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .editor-actions {
   padding-top: 4px;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.comments-section {
+  display: grid;
+  gap: 10px;
+  padding: 10px;
+  background: color-mix(in srgb, var(--panel) 88%, var(--panel-2) 12%);
+  border: 2px dashed var(--muted);
+}
+
+.comments-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.comments-header h4,
+.comment-card p {
+  margin: 0;
+}
+
+.comments-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.comment-card {
+  display: grid;
+  gap: 6px;
+  padding: 10px;
+  background: var(--panel-2);
+  border: 2px solid var(--line);
+}
+
+.comment-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+.comment-composer {
+  display: grid;
+  gap: 8px;
+}
+
+.comments-empty {
+  margin: 0;
 }
 .draft-status {
   display: inline-flex;

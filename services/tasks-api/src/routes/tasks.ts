@@ -50,6 +50,16 @@ function decodeCursor(cursor) {
   }
 }
 
+function mapComment(comment) {
+  return {
+    id: comment.id,
+    author: comment.author,
+    text: comment.body,
+    createdAt: comment.createdAt,
+    updatedAt: comment.updatedAt
+  };
+}
+
 function mapTask(task) {
   return {
     id: task.id,
@@ -66,8 +76,13 @@ function mapTask(task) {
     ready: task.ready ?? false,
     createdAt: task.createdAt,
     updatedAt: task.updatedAt,
-    tags: task.tags?.map((taskTag) => taskTag.tag?.name).filter(Boolean) ?? []
+    tags: task.tags?.map((taskTag) => taskTag.tag?.name).filter(Boolean) ?? [],
+    comments: task.comments?.map(mapComment) ?? []
   };
+}
+
+function mapTaskComment(comment) {
+  return mapComment(comment);
 }
 
 function normalizeString(value) {
@@ -267,6 +282,9 @@ tasksRouter.get('/tasks/:id', async (req, res, next) => {
           include: {
             tag: true
           }
+        },
+        comments: {
+          orderBy: [{ createdAt: 'asc' }, { id: 'asc' }]
         }
       }
     });
@@ -417,6 +435,32 @@ tasksRouter.patch('/tasks/:id', async (req, res, next) => {
     });
 
     return res.status(200).json({ data: mapTask(task ?? updated) });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+tasksRouter.post('/tasks/:id/comments', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const existing = await prisma.task.findFirst({ where: { id, archivedAt: null } });
+    if (!existing) return notFound(res, 'TASK_NOT_FOUND', 'Task not found');
+
+    const author = normalizeString(req.body?.author);
+    const text = normalizeString(req.body?.text);
+
+    if (!author) return badRequest(res, 'COMMENT_AUTHOR_REQUIRED', 'author is required');
+    if (!text) return badRequest(res, 'COMMENT_TEXT_REQUIRED', 'text is required');
+
+    const comment = await prisma.taskComment.create({
+      data: {
+        taskId: id,
+        author,
+        body: text
+      }
+    });
+
+    return res.status(201).json({ data: mapTaskComment(comment) });
   } catch (error) {
     return next(error);
   }

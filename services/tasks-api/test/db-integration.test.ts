@@ -31,6 +31,20 @@ describe('tasks api db integration', () => {
     expect(moved.status).toBe(200);
     expect(moved.body.data.status).toBe('doing');
 
+    const commented = await request(app)
+      .post(`/api/v1/tasks/${taskId}/comments`)
+      .send({ author: 'CI', text: 'Happy-path integration comment' });
+
+    expect(commented.status).toBe(201);
+    expect(commented.body.data.author).toBe('CI');
+    expect(commented.body.data.text).toBe('Happy-path integration comment');
+
+    const detail = await request(app).get(`/api/v1/tasks/${taskId}`);
+    expect(detail.status).toBe(200);
+    expect(detail.body.data.comments).toEqual([
+      expect.objectContaining({ author: 'CI', text: 'Happy-path integration comment' })
+    ]);
+
     const archived = await request(app).delete(`/api/v1/tasks/${taskId}`);
     expect(archived.status).toBe(200);
     expect(archived.body.data.id).toBe(taskId);

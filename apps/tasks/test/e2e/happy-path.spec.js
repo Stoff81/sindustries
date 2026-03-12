@@ -136,3 +136,68 @@ test('archived filter stays right-aligned on narrow screens', async ({ page }) =
   expect(toggleBox).not.toBeNull();
   expect(toggleBox.x + toggleBox.width).toBeGreaterThan(panelBox.x + panelBox.width - 24);
 });
+
+test('happy path: create and render a task comment', async ({ page }) => {
+  const createdAt = new Date().toISOString();
+  const tasks = [
+    {
+      id: 'task-with-comments',
+      title: 'Comment target',
+      description: 'Used for comment e2e coverage',
+      status: 'todo',
+      statusChangedAt: createdAt,
+      priority: 'medium',
+      archivedAt: null,
+      blocked: false,
+      ready: true,
+      tags: [],
+      comments: []
+    }
+  ];
+
+  await page.route('**/api/v1/tasks**', async (route) => {
+    const request = route.request();
+    const method = request.method();
+    const url = new URL(request.url());
+    const isCollection = /\/tasks$/.test(url.pathname);
+    const commentMatch = url.pathname.match(/\/tasks\/([^/]+)\/comments$/);
+
+    if (method === 'GET' && isCollection) {
+      await route.fulfill({ json: { data: tasks } });
+      return;
+    }
+
+    if (method === 'POST' && commentMatch) {
+      const [, taskId] = commentMatch;
+      const body = request.postDataJSON();
+      const task = tasks.find((entry) => entry.id === taskId);
+      const comment = {
+        id: `comment-${Date.now()}`,
+        author: body.author,
+        text: body.text,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      if (task) task.comments = [...(task.comments ?? []), comment];
+      await route.fulfill({ status: 201, json: { data: comment } });
+      return;
+    }
+
+    await route.fulfill({ status: 404, json: { error: { message: 'Not found' } } });
+  });
+
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Backlog' }).click();
+  await page.getByRole('button', { name: 'Comment target' }).click();
+
+  await expect(page.getByRole('heading', { name: 'Comments' })).toBeVisible();
+  await expect(page.getByText('Add the first note on this task.')).toBeVisible();
+
+  await page.getByLabel('Comment author').fill('Rowan');
+  await page.getByLabel('Comment text').fill('E2E comment path works.');
+  await page.getByRole('button', { name: 'Add comment' }).click();
+
+  await expect(page.getByText('Rowan')).toBeVisible();
+  await expect(page.getByText('E2E comment path works.')).toBeVisible();
+  await expect(page.locator('.comment-meta time')).toBeVisible();
+});
