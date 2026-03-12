@@ -150,10 +150,13 @@ function TaskEditor({ draft, task, isDirty, onDraftChange, onSave, onArchive, on
   return (
     <div className="editor" onClick={(e) => e.stopPropagation()}>
       <div className="editor-fields">
-        <label>
-          <span className="small">Title</span>
-          <input ref={titleRef} className="edit-control" aria-label="Detail title" value={draft.title} onChange={(e) => update('title', e.target.value)} onMouseDown={stopPropagation} onTouchStart={stopPropagation} onKeyDown={(e) => handleKeyDown(e, titleRef, false)} autoFocus />
-        </label>
+        <div className="title-row">
+          <label>
+            <span className="small">Title</span>
+            <input ref={titleRef} className="edit-control" aria-label="Detail title" value={draft.title} onChange={(e) => update('title', e.target.value)} onMouseDown={stopPropagation} onTouchStart={stopPropagation} onKeyDown={(e) => handleKeyDown(e, titleRef, false)} autoFocus />
+          </label>
+          <button className="tertiary-btn title-close-btn" onClick={onClose}>Close</button>
+        </div>
 
         <label>
           <span className="small">Description</span>
@@ -239,8 +242,10 @@ function TaskEditor({ draft, task, isDirty, onDraftChange, onSave, onArchive, on
           >
             Save changes
           </button>
-          <button className="secondary-btn font-display" onClick={onArchive}>Archive task</button>
-          <button className="tertiary-btn" onClick={onClose}>Close</button>
+          <div className="editor-secondary-actions">
+            <button className="secondary-btn font-display" onClick={onArchive}>Archive task</button>
+            <button className="tertiary-btn" onClick={onClose}>Close</button>
+          </div>
         </div>
 
         <div className="comments-section">

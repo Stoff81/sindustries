@@ -254,7 +254,8 @@ describe('tasks ui', () => {
     fireEvent.change(screen.getByLabelText('Detail title'), { target: { value: 'Draft title' } });
     expect(screen.getByLabelText('Detail title')).toHaveValue('Draft title');
 
-    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+    // Click the first Close button (there are now two - one in title row, one in actions)
+    fireEvent.click(screen.getAllByRole('button', { name: 'Close' })[0]);
     expect(screen.getByText('Unsaved')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Original title' }));

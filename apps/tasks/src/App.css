@@ -466,6 +466,29 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel); outline:
   align-items: center;
   padding-bottom: 10px;
   border-bottom: 2px dashed var(--muted);
+  justify-content: space-between;
+}
+
+.editor-secondary-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.title-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.title-row label {
+  flex: 1;
+}
+
+.title-close-btn {
+  margin-top: 18px;
 }
 
 .comments-section {
