@@ -8,6 +8,9 @@ const prismaMock = {
     create: vi.fn(),
     update: vi.fn()
   },
+  taskComment: {
+    create: vi.fn()
+  },
   taskTag: {
     deleteMany: vi.fn(),
     createMany: vi.fn()
@@ -99,12 +102,28 @@ describe('tasks api endpoints', () => {
     expect(prismaMock.task.findMany).not.toHaveBeenCalled();
   });
 
-  it('GET /api/v1/tasks/:id returns a single task', async () => {
+  it('GET /api/v1/tasks/:id returns a single task with comments oldest-first', async () => {
     prismaMock.task.findFirst.mockResolvedValue(
       task({
         id: '22222222-2222-2222-2222-222222222222',
         title: 'Task detail',
-        tags: [{ tag: { name: 'backend' } }]
+        tags: [{ tag: { name: 'backend' } }],
+        comments: [
+          {
+            id: 'comment-1',
+            author: 'Rowan',
+            body: 'First note',
+            createdAt: new Date('2026-03-11T00:00:00.000Z'),
+            updatedAt: new Date('2026-03-11T00:00:00.000Z')
+          },
+          {
+            id: 'comment-2',
+            author: 'Tom',
+            body: 'Second note',
+            createdAt: new Date('2026-03-12T00:00:00.000Z'),
+            updatedAt: new Date('2026-03-12T00:00:00.000Z')
+          }
+        ]
       })
     );
 
@@ -114,6 +133,89 @@ describe('tasks api endpoints', () => {
     expect(response.status).toBe(200);
     expect(response.body.data.id).toBe('22222222-2222-2222-2222-222222222222');
     expect(response.body.data.tags).toEqual(['backend']);
+    expect(response.body.data.comments).toEqual([
+      {
+        id: 'comment-1',
+        author: 'Rowan',
+        text: 'First note',
+        createdAt: '2026-03-11T00:00:00.000Z',
+        updatedAt: '2026-03-11T00:00:00.000Z'
+      },
+      {
+        id: 'comment-2',
+        author: 'Tom',
+        text: 'Second note',
+        createdAt: '2026-03-12T00:00:00.000Z',
+        updatedAt: '2026-03-12T00:00:00.000Z'
+      }
+    ]);
+    expect(prismaMock.task.findFirst.mock.calls.at(-1)?.[0]?.include?.comments).toEqual({
+      orderBy: [{ createdAt: 'asc' }, { id: 'asc' }]
+    });
+  });
+
+  it('POST /api/v1/tasks/:id/comments creates a comment', async () => {
+    prismaMock.task.findFirst.mockResolvedValueOnce(task());
+    prismaMock.taskComment.create.mockResolvedValue({
+      id: 'comment-1',
+      taskId: '11111111-1111-1111-1111-111111111111',
+      author: 'Rowan',
+      body: 'Investigated API contract',
+      createdAt: new Date('2026-03-12T00:00:00.000Z'),
+      updatedAt: new Date('2026-03-12T00:00:00.000Z')
+    });
+
+    const app = createApp();
+    const response = await request(app)
+      .post('/api/v1/tasks/11111111-1111-1111-1111-111111111111/comments')
+      .send({ author: '  Rowan  ', text: '  Investigated API contract  ' });
+
+    expect(response.status).toBe(201);
+    expect(response.body.data).toEqual({
+      id: 'comment-1',
+      author: 'Rowan',
+      text: 'Investigated API contract',
+      createdAt: '2026-03-12T00:00:00.000Z',
+      updatedAt: '2026-03-12T00:00:00.000Z'
+    });
+    expect(prismaMock.taskComment.create).toHaveBeenCalledWith({
+      data: {
+        taskId: '11111111-1111-1111-1111-111111111111',
+        author: 'Rowan',
+        body: 'Investigated API contract'
+      }
+    });
+  });
+
+  it('POST /api/v1/tasks/:id/comments validates required fields and missing task', async () => {
+    const app = createApp();
+
+    prismaMock.task.findFirst.mockResolvedValueOnce(task());
+    const missingAuthor = await request(app)
+      .post('/api/v1/tasks/11111111-1111-1111-1111-111111111111/comments')
+      .send({ text: 'hello' });
+    expect(missingAuthor.status).toBe(400);
+    expect(missingAuthor.body).toEqual({
+      error: { code: 'COMMENT_AUTHOR_REQUIRED', message: 'author is required' }
+    });
+
+    prismaMock.task.findFirst.mockResolvedValueOnce(task());
+    const missingText = await request(app)
+      .post('/api/v1/tasks/11111111-1111-1111-1111-111111111111/comments')
+      .send({ author: 'Rowan', text: '   ' });
+    expect(missingText.status).toBe(400);
+    expect(missingText.body).toEqual({
+      error: { code: 'COMMENT_TEXT_REQUIRED', message: 'text is required' }
+    });
+
+    prismaMock.task.findFirst.mockResolvedValueOnce(null);
+    const missingTask = await request(app)
+      .post('/api/v1/tasks/missing/comments')
+      .send({ author: 'Rowan', text: 'hello' });
+    expect(missingTask.status).toBe(404);
+    expect(missingTask.body).toEqual({
+      error: { code: 'TASK_NOT_FOUND', message: 'Task not found' }
+    });
   });
 
   it('POST /api/v1/tasks creates a task', async () => {

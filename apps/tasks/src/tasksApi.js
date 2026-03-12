@@ -53,3 +53,12 @@ export async function archiveTask(id) {
   const response = await api(`/tasks/${id}`, { method: 'DELETE' });
   return response.data;
 }
+
+export async function createTaskComment(id, payload) {
+  const response = await api(`/tasks/${id}/comments`, {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  });
+
+  return response.data;
+}

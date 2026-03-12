@@ -21,26 +21,40 @@ enum TaskPriority {
 }
 
 model Task {
-  id              String      @id @default(uuid()) @db.Uuid
+  id              String       @id @default(uuid()) @db.Uuid
   title           String
   description     String?
-  status          TaskStatus  @default(todo)
-  statusChangedAt DateTime    @default(now())
+  status          TaskStatus   @default(todo)
+  statusChangedAt DateTime     @default(now())
   priority        TaskPriority @default(medium)
   dueAt           DateTime?
   completedAt     DateTime?
   assignee        String?
   archivedAt      DateTime?
-  blocked         Boolean     @default(false)
-  ready           Boolean     @default(false)
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  blocked         Boolean      @default(false)
+  ready           Boolean      @default(false)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
 
   tags            TaskTag[]
+  comments        TaskComment[]
 
   @@index([archivedAt, priority])
   @@index([status, statusChangedAt])
   @@index([dueAt])
+}
+
+model TaskComment {
+  id        String   @id @default(uuid()) @db.Uuid
+  taskId     String   @db.Uuid
+  author    String
+  body      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([taskId, createdAt])
 }
 
 model Tag {

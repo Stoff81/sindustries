@@ -9,6 +9,7 @@ function mockTask(overrides = {}) {
     status: 'todo',
     statusChangedAt: '2026-03-01T00:00:00.000Z',
     priority: 'medium',
+    comments: [],
     ...overrides
   };
 }
@@ -17,6 +18,102 @@ describe('tasks ui', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
     window.localStorage.clear();
+  });
+
+  it('renders existing comments in the task detail view', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          data: [mockTask({
+            id: 'commented-task',
+            title: 'Commented task',
+            comments: [
+              {
+                id: 'comment-1',
+                author: 'Quinn',
+                text: 'Backend slice is in.',
+                createdAt: '2026-03-12T09:00:00.000Z'
+              }
+            ]
+          })]
+        })
+      })
+    );
+
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Backlog' }));
+
+    await screen.findByRole('list', { name: 'Backlog list' });
+    fireEvent.click(screen.getByRole('button', { name: 'Commented task' }));
+
+    expect(screen.getByRole('heading', { name: 'Comments' })).toBeInTheDocument();
+    expect(screen.getByRole('list', { name: 'Task comments' })).toBeInTheDocument();
+    expect(screen.getByText('Backend slice is in.')).toBeInTheDocument();
+    expect(screen.getByText('Quinn')).toBeInTheDocument();
+  });
+
+  it('creates a comment, disables submit while pending, and clears the composer on success', async () => {
+    let comments = [];
+    let resolvePost;
+
+    const fetchMock = vi.fn((url, options = {}) => {
+      const method = options.method ?? 'GET';
+      const urlText = String(url);
+
+      if (method === 'GET' && urlText.includes('/tasks?')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            data: [mockTask({ id: 'comment-create-task', title: 'Comment create task', comments })]
+          })
+        });
+      }
+
+      if (method === 'POST' && urlText.includes('/tasks/comment-create-task/comments')) {
+        return new Promise((resolve) => {
+          resolvePost = () => {
+            comments = [
+              {
+                id: 'comment-2',
+                author: 'Rowan',
+                text: 'UI slice landed.',
+                createdAt: '2026-03-12T10:00:00.000Z'
+              }
+            ];
+            resolve({
+              ok: true,
+              json: async () => ({ data: comments[0] })
+            });
+          };
+        });
+      }
+
+      throw new Error(`Unexpected fetch call: ${method} ${urlText}`);
+    });
+
+    vi.stubGlobal('fetch', fetchMock);
+
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Backlog' }));
+
+    await screen.findByRole('list', { name: 'Backlog list' });
+    fireEvent.click(screen.getByRole('button', { name: 'Comment create task' }));
+
+    fireEvent.change(screen.getByLabelText('Comment author'), { target: { value: 'Rowan' } });
+    fireEvent.change(screen.getByLabelText('Comment text'), { target: { value: 'UI slice landed.' } });
+
+    const addCommentButton = screen.getByRole('button', { name: 'Add comment' });
+    fireEvent.click(addCommentButton);
+
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Adding…' })).toBeDisabled());
+    resolvePost();
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining('/tasks/comment-create-task/comments'), expect.objectContaining({ method: 'POST' })));
+    await waitFor(() => expect(screen.getByText('UI slice landed.')).toBeInTheDocument());
+    expect(screen.getByLabelText('Comment author')).toHaveValue('');
+    expect(screen.getByLabelText('Comment text')).toHaveValue('');
   });
 
   it('renders backlog list and filter controls', async () => {

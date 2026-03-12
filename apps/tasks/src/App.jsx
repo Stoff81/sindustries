@@ -20,6 +20,17 @@ function createConfettiPieces(pieceCount = 120) {
   }));
 }
 
+function normalizeComments(comments) {
+  return Array.isArray(comments) ? comments : [];
+}
+
+function formatCommentTimestamp(value) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleString();
+}
+
 function normalizeTaskForEditor(task) {
   return {
     title: task.title ?? '',
@@ -34,7 +45,7 @@ function normalizeTaskForEditor(task) {
   };
 }
 
-function TaskEditor({ draft, isDirty, onDraftChange, onSave, onArchive, onClose }) {
+function TaskEditor({ draft, task, isDirty, onDraftChange, onSave, onArchive, onClose, onAddComment, isSubmittingComment }) {
   const descriptionRef = useRef(null);
   const titleRef = useRef(null);
   const statusRef = useRef(null);
@@ -44,6 +55,7 @@ function TaskEditor({ draft, isDirty, onDraftChange, onSave, onArchive, onClose 
   const tagsRef = useRef(null);
   const blockedRef = useRef(null);
   const readyRef = useRef(null);
+  const [commentDraft, setCommentDraft] = useState({ author: '', text: '' });
 
   useEffect(() => {
     const textarea = descriptionRef.current;
@@ -113,6 +125,21 @@ function TaskEditor({ draft, isDirty, onDraftChange, onSave, onArchive, onClose 
       onSave(buildSavePayload());
     }
   }
+
+  async function handleAddComment() {
+    const payload = {
+      author: commentDraft.author.trim(),
+      text: commentDraft.text.trim()
+    };
+
+    if (!payload.author || !payload.text) return;
+
+    const didCreate = await onAddComment(payload);
+    if (!didCreate) return;
+    setCommentDraft({ author: '', text: '' });
+  }
+
+  const comments = normalizeComments(task.comments);
 
   return (
     <div className="editor" onClick={(e) => e.stopPropagation()}>
@@ -199,6 +226,65 @@ function TaskEditor({ draft, isDirty, onDraftChange, onSave, onArchive, onClose 
       </div>
 
       <div className="actions editor-actions">
+        <div className="comments-section">
+          <div className="comments-header">
+            <h4 className="font-display">Comments</h4>
+            <span className="small">{comments.length === 0 ? 'No comments yet' : `${comments.length} comment${comments.length === 1 ? '' : 's'}`}</span>
+          </div>
+
+          {comments.length > 0 ? (
+            <ol className="comments-list" aria-label="Task comments">
+              {comments.map((comment) => (
+                <li key={comment.id} className="comment-card">
+                  <div className="comment-meta">
+                    <strong>{comment.author}</strong>
+                    <time className="small" dateTime={comment.createdAt}>{formatCommentTimestamp(comment.createdAt)}</time>
+                  </div>
+                  <p>{comment.text}</p>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className="small comments-empty">Add the first note on this task.</p>
+          )}
+
+          <div className="comment-composer">
+            <label>
+              <span className="small">Comment author</span>
+              <input
+                className="edit-control"
+                aria-label="Comment author"
+                value={commentDraft.author}
+                onChange={(e) => setCommentDraft((current) => ({ ...current, author: e.target.value }))}
+                onMouseDown={stopPropagation}
+                onTouchStart={stopPropagation}
+              />
+            </label>
+            <label>
+              <span className="small">Comment</span>
+              <textarea
+                className="edit-control"
+                aria-label="Comment text"
+                value={commentDraft.text}
+                rows={3}
+                onChange={(e) => setCommentDraft((current) => ({ ...current, text: e.target.value }))}
+                onMouseDown={stopPropagation}
+                onTouchStart={stopPropagation}
+              />
+            </label>
+            <div className="actions">
+              <button
+                className="primary-btn font-display"
+                type="button"
+                onClick={() => void handleAddComment()}
+                disabled={isSubmittingComment || !commentDraft.author.trim() || !commentDraft.text.trim()}
+              >
+                {isSubmittingComment ? 'Adding…' : 'Add comment'}
+              </button>
+            </div>
+          </div>
+        </div>
+
         <button
           className="primary-btn font-display"
           onClick={() => onSave(buildSavePayload())}
@@ -230,6 +316,7 @@ export function App() {
 
   const [newTask, setNewTask] = useState({ title: '', expanded: false, description: '', priority: 'medium', assignee: '', dueAt: '', tagsText: '', blocked: false, ready: false });
   const [confettiBursts, setConfettiBursts] = useState([]);
+  const [submittingCommentForTaskId, setSubmittingCommentForTaskId] = useState(null);
   const confettiTimeoutsRef = useRef(new Map());
   const audioContextRef = useRef(null);
   const taskCardRefs = useRef({});
@@ -253,7 +340,8 @@ export function App() {
     error,
     createTask: createTaskRequest,
     updateTask: patchTaskRequest,
-    archiveTask: archiveTaskRequest
+    archiveTask: archiveTaskRequest,
+    createTaskComment: createTaskCommentRequest
   } = useTasks(filters, {
     pauseAutoRefresh: selectedId !== null,
     refreshIntervalMs: 3000
@@ -366,6 +454,18 @@ export function App() {
       return true;
     } catch {
       return false;
+    }
+  }
+
+  async function createTaskComment(id, payload) {
+    setSubmittingCommentForTaskId(id);
+    try {
+      await createTaskCommentRequest(id, payload);
+      return true;
+    } catch {
+      return false;
+    } finally {
+      setSubmittingCommentForTaskId((current) => (current === id ? null : current));
     }
   }
 
@@ -679,6 +779,7 @@ export function App() {
                       {isSelected ? (
                         <TaskEditor
                           draft={draft}
+                          task={task}
                           isDirty={hasDraft}
                           onDraftChange={(nextDraft) => storeDraft(task, nextDraft)}
                           onSave={async (patch) => {
@@ -693,6 +794,8 @@ export function App() {
                             setSelectedId(null);
                             scrollToTaskIfNeeded(task.id);
                           }}
+                          onAddComment={(payload) => createTaskComment(task.id, payload)}
+                          isSubmittingComment={submittingCommentForTaskId === task.id}
                         />
                       ) : null}
                     </article>
@@ -767,6 +870,7 @@ export function App() {
                             {isSelected ? (
                               <TaskEditor
                                 draft={draft}
+                                task={task}
                                 isDirty={hasDraft}
                                 onDraftChange={(nextDraft) => storeDraft(task, nextDraft)}
                                 onSave={async (patch) => {
@@ -781,6 +885,8 @@ export function App() {
                                   setSelectedId(null);
                                   scrollToTaskIfNeeded(task.id);
                                 }}
+                                onAddComment={(payload) => createTaskComment(task.id, payload)}
+                                isSubmittingComment={submittingCommentForTaskId === task.id}
                               />
                             ) : null}
                           </article>
