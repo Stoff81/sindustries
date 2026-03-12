@@ -347,7 +347,8 @@ export function App() {
     createTask: createTaskRequest,
     updateTask: patchTaskRequest,
     archiveTask: archiveTaskRequest,
-    createTaskComment: createTaskCommentRequest
+    createTaskComment: createTaskCommentRequest,
+    refreshTask
   } = useTasks(filters, {
     pauseAutoRefresh: selectedId !== null,
     refreshIntervalMs: 3000
@@ -467,6 +468,7 @@ export function App() {
     setSubmittingCommentForTaskId(id);
     try {
       await createTaskCommentRequest(id, payload);
+      await refreshTask(id);
       return true;
     } catch {
       return false;

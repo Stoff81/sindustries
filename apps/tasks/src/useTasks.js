@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { archiveTask as archiveTaskRequest, createTask as createTaskRequest, createTaskComment as createTaskCommentRequest, fetchTasks, updateTask as updateTaskRequest } from './tasksApi.js';
+import { archiveTask as archiveTaskRequest, createTask as createTaskRequest, createTaskComment as createTaskCommentRequest, fetchTask as fetchTaskRequest, fetchTasks, updateTask as updateTaskRequest } from './tasksApi.js';
 
 const DEFAULT_REFRESH_INTERVAL_MS = 3000;
 
@@ -70,6 +70,17 @@ export function useTasks(filters, options = {}) {
   const updateTask = useCallback((id, patch) => runMutation(() => updateTaskRequest(id, patch)), [runMutation]);
   const archiveTask = useCallback((id) => runMutation(() => archiveTaskRequest(id)), [runMutation]);
   const createTaskComment = useCallback((id, payload) => runMutation(() => createTaskCommentRequest(id, payload)), [runMutation]);
+  const refreshTask = useCallback(async (id) => {
+    setError('');
+    try {
+      const task = await fetchTaskRequest(id);
+      setTasks((current) => current.map((entry) => (entry.id === id ? task : entry)));
+      return task;
+    } catch (e) {
+      setError(e.message);
+      throw e;
+    }
+  }, []);
 
   return {
     tasks,
@@ -78,6 +89,7 @@ export function useTasks(filters, options = {}) {
     createTask,
     updateTask,
     archiveTask,
-    createTaskComment
+    createTaskComment,
+    refreshTask
   };
 }

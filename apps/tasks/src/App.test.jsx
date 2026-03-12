@@ -66,7 +66,16 @@ describe('tasks ui', () => {
         return Promise.resolve({
           ok: true,
           json: async () => ({
-            data: [mockTask({ id: 'comment-create-task', title: 'Comment create task', comments })]
+            data: [mockTask({ id: 'comment-create-task', title: 'Comment create task', comments: [] })]
+          })
+        });
+      }
+
+      if (method === 'GET' && urlText.endsWith('/tasks/comment-create-task')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            data: mockTask({ id: 'comment-create-task', title: 'Comment create task', comments })
           })
         });
       }
