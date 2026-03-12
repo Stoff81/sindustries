@@ -98,7 +98,31 @@ async function main() {
     }
   }
 
-  console.log('Seed complete: 24 tasks, 8 tags, Seed Task 15 comments.');
+  await prisma.task.create({
+    data: {
+      title: 'Comment Test Task',
+      description: 'Purpose-built seed task for validating the comments UI demo flow',
+      status: 'todo',
+      priority: 'high',
+      statusChangedAt: new Date(),
+      assignee: 'Rowan',
+      ready: true,
+      comments: {
+        create: [
+          {
+            author: 'Tom',
+            body: 'Please make sure seeded comments are clearly visible in the UI.'
+          },
+          {
+            author: 'Rowan',
+            body: 'Added this task so the comments feature is easy to review without creating new data first.'
+          }
+        ]
+      }
+    }
+  });
+
+  console.log('Seed complete: 25 tasks, 8 tags, Seed Task 15 comments, Comment Test Task.');
 }
 
 main()

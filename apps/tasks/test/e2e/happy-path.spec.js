@@ -160,10 +160,18 @@ test('happy path: create and render a task comment', async ({ page }) => {
     const method = request.method();
     const url = new URL(request.url());
     const isCollection = /\/tasks$/.test(url.pathname);
+    const detailMatch = url.pathname.match(/\/tasks\/([^/]+)$/);
     const commentMatch = url.pathname.match(/\/tasks\/([^/]+)\/comments$/);
 
     if (method === 'GET' && isCollection) {
-      await route.fulfill({ json: { data: tasks } });
+      await route.fulfill({ json: { data: tasks.map(({ comments, ...task }) => task) } });
+      return;
+    }
+
+    if (method === 'GET' && detailMatch && !commentMatch) {
+      const [, taskId] = detailMatch;
+      const task = tasks.find((entry) => entry.id === taskId);
+      await route.fulfill({ json: { data: task } });
       return;
     }
 
@@ -193,11 +201,17 @@ test('happy path: create and render a task comment', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Comments' })).toBeVisible();
   await expect(page.getByText('Add the first note on this task.')).toBeVisible();
 
+  const toggleButton = page.getByRole('button', { name: '+', exact: true });
+  await expect(toggleButton).toHaveAttribute('aria-expanded', 'false');
+  await toggleButton.click();
+  await expect(toggleButton).toHaveAttribute('aria-expanded', 'true');
+
   await page.getByLabel('Comment author').fill('Rowan');
   await page.getByLabel('Comment text').fill('E2E comment path works.');
   await page.getByRole('button', { name: 'Add comment' }).click();
 
   const commentsList = page.getByRole('list', { name: 'Task comments' });
+  await expect(toggleButton).toHaveAttribute('aria-expanded', 'false');
   await expect(commentsList.getByText('Rowan')).toBeVisible();
   await expect(commentsList.getByText('E2E comment path works.')).toBeVisible();
   await expect(commentsList.locator('.comment-meta time')).toBeVisible();

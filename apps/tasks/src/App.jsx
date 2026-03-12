@@ -56,6 +56,7 @@ function TaskEditor({ draft, task, isDirty, onDraftChange, onSave, onArchive, on
   const blockedRef = useRef(null);
   const readyRef = useRef(null);
   const [commentDraft, setCommentDraft] = useState({ author: '', text: '' });
+  const [isCommentComposerOpen, setIsCommentComposerOpen] = useState(false);
 
   useEffect(() => {
     const textarea = descriptionRef.current;
@@ -137,9 +138,14 @@ function TaskEditor({ draft, task, isDirty, onDraftChange, onSave, onArchive, on
     const didCreate = await onAddComment(payload);
     if (!didCreate) return;
     setCommentDraft({ author: '', text: '' });
+    setIsCommentComposerOpen(false);
   }
 
-  const comments = normalizeComments(task.comments);
+  const comments = [...normalizeComments(task.comments)].sort((a, b) => {
+    const timeDiff = new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    if (timeDiff !== 0) return timeDiff;
+    return String(b.id ?? '').localeCompare(String(a.id ?? ''));
+  });
 
   return (
     <div className="editor" onClick={(e) => e.stopPropagation()}>
@@ -226,62 +232,74 @@ function TaskEditor({ draft, task, isDirty, onDraftChange, onSave, onArchive, on
       </div>
 
       <div className="actions editor-actions">
-        <button
-          className="primary-btn font-display"
-          onClick={() => onSave(buildSavePayload())}
-        >
-          Save changes
-        </button>
-        <button className="secondary-btn font-display" onClick={onArchive}>Archive task</button>
-        <button className="tertiary-btn" onClick={onClose}>Close</button>
-
-        <div className="comments-section comment-composer-card">
-          <div className="comments-header">
-            <h4 className="font-display">New comment</h4>
-          </div>
-
-          <div className="comment-composer">
-            <label>
-              <span className="small">Comment author</span>
-              <input
-                className="edit-control"
-                aria-label="Comment author"
-                value={commentDraft.author}
-                onChange={(e) => setCommentDraft((current) => ({ ...current, author: e.target.value }))}
-                onMouseDown={stopPropagation}
-                onTouchStart={stopPropagation}
-              />
-            </label>
-            <label>
-              <span className="small">Comment</span>
-              <textarea
-                className="edit-control"
-                aria-label="Comment text"
-                value={commentDraft.text}
-                rows={3}
-                onChange={(e) => setCommentDraft((current) => ({ ...current, text: e.target.value }))}
-                onMouseDown={stopPropagation}
-                onTouchStart={stopPropagation}
-              />
-            </label>
-            <div className="actions">
-              <button
-                className="primary-btn font-display"
-                type="button"
-                onClick={() => void handleAddComment()}
-                disabled={isSubmittingComment || !commentDraft.author.trim() || !commentDraft.text.trim()}
-              >
-                {isSubmittingComment ? 'Adding…' : 'Add comment'}
-              </button>
-            </div>
-          </div>
+        <div className="editor-primary-actions">
+          <button
+            className="primary-btn font-display"
+            onClick={() => onSave(buildSavePayload())}
+          >
+            Save changes
+          </button>
+          <button className="secondary-btn font-display" onClick={onArchive}>Archive task</button>
+          <button className="tertiary-btn" onClick={onClose}>Close</button>
         </div>
 
         <div className="comments-section">
           <div className="comments-header">
-            <h4 className="font-display">Comments</h4>
+            <div className="comments-heading-row">
+              <h4 className="font-display">Comments</h4>
+              <button
+                className="primary-btn font-display comment-toggle-btn"
+                type="button"
+                aria-expanded={isCommentComposerOpen}
+                aria-controls="task-comment-composer"
+                onClick={() => setIsCommentComposerOpen((current) => !current)}
+              >
+                +
+              </button>
+            </div>
             <span className="small">{comments.length === 0 ? 'No comments yet' : `${comments.length} comment${comments.length === 1 ? '' : 's'}`}</span>
           </div>
+
+          {isCommentComposerOpen ? (
+            <div id="task-comment-composer" className="comment-composer">
+              <div className="comment-composer-actions">
+                <button className="tertiary-btn comment-composer-close" type="button" onClick={() => setIsCommentComposerOpen(false)}>Close</button>
+              </div>
+              <label>
+                <span className="small">Comment author</span>
+                <input
+                  className="edit-control"
+                  aria-label="Comment author"
+                  value={commentDraft.author}
+                  onChange={(e) => setCommentDraft((current) => ({ ...current, author: e.target.value }))}
+                  onMouseDown={stopPropagation}
+                  onTouchStart={stopPropagation}
+                />
+              </label>
+              <label>
+                <span className="small">Comment</span>
+                <textarea
+                  className="edit-control"
+                  aria-label="Comment text"
+                  value={commentDraft.text}
+                  rows={3}
+                  onChange={(e) => setCommentDraft((current) => ({ ...current, text: e.target.value }))}
+                  onMouseDown={stopPropagation}
+                  onTouchStart={stopPropagation}
+                />
+              </label>
+              <div className="actions">
+                <button
+                  className="primary-btn font-display"
+                  type="button"
+                  onClick={() => void handleAddComment()}
+                  disabled={isSubmittingComment || !commentDraft.author.trim() || !commentDraft.text.trim()}
+                >
+                  {isSubmittingComment ? 'Adding…' : 'Add comment'}
+                </button>
+              </div>
+            </div>
+          ) : null}
 
           {comments.length > 0 ? (
             <ol className="comments-list" aria-label="Task comments">
