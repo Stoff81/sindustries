@@ -245,26 +245,23 @@ function TaskEditor({ draft, task, isDirty, onDraftChange, onSave, onArchive, on
 
         <div className="comments-section">
           <div className="comments-header">
-            <div className="comments-heading-row">
-              <h4 className="font-display">Comments</h4>
+            <h4 className="font-display">Comments</h4>
+            <div className="comments-header-actions">
+              <span className="small comments-count">{comments.length === 0 ? 'No comments yet' : `${comments.length} comment${comments.length === 1 ? '' : 's'}`}</span>
               <button
-                className="primary-btn font-display comment-toggle-btn"
+                className={`${isCommentComposerOpen ? 'tertiary-btn' : 'primary-btn font-display'} comment-toggle-btn`}
                 type="button"
                 aria-expanded={isCommentComposerOpen}
                 aria-controls="task-comment-composer"
                 onClick={() => setIsCommentComposerOpen((current) => !current)}
               >
-                +
+                {isCommentComposerOpen ? 'Close' : '+'}
               </button>
             </div>
-            <span className="small">{comments.length === 0 ? 'No comments yet' : `${comments.length} comment${comments.length === 1 ? '' : 's'}`}</span>
           </div>
 
           {isCommentComposerOpen ? (
             <div id="task-comment-composer" className="comment-composer">
-              <div className="comment-composer-actions">
-                <button className="tertiary-btn comment-composer-close" type="button" onClick={() => setIsCommentComposerOpen(false)}>Close</button>
-              </div>
               <label>
                 <span className="small">Comment author</span>
                 <input
@@ -313,9 +310,7 @@ function TaskEditor({ draft, task, isDirty, onDraftChange, onSave, onArchive, on
                 </li>
               ))}
             </ol>
-          ) : (
-            <p className="small comments-empty">Add the first note on this task.</p>
-          )}
+          ) : null}
         </div>
       </div>
     </div>
@@ -543,6 +538,19 @@ export function App() {
     } catch {
       // No-op on browsers that block or lack Web Audio.
     }
+  }
+
+  function openTask(taskId) {
+    setSelectedId(taskId);
+    void refreshTask(taskId).catch(() => {});
+  }
+
+  function toggleTask(taskId, isSelected) {
+    if (isSelected) {
+      setSelectedId(null);
+      return;
+    }
+    openTask(taskId);
   }
 
   function launchPulseCelebration() {
@@ -774,8 +782,8 @@ export function App() {
                     <article 
                       ref={(el) => { taskCardRefs.current[task.id] = el; }}
                       className={`task-card ${task.archivedAt ? 'archived' : ''} ${task.blocked ? 'blocked' : ''} ${task.ready ? 'ready' : ''} ${isSelected ? 'is-editing' : ''} card-tilt-${index % 3}`}
-                      onClick={(e) => {
-                        if (!isSelected) setSelectedId(task.id);
+                      onClick={() => {
+                        if (!isSelected) openTask(task.id);
                       }}
                     >
                       <div className="task-row">
@@ -783,7 +791,7 @@ export function App() {
                           className="task-title-btn" 
                           onClick={(e) => {
                             e.stopPropagation();
-                            setSelectedId(isSelected ? null : task.id);
+                            toggleTask(task.id, isSelected);
                           }}
                         >
                           {task.title}
@@ -868,7 +876,7 @@ export function App() {
                             onClick={(e) => {
                               if (!isSelected) {
                                 e.stopPropagation();
-                                setSelectedId(task.id);
+                                openTask(task.id);
                               }
                             }}
                           >
@@ -877,7 +885,7 @@ export function App() {
                                 className="task-title-btn" 
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  setSelectedId(isSelected ? null : task.id);
+                                  toggleTask(task.id, isSelected);
                                 }}
                               >
                                 {task.title}

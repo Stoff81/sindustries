@@ -49,6 +49,7 @@ describe('tasks ui', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Commented task' }));
 
     expect(screen.getByRole('heading', { name: 'Comments' })).toBeInTheDocument();
+    expect(screen.getByText('1 comment')).toBeInTheDocument();
     expect(screen.getByRole('list', { name: 'Task comments' })).toBeInTheDocument();
     expect(screen.getByText('Backend slice is in.')).toBeInTheDocument();
     expect(screen.getByText('Quinn')).toBeInTheDocument();
@@ -128,7 +129,8 @@ describe('tasks ui', () => {
     const toggleButton = screen.getByRole('button', { name: '+' });
     expect(toggleButton).toHaveAttribute('aria-expanded', 'false');
     fireEvent.click(toggleButton);
-    expect(toggleButton).toHaveAttribute('aria-expanded', 'true');
+    const closeComposerButton = screen.getAllByRole('button', { name: 'Close' }).find((button) => button.getAttribute('aria-controls') === 'task-comment-composer');
+    expect(closeComposerButton).toHaveAttribute('aria-expanded', 'true');
 
     fireEvent.change(screen.getByLabelText('Comment author'), { target: { value: 'Rowan' } });
     fireEvent.change(screen.getByLabelText('Comment text'), { target: { value: 'UI slice landed.' } });

@@ -481,10 +481,15 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel); outline:
   flex-wrap: wrap;
 }
 
-.comments-heading-row {
+.comments-header-actions {
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-left: auto;
+}
+
+.comments-count {
+  text-align: right;
 }
 
 .comments-header h4,

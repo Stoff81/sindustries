@@ -199,12 +199,12 @@ test('happy path: create and render a task comment', async ({ page }) => {
   await page.getByRole('button', { name: 'Comment target' }).click();
 
   await expect(page.getByRole('heading', { name: 'Comments' })).toBeVisible();
-  await expect(page.getByText('Add the first note on this task.')).toBeVisible();
+  await expect(page.getByText('No comments yet')).toBeVisible();
 
   const toggleButton = page.getByRole('button', { name: '+', exact: true });
   await expect(toggleButton).toHaveAttribute('aria-expanded', 'false');
   await toggleButton.click();
-  await expect(toggleButton).toHaveAttribute('aria-expanded', 'true');
+  await expect(page.locator('button[aria-controls="task-comment-composer"]')).toHaveAttribute('aria-expanded', 'true');
 
   await page.getByLabel('Comment author').fill('Rowan');
   await page.getByLabel('Comment text').fill('E2E comment path works.');
