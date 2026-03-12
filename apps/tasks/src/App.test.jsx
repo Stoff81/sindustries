@@ -52,10 +52,24 @@ describe('tasks ui', () => {
     expect(screen.getByRole('list', { name: 'Task comments' })).toBeInTheDocument();
     expect(screen.getByText('Backend slice is in.')).toBeInTheDocument();
     expect(screen.getByText('Quinn')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '+', exact: true })).toHaveAttribute('aria-expanded', 'false');
   });
 
-  it('creates a comment, disables submit while pending, and clears the composer on success', async () => {
-    let comments = [];
+  it('creates a comment, disables submit while pending, and clears/closes the composer on success', async () => {
+    let comments = [
+      {
+        id: 'comment-1',
+        author: 'Tom',
+        text: 'Oldest comment',
+        createdAt: '2026-03-12T09:00:00.000Z'
+      },
+      {
+        id: 'comment-2',
+        author: 'Quinn',
+        text: 'Newer existing comment',
+        createdAt: '2026-03-12T09:30:00.000Z'
+      }
+    ];
     let resolvePost;
 
     const fetchMock = vi.fn((url, options = {}) => {
@@ -84,8 +98,9 @@ describe('tasks ui', () => {
         return new Promise((resolve) => {
           resolvePost = () => {
             comments = [
+              ...comments,
               {
-                id: 'comment-2',
+                id: 'comment-3',
                 author: 'Rowan',
                 text: 'UI slice landed.',
                 createdAt: '2026-03-12T10:00:00.000Z'
@@ -93,7 +108,7 @@ describe('tasks ui', () => {
             ];
             resolve({
               ok: true,
-              json: async () => ({ data: comments[0] })
+              json: async () => ({ data: comments.at(-1) })
             });
           };
         });
@@ -110,13 +125,15 @@ describe('tasks ui', () => {
     await screen.findByRole('list', { name: 'Backlog list' });
     fireEvent.click(screen.getByRole('button', { name: 'Comment create task' }));
 
+    const toggleButton = screen.getByRole('button', { name: '+' });
+    expect(toggleButton).toHaveAttribute('aria-expanded', 'false');
+    fireEvent.click(toggleButton);
+    expect(toggleButton).toHaveAttribute('aria-expanded', 'true');
+
     fireEvent.change(screen.getByLabelText('Comment author'), { target: { value: 'Rowan' } });
     fireEvent.change(screen.getByLabelText('Comment text'), { target: { value: 'UI slice landed.' } });
 
-    const closeButton = screen.getByRole('button', { name: 'Close' });
     const addCommentButton = screen.getByRole('button', { name: 'Add comment' });
-    expect(closeButton.compareDocumentPosition(addCommentButton) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-
     fireEvent.click(addCommentButton);
 
     await waitFor(() => expect(screen.getByRole('button', { name: 'Adding…' })).toBeDisabled());
@@ -124,8 +141,14 @@ describe('tasks ui', () => {
 
     await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining('/tasks/comment-create-task/comments'), expect.objectContaining({ method: 'POST' })));
     await waitFor(() => expect(screen.getByText('UI slice landed.')).toBeInTheDocument());
-    expect(screen.getByLabelText('Comment author')).toHaveValue('');
-    expect(screen.getByLabelText('Comment text')).toHaveValue('');
+    expect(screen.queryByLabelText('Comment author')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Comment text')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '+', exact: true })).toHaveAttribute('aria-expanded', 'false');
+
+    const commentItems = within(screen.getByRole('list', { name: 'Task comments' })).getAllByRole('listitem');
+    expect(within(commentItems[0]).getByText('UI slice landed.')).toBeInTheDocument();
+    expect(within(commentItems[1]).getByText('Newer existing comment')).toBeInTheDocument();
+    expect(within(commentItems[2]).getByText('Oldest comment')).toBeInTheDocument();
   });
 
   it('renders backlog list and filter controls', async () => {

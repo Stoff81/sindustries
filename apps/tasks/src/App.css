@@ -459,25 +459,46 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel); outline:
   align-items: stretch;
 }
 
+.editor-primary-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding-bottom: 10px;
+  border-bottom: 2px dashed var(--muted);
+}
+
 .comments-section {
   display: grid;
   gap: 10px;
-  padding: 10px;
-  background: color-mix(in srgb, var(--panel) 88%, var(--panel-2) 12%);
-  border: 2px dashed var(--muted);
 }
 
 .comments-header {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
   gap: 8px;
   flex-wrap: wrap;
+}
+
+.comments-heading-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .comments-header h4,
 .comment-card p {
   margin: 0;
+}
+
+.comment-toggle-btn {
+  min-width: 42px;
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
 }
 
 .comments-list {
@@ -491,9 +512,11 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel); outline:
 .comment-card {
   display: grid;
   gap: 6px;
+  width: 100%;
   padding: 10px;
-  background: var(--panel-2);
+  background: color-mix(in srgb, var(--text) 95%, var(--panel) 5%);
   border: 2px solid var(--line);
+  color: var(--panel);
 }
 
 .comment-meta {
@@ -504,13 +527,22 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel); outline:
   flex-wrap: wrap;
 }
 
+.comment-meta .small {
+  color: color-mix(in srgb, var(--panel) 72%, var(--line) 28%);
+}
+
 .comment-composer {
   display: grid;
   gap: 8px;
 }
 
-.comment-composer-card {
-  margin-top: 2px;
+.comment-composer-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.comment-composer-close {
+  margin-left: auto;
 }
 
 .comments-empty {
