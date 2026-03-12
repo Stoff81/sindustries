@@ -49,6 +49,11 @@ export async function updateTask(id, patch) {
   return response.data;
 }
 
+export async function fetchTask(id) {
+  const response = await api(`/tasks/${id}`);
+  return response.data;
+}
+
 export async function archiveTask(id) {
   const response = await api(`/tasks/${id}`, { method: 'DELETE' });
   return response.data;

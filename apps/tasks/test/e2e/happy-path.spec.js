@@ -197,7 +197,8 @@ test('happy path: create and render a task comment', async ({ page }) => {
   await page.getByLabel('Comment text').fill('E2E comment path works.');
   await page.getByRole('button', { name: 'Add comment' }).click();
 
-  await expect(page.getByText('Rowan')).toBeVisible();
-  await expect(page.getByText('E2E comment path works.')).toBeVisible();
-  await expect(page.locator('.comment-meta time')).toBeVisible();
+  const commentsList = page.getByRole('list', { name: 'Task comments' });
+  await expect(commentsList.getByText('Rowan')).toBeVisible();
+  await expect(commentsList.getByText('E2E comment path works.')).toBeVisible();
+  await expect(commentsList.locator('.comment-meta time')).toBeVisible();
 });
