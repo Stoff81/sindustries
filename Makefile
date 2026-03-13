@@ -1,4 +1,4 @@
-.PHONY: bootstrap up down reset-db test test-api test-app test-e2e
+.PHONY: bootstrap up down reset-db migrate-db test test-api test-app test-e2e
 
 MODE ?= dev
 
@@ -13,6 +13,9 @@ down:
 
 reset-db:
 	MODE=$(MODE) ./scripts/dev/reset-db.sh
+
+migrate-db:
+	MODE=$(MODE) ./scripts/dev/migrate-db.sh
 
 test: test-api test-app test-e2e
 

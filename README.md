@@ -103,6 +103,25 @@ SEED_DB=true make reset-db MODE=prodlike
 SEED_DB=false make reset-db MODE=dev
 ```
 
+### Migrate only (with backup)
+
+Apply checked-in Prisma migrations without resetting schemas:
+
+```bash
+make migrate-db MODE=dev
+make migrate-db MODE=prodlike
+```
+
+This first creates a timestamped backup of the target database under `.db-backups/<mode>/` when the database already exists, then runs `prisma migrate deploy`.
+
+For the known local drift case where the `blocked` / `ready` columns already exist but Prisma still has `20260308000000_add_blocked_ready_columns` marked unfinished, `make migrate-db` will auto-recover and continue.
+
+Optional override:
+
+```bash
+BACKUP_ROOT=/path/to/backups make migrate-db MODE=prodlike
+```
+
 ### Cron/automation targeting
 
 Use explicit API base URLs:

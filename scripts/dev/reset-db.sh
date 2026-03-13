@@ -7,6 +7,18 @@ API_DIR="$ROOT_DIR/services/tasks-api"
 # shellcheck source=./mode-env.sh
 source "$ROOT_DIR/scripts/dev/mode-env.sh"
 
+ensure_tasks_api_deps() {
+  if [[ -x "$API_DIR/node_modules/.bin/prisma" ]]; then
+    return 0
+  fi
+
+  echo "Prisma CLI not found in services/tasks-api/node_modules; installing dependencies..."
+  (
+    cd "$API_DIR"
+    npm install
+  )
+}
+
 if ! command -v psql >/dev/null 2>&1; then
   echo "psql is required but not installed." >&2
   exit 1
@@ -68,6 +80,7 @@ SQL
 
 (
   cd "$API_DIR"
+  ensure_tasks_api_deps
   DATABASE_URL="$DATABASE_URL" npm run prisma:migrate
 
   if [[ "$SEED_DB" == "true" ]]; then
