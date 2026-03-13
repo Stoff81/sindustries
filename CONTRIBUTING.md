@@ -4,6 +4,11 @@
 
 This repo uses a **spec-first** workflow for any non-trivial change, plus a strict **dev vs prodlike** split for local work.
 
+For non-trivial code tasks:
+- create or update a real spec doc before implementation starts in `docs/specs`
+- record the spec doc path in the task
+- task notes are not a substitute for a spec doc
+
 ## Environment rules
 
 ### Dev is for implementation
@@ -77,7 +82,7 @@ CI currently covers:
 
 ## Pull request standards
 
-1. Review feedback belongs on the GitHub PR.
+1. Code review feedback belongs on the GitHub PR.
 2. Task acceptance criteria belong to the task.
 3. Each PR must reference the task.
 4. Each PR must make it easy to trace the implementation scope it represents.
