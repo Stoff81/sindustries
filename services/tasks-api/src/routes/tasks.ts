@@ -7,6 +7,7 @@ const MAX_LIMIT = 100;
 
 const validStatuses = new Set(['open', 'ready', 'doing', 'acceptance', 'done']);
 const validPriorities = new Set(['low', 'medium', 'high', 'urgent']);
+const validAssignees = new Set(['Tom', 'Quinn', 'Rowan', 'Lox']);
 const validSorts = new Set(['priority', 'createdAt', 'updatedAt', 'dueAt', 'statusChangedAt']);
 
 const priorityOrder = {
@@ -333,6 +334,9 @@ tasksRouter.post('/tasks', async (req, res, next) => {
     if (!validPriorities.has(priority)) return badRequest(res, 'INVALID_PRIORITY_VALUE', 'Invalid priority value');
     if (req.body?.dueAt && !dueAt) return badRequest(res, 'INVALID_DUE_AT', 'Invalid dueAt value');
     if (req.body?.tags && !tags) return badRequest(res, 'INVALID_TAGS', 'tags must be an array of strings');
+    if (assignee && !validAssignees.has(assignee)) {
+      return badRequest(res, 'INVALID_ASSIGNEE', 'Assignee must be one of: Tom, Quinn, Rowan, Lox');
+    }
 
     const tagRecords = await connectTags(tags);
     const now = new Date();
@@ -385,7 +389,12 @@ tasksRouter.patch('/tasks/:id', async (req, res, next) => {
     }
 
     if (description !== undefined) updates.description = description || null;
-    if (assignee !== undefined) updates.assignee = assignee || null;
+    if (assignee !== undefined) {
+      if (assignee && !validAssignees.has(assignee)) {
+        return badRequest(res, 'INVALID_ASSIGNEE', 'Assignee must be one of: Tom, Quinn, Rowan, Lox');
+      }
+      updates.assignee = assignee || null;
+    }
 
     if (req.body?.priority !== undefined) {
       if (!validPriorities.has(req.body.priority)) {
