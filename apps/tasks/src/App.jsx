@@ -41,27 +41,21 @@ export function App() {
   // Scroll to task card after save/close if needed
   // AC9: When closing a task that has a long card (top above window), scroll should reset accounting for header
   function scrollToTaskIfNeeded(taskId) {
-    // Use setTimeout to ensure DOM has updated after TaskEditor is removed
-    setTimeout(() => {
-      const cardEl = taskCardRefs.current[taskId];
-      if (!cardEl) return;
-      
-      const cardRect = cardEl.getBoundingClientRect();
-      const headerHeight = document.querySelector('header')?.offsetHeight || 0;
-      
-      // When closing, always ensure the card is properly positioned below the header
-      // This handles the case where a long card's top was above the window while editing
-      // AC6: Increase offset to account for header
-      const offsetPosition = cardEl.offsetTop - headerHeight - 60; // 60px buffer for header
-      
-      // Check if we need to scroll (card top is above visible area OR card is not fully visible)
-      if (cardRect.top < headerHeight || cardRect.bottom <= 0) {
-        window.scrollTo({
-          top: offsetPosition,
-          behavior: 'smooth'
-        });
-      }
-    }, 0);
+    // Wait for React to commit (editor unmounted, card visible) and ref to be set
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const key = String(taskId);
+        const cardEl = taskCardRefs.current[key] ?? taskCardRefs.current[taskId];
+        if (!cardEl) return;
+
+        const cardRect = cardEl.getBoundingClientRect();
+        const headerHeight = document.querySelector('header')?.offsetHeight ?? 0;
+        const buffer = 8;
+
+        const targetScrollY = cardRect.top + window.scrollY - headerHeight - buffer;
+        window.scrollTo({ top: Math.max(0, targetScrollY), behavior: 'smooth' });
+      });
+    });
   }
 
   // Compute filters with debounced search for API calls
@@ -502,7 +496,7 @@ export function App() {
           <section>
 
             <ul aria-label="Backlog list" className="task-list">
-              {sortedBacklogTasks.map((task, index) => {
+               {sortedBacklogTasks.map((task, index) => {  
                 const isSelected = selectedId === task.id;
                 const draft = getDraft(task);
                 const hasDraft = isTaskDirty(task);
@@ -510,6 +504,7 @@ export function App() {
                 const assignee = task.assignee ?? 'Unassigned';
                 return (
                   <li key={task.id}>
+                    ref={(el) => { if (el) taskCardRefs.current[String(task.id)] = el; }}
                     <article 
                       ref={(el) => { taskCardRefs.current[task.id] = el; }}
                       className={`task-card ${task.archivedAt ? 'archived' : ''} ${task.blocked ? 'blocked' : ''} ${task.ready ? 'ready' : ''} ${isSelected ? 'is-editing' : ''} card-tilt-${index % 3}`}
@@ -598,6 +593,7 @@ export function App() {
                       return (
                         <li key={task.id}>
                           <article
+                            ref={(el) => { if (el) taskCardRefs.current[String(task.id)] = el; }}
                             data-testid={`card-${task.id}`}
                             className={`board-card ${task.archivedAt ? 'archived' : ''} ${task.blocked ? 'blocked' : ''} ${task.ready ? 'ready' : ''} ${isSelected ? 'is-editing' : ''} card-tilt-${index % 3}`}
                             draggable={!isSelected}
