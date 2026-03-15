@@ -1,0 +1,165 @@
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { TaskEditor } from '../components/TaskEditor.jsx';
+
+const defaultProps = {
+  draft: {
+    title: 'Test Task',
+    description: 'Test description',
+    status: 'todo',
+    priority: 'medium',
+    assignee: '',
+    dueAt: '',
+    tagsText: '',
+    blocked: false,
+    ready: false
+  },
+  task: {
+    id: 1,
+    title: 'Test Task',
+    comments: []
+  },
+  isDirty: false,
+  onDraftChange: vi.fn(),
+  onSave: vi.fn(),
+  onArchive: vi.fn(),
+  onClose: vi.fn(),
+  onAddComment: vi.fn(),
+  isSubmittingComment: false
+};
+
+describe('TaskEditor', () => {
+  it('renders task title', () => {
+    render(<TaskEditor {...defaultProps} />);
+    expect(screen.getByLabelText('Detail title')).toHaveValue('Test Task');
+  });
+
+  it('renders task description', () => {
+    render(<TaskEditor {...defaultProps} />);
+    expect(screen.getByLabelText('Detail description')).toHaveValue('Test description');
+  });
+
+  it('renders status select', () => {
+    render(<TaskEditor {...defaultProps} />);
+    expect(screen.getByLabelText('Detail status')).toHaveValue('todo');
+  });
+
+  it('renders priority select', () => {
+    render(<TaskEditor {...defaultProps} />);
+    expect(screen.getByLabelText('Detail priority')).toHaveValue('medium');
+  });
+
+  it('calls onDraftChange when title changes', () => {
+    const onDraftChange = vi.fn();
+    render(<TaskEditor {...defaultProps} onDraftChange={onDraftChange} />);
+
+    const titleInput = screen.getByLabelText('Detail title');
+    fireEvent.change(titleInput, { target: { value: 'New Title' } });
+
+    expect(onDraftChange).toHaveBeenCalledWith(
+      expect.objectContaining({ title: 'New Title' })
+    );
+  });
+
+  it('calls onSave when save button clicked', () => {
+    const onSave = vi.fn();
+    render(<TaskEditor {...defaultProps} onSave={onSave} />);
+
+    fireEvent.click(screen.getByText('Save changes'));
+
+    expect(onSave).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'Test Task',
+        description: 'Test description'
+      })
+    );
+  });
+
+  it('calls onClose when close button clicked', () => {
+    const onClose = vi.fn();
+    render(<TaskEditor {...defaultProps} onClose={onClose} />);
+
+    // There are two Close buttons - click the one in editor-actions (not title-close-btn)
+    const closeButtons = screen.getAllByText('Close');
+    fireEvent.click(closeButtons[1]);
+
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('calls onArchive when archive button clicked', () => {
+    const onArchive = vi.fn();
+    render(<TaskEditor {...defaultProps} onArchive={onArchive} />);
+
+    fireEvent.click(screen.getByText('Archive task'));
+
+    expect(onArchive).toHaveBeenCalled();
+  });
+
+  it('renders blocked checkbox', () => {
+    render(<TaskEditor {...defaultProps} />);
+    expect(screen.getByLabelText('Detail blocked')).not.toBeChecked();
+  });
+
+  it('renders ready checkbox', () => {
+    render(<TaskEditor {...defaultProps} />);
+    expect(screen.getByLabelText('Detail ready')).not.toBeChecked();
+  });
+
+  it('shows comments section', () => {
+    render(<TaskEditor {...defaultProps} />);
+    expect(screen.getByText('Comments')).toBeInTheDocument();
+  });
+
+  it('shows no comments message when empty', () => {
+    render(<TaskEditor {...defaultProps} />);
+    expect(screen.getByText('No comments yet')).toBeInTheDocument();
+  });
+
+  it('displays comments when present', () => {
+    const propsWithComments = {
+      ...defaultProps,
+      task: {
+        id: 1,
+        title: 'Test Task',
+        comments: [
+          { id: 1, author: 'John', text: 'Great work!', createdAt: '2024-01-15T10:00:00Z' }
+        ]
+      }
+    };
+    render(<TaskEditor {...propsWithComments} />);
+
+    expect(screen.getByText('John')).toBeInTheDocument();
+    expect(screen.getByText('Great work!')).toBeInTheDocument();
+  });
+
+  it('can toggle comment composer', () => {
+    render(<TaskEditor {...defaultProps} />);
+
+    // Click the + button to open comment composer
+    const toggleBtn = screen.getByRole('button', { name: /^\+$/ });
+    fireEvent.click(toggleBtn);
+
+    expect(screen.getByLabelText('Comment author')).toBeInTheDocument();
+    expect(screen.getByLabelText('Comment text')).toBeInTheDocument();
+  });
+
+  it('renders tags input', () => {
+    const propsWithTags = {
+      ...defaultProps,
+      draft: { ...defaultProps.draft, tagsText: 'ui, api' }
+    };
+    render(<TaskEditor {...propsWithTags} />);
+
+    expect(screen.getByLabelText('Detail tags')).toHaveValue('ui, api');
+  });
+
+  it('renders assignee input', () => {
+    const propsWithAssignee = {
+      ...defaultProps,
+      draft: { ...defaultProps.draft, assignee: 'John' }
+    };
+    render(<TaskEditor {...propsWithAssignee} />);
+
+    expect(screen.getByLabelText('Detail assignee')).toHaveValue('John');
+  });
+});

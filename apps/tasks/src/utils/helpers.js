@@ -64,5 +64,8 @@ export function normalizeTaskForEditor(task) {
  * @returns {string|null}
  */
 export function assigneeInitial(assignee) {
-  return assignee?.trim()?.charAt(0)?.toUpperCase() ?? null;
+  const trimmed = assignee?.trim();
+  if (!trimmed) return null;
+  const initial = trimmed.charAt(0);
+  return initial ? initial.toUpperCase() : null;
 }
