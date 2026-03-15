@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { archiveTask as archiveTaskRequest, createTask as createTaskRequest, createTaskComment as createTaskCommentRequest, fetchTask as fetchTaskRequest, fetchTasks, updateTask as updateTaskRequest } from './tasksApi.js';
+import { archiveTask as archiveTaskRequest, createTask as createTaskRequest, createTaskComment as createTaskCommentRequest, fetchTask as fetchTaskRequest, fetchTasks, updateTask as updateTaskRequest } from './tasksApi';
 
 const DEFAULT_REFRESH_INTERVAL_MS = 3000;
 
