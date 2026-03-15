@@ -135,8 +135,8 @@ describe('TaskEditor', () => {
   it('can toggle comment composer', () => {
     render(<TaskEditor {...defaultProps} />);
 
-    // Click the + button to open comment composer
-    const toggleBtn = screen.getByRole('button', { name: /^\+$/ });
+    // Click the Comment button to open comment composer
+    const toggleBtn = screen.getByRole('button', { name: 'Comment' });
     fireEvent.click(toggleBtn);
 
     expect(screen.getByLabelText('Comment author')).toBeInTheDocument();

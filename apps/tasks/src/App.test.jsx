@@ -53,7 +53,7 @@ describe('tasks ui', () => {
     expect(screen.getByRole('list', { name: 'Task comments' })).toBeInTheDocument();
     expect(screen.getByText('Backend slice is in.')).toBeInTheDocument();
     expect(screen.getByText('Quinn')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '+', exact: true })).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getByRole('button', { name: 'Comment', exact: true })).toHaveAttribute('aria-expanded', 'false');
   });
 
   it('creates a comment, disables submit while pending, and clears/closes the composer on success', async () => {
@@ -126,7 +126,7 @@ describe('tasks ui', () => {
     await screen.findByRole('list', { name: 'Backlog list' });
     fireEvent.click(screen.getByRole('button', { name: 'Comment create task' }));
 
-    const toggleButton = screen.getByRole('button', { name: '+' });
+    const toggleButton = screen.getByRole('button', { name: 'Comment' });
     expect(toggleButton).toHaveAttribute('aria-expanded', 'false');
     fireEvent.click(toggleButton);
     const closeComposerButton = screen.getAllByRole('button', { name: 'Close' }).find((button) => button.getAttribute('aria-controls') === 'task-comment-composer');
@@ -145,7 +145,7 @@ describe('tasks ui', () => {
     await waitFor(() => expect(screen.getByText('UI slice landed.')).toBeInTheDocument());
     expect(screen.queryByLabelText('Comment author')).not.toBeInTheDocument();
     expect(screen.queryByLabelText('Comment text')).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '+', exact: true })).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getByRole('button', { name: 'Comment', exact: true })).toHaveAttribute('aria-expanded', 'false');
 
     const commentItems = within(screen.getByRole('list', { name: 'Task comments' })).getAllByRole('listitem');
     expect(within(commentItems[0]).getByText('UI slice landed.')).toBeInTheDocument();
