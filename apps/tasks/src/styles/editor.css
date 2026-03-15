@@ -1,0 +1,135 @@
+/* Task editor */
+.editor {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 2px solid var(--line);
+}
+
+.editor-fields {
+  display: grid;
+  gap: 12px;
+}
+
+.title-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.title-row label {
+  flex: 1;
+}
+
+.title-close-btn {
+  flex-shrink: 0;
+  align-self: flex-end;
+}
+
+/* Editor actions */
+.editor-actions {
+  margin-top: 16px;
+}
+
+.editor-primary-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.editor-secondary-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Comments section */
+.comments-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 2px solid var(--line);
+}
+
+.comments-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.comments-header h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.comments-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.comments-count {
+  color: var(--muted);
+}
+
+.comment-toggle-btn {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  font-size: 1.1rem;
+}
+
+.comment-composer {
+  background: var(--panel-2);
+  border: 2px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.comments-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.comment-card {
+  background: var(--panel-2);
+  border: 2px solid var(--line);
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+
+.comment-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.comment-meta strong {
+  font-size: 0.9rem;
+}
+
+.comment-meta time {
+  font-size: 0.8rem;
+}
+
+.comment-card p {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+/* Action buttons container */
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
