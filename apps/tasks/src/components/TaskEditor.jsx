@@ -141,9 +141,6 @@ export function TaskEditor({ draft, task, isDirty, onDraftChange, onSave, onArch
           <button className="tertiary-btn title-close-btn" onClick={onClose}>Close</button>
         </div>
 
-        {/* AC3: Dividing line between card title and contents - sage and dashed */}
-        <div className="editor-title-divider"></div>
-
         <label>
           <span className="small">Description</span>
           <textarea
@@ -234,9 +231,6 @@ export function TaskEditor({ draft, task, isDirty, onDraftChange, onSave, onArch
           </div>
         </div>
 
-        {/* AC4: Dividing line between card contents and comments - sage and dashed */}
-        <div className="editor-comments-divider"></div>
-
         <div className="comments-section">
           <div className="comments-header">
             <h4 className="font-display">Comments</h4>
@@ -249,7 +243,7 @@ export function TaskEditor({ draft, task, isDirty, onDraftChange, onSave, onArch
                 aria-controls="task-comment-composer"
                 onClick={() => setIsCommentComposerOpen((current) => !current)}
               >
-                {isCommentComposerOpen ? 'Close' : '+'}
+                {isCommentComposerOpen ? 'Close' : 'Comment'}
               </button>
             </div>
           </div>
