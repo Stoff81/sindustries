@@ -2,7 +2,7 @@
 .editor {
   margin-top: 16px;
   padding-top: 16px;
-  border-top: 2px solid var(--line);
+  border-top: 2px dashed var(--muted);
 }
 
 .editor-fields {
@@ -46,7 +46,7 @@
 .comments-section {
   margin-top: 16px;
   padding-top: 16px;
-  border-top: 2px solid var(--line);
+  border-top: 2px dashed var(--muted);
 }
 
 .comments-header {

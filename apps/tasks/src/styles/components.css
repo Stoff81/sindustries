@@ -134,10 +134,10 @@
   border: 1px solid transparent;
 }
 
-.pill.urgent { background: #fee2e2; color: #dc2626; border-color: #fecaca; }
-.pill.high { background: #ffedd5; color: #ea580c; border-color: #fed7aa; }
-.pill.medium { background: #fef9c3; color: #ca8a04; border-color: #fef08a; }
-.pill.low { background: #f0fdf4; color: #16a34a; border-color: #bbf7d0; }
+.pill.urgent { background: #fee2e2; color: var(--panel-2); border-color: #fecaca; }
+.pill.high { background: #ffedd5; color: var(--panel-2); border-color: #fed7aa; }
+.pill.medium { background: #fef9c3; color: var(--panel-2); border-color: #fef08a; }
+.pill.low { background: #f0fdf4; color: var(--panel-2); border-color: #bbf7d0; }
 .pill.status { background: var(--panel); border-color: var(--line); color: var(--muted); }
 
 .draft-pill {
