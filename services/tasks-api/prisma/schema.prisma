@@ -8,8 +8,10 @@ datasource db {
 }
 
 enum TaskStatus {
-  todo
+  open
+  ready
   doing
+  acceptance
   done
 }
 
@@ -24,7 +26,7 @@ model Task {
   id              String       @id @default(uuid()) @db.Uuid
   title           String
   description     String?
-  status          TaskStatus   @default(todo)
+  status          TaskStatus   @default(open)
   statusChangedAt DateTime     @default(now())
   priority        TaskPriority @default(medium)
   dueAt           DateTime?

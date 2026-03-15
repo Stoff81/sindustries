@@ -6,7 +6,7 @@ function mockTask(overrides = {}) {
   return {
     id: 'task-1',
     title: 'Task 1',
-    status: 'todo',
+    status: 'open',
     statusChangedAt: '2026-03-01T00:00:00.000Z',
     priority: 'medium',
     comments: [],
@@ -174,8 +174,8 @@ describe('tasks ui', () => {
         ok: true,
         json: async () => ({
           data: [
-            mockTask({ id: 'newer', title: 'Newer', status: 'todo', priority: 'medium', ready: false, createdAt: '2026-03-02T00:00:00.000Z' }),
-            mockTask({ id: 'older', title: 'Older', status: 'todo', priority: 'medium', ready: false, createdAt: '2026-03-01T00:00:00.000Z' })
+            mockTask({ id: 'newer', title: 'Newer', status: 'ready', priority: 'medium', ready: false, createdAt: '2026-03-02T00:00:00.000Z' }),
+            mockTask({ id: 'older', title: 'Older', status: 'ready', priority: 'medium', ready: false, createdAt: '2026-03-01T00:00:00.000Z' })
           ]
         })
       })
@@ -184,8 +184,8 @@ describe('tasks ui', () => {
     render(<App />);
     fireEvent.click(screen.getByRole('button', { name: 'Kanban' }));
 
-    const todoColumn = await screen.findByTestId('column-todo');
-    const cards = within(todoColumn).getAllByRole('button');
+    const readyColumn = await screen.findByTestId('column-ready');
+    const cards = within(readyColumn).getAllByRole('button');
     expect(cards[0]).toHaveTextContent('Older');
     expect(cards[1]).toHaveTextContent('Newer');
   });
@@ -474,7 +474,7 @@ describe('tasks ui', () => {
 
     render(<App />);
 
-    await screen.findByTestId('column-todo');
+    await screen.findByTestId('column-open');
     fireEvent.click(screen.getByRole('button', { name: 'Show archived' }));
 
     const archivedCard = await screen.findByTestId('card-archived-task');

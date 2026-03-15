@@ -6,7 +6,7 @@ const defaultProps = {
   draft: {
     title: 'Test Task',
     description: 'Test description',
-    status: 'todo',
+    status: 'ready',
     priority: 'medium',
     assignee: '',
     dueAt: '',
@@ -41,7 +41,7 @@ describe('TaskEditor', () => {
 
   it('renders status select', () => {
     render(<TaskEditor {...defaultProps} />);
-    expect(screen.getByLabelText('Detail status')).toHaveValue('todo');
+    expect(screen.getByLabelText('Detail status')).toHaveValue('ready');
   });
 
   it('renders priority select', () => {

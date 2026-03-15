@@ -204,3 +204,30 @@
   display: block;
   margin-bottom: 2px;
 }
+
+/* Column collapse/expand */
+.collapse-btn {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 2px 6px;
+  margin-left: 4px;
+  font-size: 0.7rem;
+}
+
+.collapse-btn:hover {
+  color: var(--text);
+}
+
+.column.collapsed {
+  flex: 0 0 auto;
+}
+
+.column.collapsed ol {
+  display: none;
+}
+
+.column.hidden {
+  display: none;
+}

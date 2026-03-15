@@ -32,7 +32,7 @@ function task(overrides = {}) {
     id: '11111111-1111-1111-1111-111111111111',
     title: 'Task',
     description: null,
-    status: 'todo',
+    status: 'open',
     statusChangedAt: new Date('2026-03-01T00:00:00.000Z'),
     priority: 'medium',
     dueAt: null,
@@ -62,7 +62,7 @@ describe('tasks api endpoints', () => {
     const app = createApp();
     const response = await request(app)
       .get('/api/v1/tasks')
-      .query({ status: 'todo', limit: 2, q: 'task' });
+      .query({ status: 'open', limit: 2, q: 'task' });
 
     expect(response.status).toBe(200);
     expect(response.body.data).toHaveLength(2);

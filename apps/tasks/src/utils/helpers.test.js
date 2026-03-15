@@ -96,7 +96,7 @@ describe('helpers', () => {
       const result = normalizeTaskForEditor({});
       expect(result.title).toBe('');
       expect(result.description).toBe('');
-      expect(result.status).toBe('todo');
+      expect(result.status).toBe('open');
       expect(result.priority).toBe('medium');
       expect(result.assignee).toBe('');
       expect(result.dueAt).toBe('');

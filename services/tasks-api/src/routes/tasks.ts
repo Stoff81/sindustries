@@ -5,7 +5,7 @@ import { badRequest, notFound } from '../lib/http.ts';
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 100;
 
-const validStatuses = new Set(['todo', 'doing', 'done']);
+const validStatuses = new Set(['open', 'ready', 'doing', 'acceptance', 'done']);
 const validPriorities = new Set(['low', 'medium', 'high', 'urgent']);
 const validSorts = new Set(['priority', 'createdAt', 'updatedAt', 'dueAt', 'statusChangedAt']);
 
@@ -133,8 +133,13 @@ tasksRouter.get('/tasks', async (req, res, next) => {
       sort = 'priority'
     } = req.query;
 
-    if (status && !validStatuses.has(status)) {
-      return badRequest(res, 'INVALID_STATUS_FILTER', 'Invalid status filter');
+    // Support multi-select status filter (comma-separated)
+    const statusValues = status ? status.toString().split(',').map(s => s.trim()) : [];
+    if (statusValues.length > 0) {
+      const invalidStatuses = statusValues.filter(s => !validStatuses.has(s));
+      if (invalidStatuses.length > 0) {
+        return badRequest(res, 'INVALID_STATUS_FILTER', 'Invalid status filter');
+      }
     }
 
     if (priority && !validPriorities.has(priority)) {
@@ -162,9 +167,17 @@ tasksRouter.get('/tasks', async (req, res, next) => {
 
     const limit = parseLimit(rawLimit);
 
+    // Build status filter
+    let statusFilter = {};
+    if (statusValues.length > 1) {
+      statusFilter = { status: { in: statusValues } };
+    } else if (statusValues.length === 1) {
+      statusFilter = { status: statusValues[0] };
+    }
+
     const where = {
       ...(includeArchived === 'true' ? {} : { archivedAt: null }),
-      ...(status ? { status } : {}),
+      ...statusFilter,
       ...(priority ? { priority } : {}),
       ...(assignee ? { assignee: { equals: assignee, mode: 'insensitive' } } : {}),
       ...(q
@@ -303,7 +316,7 @@ tasksRouter.post('/tasks', async (req, res, next) => {
   try {
     const title = normalizeString(req.body?.title);
     const description = normalizeString(req.body?.description) || null;
-    const status = req.body?.status ?? 'todo';
+    const status = req.body?.status ?? 'open';
     const priority = req.body?.priority ?? 'medium';
     const assignee = normalizeString(req.body?.assignee) || null;
     const dueAt = req.body?.dueAt ? parseDate(req.body.dueAt) : null;
