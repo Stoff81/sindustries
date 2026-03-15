@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 
 /**
  * Toast notification types
@@ -18,10 +18,11 @@ import { useState, useCallback } from 'react';
  */
 export function useToast() {
   const [toasts, setToasts] = useState(/** @type {Toast[]} */ ([]));
+  const idRef = useRef(0);
 
   /** @type {import('react').Callback} */
   const showToast = useCallback((message, type = 'info') => {
-    const id = Date.now();
+    const id = ++idRef.current;
     setToasts((current) => [...current, { id, message, type }]);
     setTimeout(() => {
       setToasts((current) => current.filter((t) => t.id !== id));
