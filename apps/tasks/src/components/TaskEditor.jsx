@@ -137,8 +137,12 @@ export function TaskEditor({ draft, task, isDirty, onDraftChange, onSave, onArch
             <span className="small">Title</span>
             <input ref={titleRef} className="edit-control" aria-label="Detail title" value={draft.title} onChange={(e) => update('title', e.target.value)} onMouseDown={stopPropagation} onTouchStart={stopPropagation} onKeyDown={(e) => handleKeyDown(e, titleRef, false)} autoFocus />
           </label>
+          {/* AC6: Close button in title section */}
           <button className="tertiary-btn title-close-btn" onClick={onClose}>Close</button>
         </div>
+
+        {/* AC3: Dividing line between card title and contents - sage and dashed */}
+        <div className="editor-title-divider"></div>
 
         <label>
           <span className="small">Description</span>
@@ -229,6 +233,9 @@ export function TaskEditor({ draft, task, isDirty, onDraftChange, onSave, onArch
             <button className="tertiary-btn" onClick={onClose}>Close</button>
           </div>
         </div>
+
+        {/* AC4: Dividing line between card contents and comments - sage and dashed */}
+        <div className="editor-comments-divider"></div>
 
         <div className="comments-section">
           <div className="comments-header">

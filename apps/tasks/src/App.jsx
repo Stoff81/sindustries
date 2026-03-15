@@ -39,6 +39,7 @@ export function App() {
   const taskCardRefs = useRef({});
 
   // Scroll to task card after save/close if needed
+  // AC9: When closing a task that has a long card (top above window), scroll should reset accounting for header
   function scrollToTaskIfNeeded(taskId) {
     // Use setTimeout to ensure DOM has updated after TaskEditor is removed
     setTimeout(() => {
@@ -48,10 +49,12 @@ export function App() {
       const cardRect = cardEl.getBoundingClientRect();
       const headerHeight = document.querySelector('header')?.offsetHeight || 0;
       
-      // If the top of the card is above the visible area (below header), scroll it into view
-      // Account for the sticky header by adding headerHeight offset
-      if (cardRect.top < headerHeight) {
-        const offsetPosition = cardEl.offsetTop - headerHeight - 10; // 10px buffer
+      // When closing, always ensure the card is properly positioned below the header
+      // This handles the case where a long card's top was above the window while editing
+      const offsetPosition = cardEl.offsetTop - headerHeight - 10; // 10px buffer
+      
+      // Check if we need to scroll (card top is above visible area OR card is not fully visible)
+      if (cardRect.top < headerHeight || cardRect.bottom <= 0) {
         window.scrollTo({
           top: offsetPosition,
           behavior: 'smooth'
