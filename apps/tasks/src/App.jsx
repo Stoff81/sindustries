@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import './App.css';
 import { useTasks } from './useTasks.js';
 import { useTaskDrafts } from './useTaskDrafts.js';
+
 const STATUSES = ['todo', 'doing', 'done'];
 const PRIORITIES = ['urgent', 'high', 'medium', 'low'];
 const PRIORITY_SCORE = { urgent: 0, high: 1, medium: 2, low: 3 };
@@ -326,8 +327,48 @@ function assigneeInitial(assignee) {
   return assignee?.trim()?.charAt(0)?.toUpperCase() ?? null;
 }
 
+// Debounce hook for search input
+function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => clearTimeout(handler);
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
+// Simple toast notifications hook
+function useToast() {
+  const [toasts, setToasts] = useState([]);
+
+  const showToast = useCallback((message, type = 'info') => {
+    const id = Date.now();
+    setToasts((current) => [...current, { id, message, type }]);
+    setTimeout(() => {
+      setToasts((current) => current.filter((t) => t.id !== id));
+    }, 3000);
+  }, []);
+
+  return { toasts, showToast };
+}
+
+const VIEW_STORAGE_KEY = 'tasks-app-view';
+
+function getStoredView() {
+  try {
+    const stored = localStorage.getItem(VIEW_STORAGE_KEY);
+    if (stored === 'backlog' || stored === 'board') return stored;
+  } catch {}
+  return 'board';
+}
+
 export function App() {
-  const [view, setView] = useState('board');
+  const [view, setView] = useState(getStoredView);
   const [selectedId, setSelectedId] = useState(null);
   const [filters, setFilters] = useState({ q: '', status: '', priority: '', tag: '', includeArchived: false });
   
@@ -337,6 +378,19 @@ export function App() {
       setFilters((current) => ({ ...current, status: 'todo' }));
     }
   }, [view, filters.status]);
+
+  // Persist view to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(VIEW_STORAGE_KEY, view);
+    } catch {}
+  }, [view]);
+
+  // Debounce search filter
+  const debouncedSearch = useDebounce(filters.q, 300);
+
+  // Toast notifications
+  const { toasts, showToast } = useToast();
 
   const [newTask, setNewTask] = useState({ title: '', expanded: false, description: '', priority: 'medium', assignee: '', dueAt: '', tagsText: '', blocked: false, ready: false });
   const [confettiBursts, setConfettiBursts] = useState([]);
@@ -359,15 +413,22 @@ export function App() {
     }
   }
 
+  // Compute filters with debounced search for API calls
+  const apiFilters = useMemo(() => ({
+    ...filters,
+    q: debouncedSearch
+  }), [filters, debouncedSearch]);
+
   const {
     tasks,
     error,
+    isLoading,
     createTask: createTaskRequest,
     updateTask: patchTaskRequest,
     archiveTask: archiveTaskRequest,
     createTaskComment: createTaskCommentRequest,
     refreshTask
-  } = useTasks(filters, {
+  } = useTasks(apiFilters, {
     pauseAutoRefresh: selectedId !== null,
     refreshIntervalMs: 3000
   });
@@ -459,14 +520,19 @@ export function App() {
         ready: newTask.ready
       });
       setNewTask({ title: '', expanded: false, description: '', priority: 'medium', assignee: '', dueAt: '', tagsText: '', blocked: false, ready: false });
-    } catch {}
+      showToast('Task created', 'success');
+    } catch {
+      showToast('Failed to create task', 'error');
+    }
   }
 
   async function patchTask(id, patch) {
     try {
       await patchTaskRequest(id, patch);
+      showToast('Task updated', 'success');
       return true;
     } catch {
+      showToast('Failed to update task', 'error');
       return false;
     }
   }
@@ -476,8 +542,10 @@ export function App() {
       await archiveTaskRequest(id);
       clearDraft(id);
       setSelectedId(null);
+      showToast('Task archived', 'success');
       return true;
     } catch {
+      showToast('Failed to archive task', 'error');
       return false;
     }
   }
@@ -772,6 +840,13 @@ export function App() {
 
         {error ? <p role="alert" className="error">{error}</p> : null}
 
+        {isLoading && tasks.length === 0 ? (
+          <div className="loading-spinner" role="status" aria-label="Loading tasks">
+            <div className="spinner" />
+            <span className="sr-only">Loading tasks...</span>
+          </div>
+        ) : null}
+
         {view === 'backlog' ? (
           <section>
 
@@ -945,6 +1020,20 @@ export function App() {
         <button className="fab font-display" onClick={() => setNewTask((current) => ({ ...current, expanded: true }))}>＋</button>
         <button className={view === 'board' ? 'active' : ''} onClick={() => setView('board')}>Board</button>
       </nav>
+
+      {/* Toast notifications */}
+      <div className="toast-container" aria-live="polite" aria-atomic="true">
+        {toasts.map((toast) => (
+          <div key={toast.id} className={`toast toast-${toast.type}`}>
+            {toast.message}
+          </div>
+        ))}
+      </div>
+
+      {/* Accessibility: announce task count to screen readers */}
+      <div className="sr-only" role="status" aria-live="polite">
+        {isLoading ? 'Loading tasks...' : `${tasks.length} tasks`}
+      </div>
 
       <div className="confetti-layer" aria-hidden="true">
         {confettiBursts.map((burst) => (
