@@ -59,9 +59,7 @@
   flex: 1;
 }
 
-.task-title-btn:hover {
-  color: var(--amber);
-}
+/* Card titles should not have hover state - removed per AC */
 
 /* Assignee chip */
 .assignee-chip {

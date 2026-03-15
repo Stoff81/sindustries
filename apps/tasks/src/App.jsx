@@ -40,16 +40,19 @@ export function App() {
 
   // Scroll to task card after save/close if needed
   function scrollToTaskIfNeeded(taskId) {
-    const cardEl = taskCardRefs.current[taskId];
-    if (!cardEl) return;
-    
-    const cardRect = cardEl.getBoundingClientRect();
-    const headerHeight = document.querySelector('header')?.offsetHeight || 0;
-    
-    // If the top of the card is above the visible area (below header), scroll it into view
-    if (cardRect.top < headerHeight) {
-      cardEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    // Use setTimeout to ensure DOM has updated after TaskEditor is removed
+    setTimeout(() => {
+      const cardEl = taskCardRefs.current[taskId];
+      if (!cardEl) return;
+      
+      const cardRect = cardEl.getBoundingClientRect();
+      const headerHeight = document.querySelector('header')?.offsetHeight || 0;
+      
+      // If the top of the card is above the visible area (below header), scroll it into view
+      if (cardRect.top < headerHeight) {
+        cardEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 0);
   }
 
   // Compute filters with debounced search for API calls
@@ -344,7 +347,7 @@ export function App() {
               />
             </label>
             <button className={`nav-btn ${view === 'backlog' ? 'active' : ''}`} onClick={() => setView('backlog')}>Backlog</button>
-            <button className={`nav-btn ${view === 'board' ? 'active' : ''}`} onClick={() => setView('board')}>Kanban</button>
+            <button className={`nav-btn ${view === 'board' ? 'active' : ''}`} onClick={() => { setView('board'); setFilters((current) => ({ ...current, status: '' })); }}>Kanban</button>
             <button type="button" className="primary-btn font-display" onClick={() => setNewTask((current) => ({ ...current, expanded: true }))}>+ New Task</button>
           </div>
         </div>
@@ -657,7 +660,7 @@ export function App() {
       <nav className="mobile-nav" aria-label="Primary">
         <button className={view === 'backlog' ? 'active' : ''} onClick={() => setView('backlog')}>List</button>
         <button className="fab font-display" onClick={() => setNewTask((current) => ({ ...current, expanded: true }))}>＋</button>
-        <button className={view === 'board' ? 'active' : ''} onClick={() => setView('board')}>Board</button>
+        <button className={view === 'board' ? 'active' : ''} onClick={() => { setView('board'); setFilters((current) => ({ ...current, status: '' })); }}>Board</button>
       </nav>
 
       {/* Toast notifications */}
