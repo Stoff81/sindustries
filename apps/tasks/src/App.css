@@ -455,9 +455,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel-2); outlin
 }
 
 .editor {
-  margin-top: 10px;
   display: grid;
-  gap: 8px;
 }
 
 /* AC3: Remove dashed line underneath edit title field */
@@ -471,24 +469,21 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel-2); outlin
 }
 .editor-fields {
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 /* AC2: Line underneath labels, when in edit mode, should be dashed and sage grey */
 .editor-fields > label {
   padding-bottom: 4px;
-  border-bottom: 2px dashed var(--muted);
 }
-.editor-grid { display: grid; gap: 8px; grid-template-columns: repeat(4, minmax(120px, 1fr)); }
-.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.editor-grid { display: grid; grid-template-columns: repeat(4, minmax(120px, 1fr)); }
+.actions { display: flex; flex-wrap: wrap; }
 .editor-actions {
-  padding-top: 4px;
   flex-direction: column;
   align-items: stretch;
 }
 
 .editor-primary-actions {
   display: flex;
-  gap: 8px;
   flex-wrap: wrap;
   align-items: center;
   padding-bottom: 10px;
@@ -497,7 +492,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel-2); outlin
 
 .editor-secondary-actions {
   display: flex;
-  gap: 8px;
   flex-wrap: wrap;
   align-items: center;
 }
@@ -534,14 +528,12 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel-2); outlin
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 8px;
   flex-wrap: wrap;
 }
 
 .comments-header-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
   margin-left: auto;
 }
 
@@ -556,20 +548,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel-2); outlin
 /* AC5: COMMENTS Title should be panel-2 */
 .comments-header h4 {
   color: var(--panel-2);
-}
-
-.comment-toggle-btn {
-  min-width: 80px;
-  min-height: 42px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 10px;
-  /* AC5: Same styling as other close buttons */
-  border: 2px solid var(--panel-2);
-  background: var(--panel);
-  color: var(--text);
-  cursor: pointer;
 }
 
 .comments-list {
@@ -593,7 +571,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel-2); outlin
 .comment-meta {
   display: flex;
   justify-content: space-between;
-  gap: 8px;
   align-items: baseline;
   flex-wrap: wrap;
 }
