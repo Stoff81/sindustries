@@ -51,7 +51,8 @@ export function App() {
       
       // When closing, always ensure the card is properly positioned below the header
       // This handles the case where a long card's top was above the window while editing
-      const offsetPosition = cardEl.offsetTop - headerHeight - 10; // 10px buffer
+      // AC6: Increase offset to account for header
+      const offsetPosition = cardEl.offsetTop - headerHeight - 60; // 60px buffer for header
       
       // Check if we need to scroll (card top is above visible area OR card is not fully visible)
       if (cardRect.top < headerHeight || cardRect.bottom <= 0) {
