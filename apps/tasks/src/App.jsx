@@ -49,8 +49,13 @@ export function App() {
       const headerHeight = document.querySelector('header')?.offsetHeight || 0;
       
       // If the top of the card is above the visible area (below header), scroll it into view
+      // Account for the sticky header by adding headerHeight offset
       if (cardRect.top < headerHeight) {
-        cardEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const offsetPosition = cardEl.offsetTop - headerHeight - 10; // 10px buffer
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
       }
     }, 0);
   }

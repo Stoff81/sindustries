@@ -195,6 +195,7 @@ button {
   padding: 8px 10px;
   cursor: pointer;
   box-shadow: 2px 2px 0 var(--panel-2);
+  min-width: 80px;
 }
 .secondary-btn:hover {
   background: color-mix(in srgb, var(--muted) 88%, var(--text) 2%);
@@ -430,10 +431,10 @@ input:focus, select:focus, textarea:focus { border-color: var(--si-color-slate-5
 
 .badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .pill { border: 2px solid var(--si-color-bg-canvas); border-radius: 0; font-size: 0.72rem; text-transform: uppercase; padding: 2px 7px; background: var(--si-color-paper-200); font-weight: 700; }
-.pill.urgent { background: var(--si-color-accent-200); }
-.pill.high { background: var(--si-color-brand-200); }
-.pill.medium { background: var(--si-color-info-200); }
-.pill.low { background: var(--si-color-neutral-300); }
+.pill.urgent { background: var(--si-color-accent-200); border-color: var(--si-color-slate-500); }
+.pill.high { background: var(--si-color-brand-200); border-color: var(--si-color-slate-500); }
+.pill.medium { background: var(--si-color-info-200); border-color: var(--si-color-slate-500); }
+.pill.low { background: var(--si-color-neutral-300); border-color: var(--si-color-slate-500); }
 .pill.status { background: var(--si-color-neutral-200); border-color: var(--si-color-slate-500); }
 .pill.draft-pill {
   background: var(--pink);
