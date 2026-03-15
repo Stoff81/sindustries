@@ -179,7 +179,11 @@ tasksRouter.get('/tasks', async (req, res, next) => {
       ...(includeArchived === 'true' ? {} : { archivedAt: null }),
       ...statusFilter,
       ...(priority ? { priority } : {}),
-      ...(assignee ? { assignee: { equals: assignee, mode: 'insensitive' } } : {}),
+      ...(assignee
+        ? assignee === 'unassigned'
+          ? { OR: [{ assignee: null }, { assignee: '' }] }
+          : { assignee: { equals: assignee, mode: 'insensitive' } }
+        : {}),
       ...(q
         ? {
             OR: [
