@@ -4,7 +4,7 @@ import { useTaskDrafts } from './useTaskDrafts.js';
 import { useDebounce } from './hooks/useDebounce.js';
 import { useToast } from './hooks/useToast.js';
 import { TaskEditor } from './components/TaskEditor.jsx';
-import { STATUSES, PRIORITIES, PRIORITY_SCORE } from './utils/constants.js';
+import { STATUSES, STATUS_LABELS, PRIORITIES, PRIORITY_SCORE } from './utils/constants.js';
 import { createConfettiPieces, normalizeTaskForEditor, assigneeInitial } from './utils/helpers.js';
 import { getStoredView, setStoredView } from './utils/storage.js';
 
@@ -12,11 +12,14 @@ export function App() {
   const [view, setView] = useState(getStoredView);
   const [selectedId, setSelectedId] = useState(null);
   const [filters, setFilters] = useState({ q: '', status: '', priority: '', tag: '', includeArchived: false });
+  const [collapsedColumns, setCollapsedColumns] = useState({ done: true });
+  // Default selected statuses for Kanban - all except done (which is collapsed)
+  const [selectedStatuses, setSelectedStatuses] = useState(new Set(['open', 'ready', 'doing', 'acceptance']));
   
-  // Default backlog view to Status: Todo
+  // Default backlog view to Status: Open
   useEffect(() => {
     if (view === 'backlog' && filters.status === '') {
-      setFilters((current) => ({ ...current, status: 'todo' }));
+      setFilters((current) => ({ ...current, status: 'open' }));
     }
   }, [view, filters.status]);
 
@@ -124,7 +127,7 @@ export function App() {
   }, [hasUnsavedDrafts]);
 
   const boardColumns = useMemo(() => {
-    const columns = { todo: [], doing: [], done: [] };
+    const columns = { open: [], ready: [], doing: [], acceptance: [], done: [] };
     for (const task of tasks) columns[task.status]?.push(task);
     for (const status of STATUSES) {
       columns[status].sort((a, b) => {
@@ -367,10 +370,36 @@ export function App() {
               >
                 <option value="">Status: All statuses</option>
                 {STATUSES.map((status) => (
-                  <option key={status} value={status}>{`Status: ${status}`}</option>
+                  <option key={status} value={status}>{`Status: ${STATUS_LABELS[status]}`}</option>
                 ))}
               </select>
             </label>
+            {/* Multi-select status filter for Kanban */}
+            {view === 'board' && (
+              <div className="status-filter-chips">
+                <span className="small">Show:</span>
+                {STATUSES.map((status) => (
+                  <button
+                    key={status}
+                    type="button"
+                    className={`status-chip ${selectedStatuses.has(status) ? 'active' : ''}`}
+                    onClick={() => {
+                      setSelectedStatuses((prev) => {
+                        const next = new Set(prev);
+                        if (next.has(status)) {
+                          next.delete(status);
+                        } else {
+                          next.add(status);
+                        }
+                        return next;
+                      });
+                    }}
+                  >
+                    {STATUS_LABELS[status]}
+                  </button>
+                ))}
+              </div>
+            )}
             <label className="select-wrap">
               <select
                 aria-label="Priority filter"
@@ -571,7 +600,7 @@ export function App() {
                 <div
                   key={status}
                   data-testid={`column-${status}`}
-                  className="column"
+                  className={`column ${collapsedColumns[status] ? 'collapsed' : ''} ${!selectedStatuses.has(status) ? 'hidden' : ''}`}
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={(e) => {
                     const id = e.dataTransfer.getData('text/plain');
@@ -579,82 +608,94 @@ export function App() {
                   }}
                 >
                   <div className="column-head">
-                    <h3 className="font-display">{status}</h3>
+                    <h3 className="font-display">{STATUS_LABELS[status]}</h3>
                     <span className="count-pill">{boardColumns[status].length}</span>
+                    {status === 'done' && (
+                      <button
+                        type="button"
+                        className="collapse-btn"
+                        onClick={() => setCollapsedColumns((prev) => ({ ...prev, done: !prev.done }))}
+                        aria-label={collapsedColumns[status] ? 'Expand Done column' : 'Collapse Done column'}
+                      >
+                        {collapsedColumns[status] ? '▶' : '▼'}
+                      </button>
+                    )}
                   </div>
-                  <ol>
-                    {boardColumns[status].map((task, index) => {
-                      const isSelected = selectedId === task.id;
-                      const draft = getDraft(task);
-                      const hasDraft = isTaskDirty(task);
-                      const assigneeLetter = assigneeInitial(task.assignee);
-                      const assignee = task.assignee?.trim() || 'Unassigned';
-                      const taskTags = Array.isArray(task.tags) ? task.tags.map((tag) => tag.name ?? String(tag)) : [];
-                      return (
-                        <li key={task.id}>
-                          <article
-                            ref={(el) => { if (el) taskCardRefs.current[String(task.id)] = el; }}
-                            data-testid={`card-${task.id}`}
-                            className={`board-card ${task.archivedAt ? 'archived' : ''} ${task.blocked ? 'blocked' : ''} ${task.ready ? 'ready' : ''} ${isSelected ? 'is-editing' : ''} card-tilt-${index % 3}`}
-                            draggable={!isSelected}
-                            onDragStart={(e) => {
-                              if (!isSelected) e.dataTransfer.setData('text/plain', task.id);
-                            }}
-                            onClick={(e) => {
-                              if (!isSelected) {
-                                e.stopPropagation();
-                                openTask(task.id);
-                              }
-                            }}
-                          >
-                            <div className="task-row board-card-row">
-                              <button 
-                                className="task-title-btn" 
-                                onClick={(e) => {
+                  {!collapsedColumns[status] && (
+                    <ol>
+                      {boardColumns[status].map((task, index) => {
+                        const isSelected = selectedId === task.id;
+                        const draft = getDraft(task);
+                        const hasDraft = isTaskDirty(task);
+                        const assigneeLetter = assigneeInitial(task.assignee);
+                        const assignee = task.assignee?.trim() || 'Unassigned';
+                        const taskTags = Array.isArray(task.tags) ? task.tags.map((tag) => tag.name ?? String(tag)) : [];
+                        return (
+                          <li key={task.id}>
+                            <article
+                              ref={(el) => { if (el) taskCardRefs.current[String(task.id)] = el; }}
+                              data-testid={`card-${task.id}`}
+                              className={`board-card ${task.archivedAt ? 'archived' : ''} ${task.blocked ? 'blocked' : ''} ${task.ready ? 'ready' : ''} ${isSelected ? 'is-editing' : ''} card-tilt-${index % 3}`}
+                              draggable={!isSelected}
+                              onDragStart={(e) => {
+                                if (!isSelected) e.dataTransfer.setData('text/plain', task.id);
+                              }}
+                              onClick={(e) => {
+                                if (!isSelected) {
                                   e.stopPropagation();
-                                  toggleTask(task.id, isSelected);
-                                }}
-                              >
-                                {task.title}
-                              </button>
-                            </div>
-                            <div className="board-card-meta">
-                              <span className={`pill ${task.priority}`}>{task.priority}</span>
-                              {taskTags.map((tag) => <span key={tag} className="pill tag-pill">#{tag}</span>)}
-                              <div className="board-card-meta-right">
-                                {hasDraft ? <span className="pill draft-pill">Unsaved</span> : null}
-                                {task.ready ? <span className="ready-dot" aria-label="Ready">✓</span> : null}
-                                {assigneeLetter ? <span className="avatar-dot" title={assignee} aria-label={`Assignee ${assignee}`}>{assigneeLetter}</span> : null}
-                                <span className="small">{String(task.statusChangedAt).slice(0, 10)}</span>
+                                  openTask(task.id);
+                                }
+                              }}
+                            >
+                              <div className="task-row board-card-row">
+                                <button 
+                                  className="task-title-btn" 
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleTask(task.id, isSelected);
+                                  }}
+                                >
+                                  {task.title}
+                                </button>
                               </div>
-                            </div>
-                            {isSelected ? (
-                              <TaskEditor
-                                draft={draft}
-                                task={task}
-                                isDirty={hasDraft}
-                                onDraftChange={(nextDraft) => storeDraft(task, nextDraft)}
-                                onSave={async (patch) => {
-                                  const didSave = await patchTask(task.id, patch);
-                                  if (!didSave) return;
-                                  clearDraft(task.id);
-                                  setSelectedId(null);
-                                  scrollToTaskIfNeeded(task.id);
-                                }}
-                                onArchive={() => archiveTask(task.id)}
-                                onClose={() => {
-                                  setSelectedId(null);
-                                  scrollToTaskIfNeeded(task.id);
-                                }}
-                                onAddComment={(payload) => createTaskComment(task.id, payload)}
-                                isSubmittingComment={submittingCommentForTaskId === task.id}
-                              />
-                            ) : null}
-                          </article>
-                        </li>
-                      );
-                    })}
-                  </ol>
+                              <div className="board-card-meta">
+                                <span className={`pill ${task.priority}`}>{task.priority}</span>
+                                {taskTags.map((tag) => <span key={tag} className="pill tag-pill">#{tag}</span>)}
+                                <div className="board-card-meta-right">
+                                  {hasDraft ? <span className="pill draft-pill">Unsaved</span> : null}
+                                  {task.ready ? <span className="ready-dot" aria-label="Ready">✓</span> : null}
+                                  {assigneeLetter ? <span className="avatar-dot" title={assignee} aria-label={`Assignee ${assignee}`}>{assigneeLetter}</span> : null}
+                                  <span className="small">{String(task.statusChangedAt).slice(0, 10)}</span>
+                                </div>
+                              </div>
+                              {isSelected ? (
+                                <TaskEditor
+                                  draft={draft}
+                                  task={task}
+                                  isDirty={hasDraft}
+                                  onDraftChange={(nextDraft) => storeDraft(task, nextDraft)}
+                                  onSave={async (patch) => {
+                                    const didSave = await patchTask(task.id, patch);
+                                    if (!didSave) return;
+                                    clearDraft(task.id);
+                                    setSelectedId(null);
+                                    scrollToTaskIfNeeded(task.id);
+                                  }}
+                                  onArchive={() => archiveTask(task.id)}
+                                  onClose={() => {
+                                    setSelectedId(null);
+                                    scrollToTaskIfNeeded(task.id);
+                                  }}
+                                  onAddComment={(payload) => createTaskComment(task.id, payload)}
+                                  isSubmittingComment={submittingCommentForTaskId === task.id}
+                                />
+                              ) : null}
+                            </article>
+                          </li>
+                        );
+                      })}
+                    </ol>
+                  )}
                 </div>
               ))}
             </div>

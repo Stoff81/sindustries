@@ -176,6 +176,35 @@
   gap: 8px;
 }
 
+/* Status filter chips */
+.status-filter-chips {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.status-chip {
+  padding: 4px 8px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.status-chip:hover {
+  border-color: var(--muted);
+}
+
+.status-chip.active {
+  background: var(--amber);
+  color: var(--panel-2);
+  border-color: var(--amber);
+}
+
 /* Mobile navigation */
 .mobile-nav {
   display: none;

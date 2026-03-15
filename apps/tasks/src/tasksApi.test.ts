@@ -48,14 +48,14 @@ describe('tasksApi', () => {
     it('adds query parameters for filters', async () => {
       mockFetch.mockResolvedValueOnce(mockResponse([]));
 
-      await fetchTasks({ q: 'test', status: 'todo', priority: 'high' });
+      await fetchTasks({ q: 'test', status: 'open', priority: 'high' });
 
       expect(mockFetch).toHaveBeenCalledWith(
         expect.stringContaining('q=test'),
         expect.any(Object)
       );
       expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining('status=todo'),
+        expect.stringContaining('status=open'),
         expect.any(Object)
       );
       expect(mockFetch).toHaveBeenCalledWith(

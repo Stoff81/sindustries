@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { STATUSES, PRIORITIES } from '../utils/constants.js';
+import { STATUSES, STATUS_LABELS, PRIORITIES } from '../utils/constants.js';
 import { normalizeComments, formatCommentTimestamp } from '../utils/helpers.js';
 
 /**
@@ -161,7 +161,7 @@ export function TaskEditor({ draft, task, isDirty, onDraftChange, onSave, onArch
             <span className="small">Status</span>
             <select ref={statusRef} className="edit-control" aria-label="Detail status" value={draft.status} onChange={(e) => update('status', e.target.value)} onMouseDown={stopPropagation} onTouchStart={stopPropagation} onKeyDown={(e) => handleKeyDown(e, statusRef)}>
               {STATUSES.map((status) => (
-                <option key={status} value={status}>{status}</option>
+                <option key={status} value={status}>{STATUS_LABELS[status]}</option>
               ))}
             </select>
           </label>

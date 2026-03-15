@@ -1,4 +1,12 @@
-export const STATUSES = ['todo', 'doing', 'done'];
+export const STATUSES = ['open', 'ready', 'doing', 'acceptance', 'done'];
+
+export const STATUS_LABELS = {
+  open: 'Open',
+  ready: 'Ready',
+  doing: 'Doing',
+  acceptance: 'Acceptance',
+  done: 'Done'
+};
 
 export const PRIORITIES = ['urgent', 'high', 'medium', 'low'];
 

@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-const statuses = ['todo', 'doing', 'done'];
+const statuses = ['open', 'ready', 'doing', 'acceptance', 'done'];
 const priorities = ['low', 'medium', 'high', 'urgent'];
 const assignees = ['Tom', 'Quinn', 'Rowan', null];
 const tagNames = ['ops', 'product', 'finance', 'family', 'health', 'automation', 'backend', 'frontend'];
@@ -102,7 +102,7 @@ async function main() {
     data: {
       title: 'Comment Test Task',
       description: 'Purpose-built seed task for validating the comments UI demo flow',
-      status: 'todo',
+      status: 'open',
       priority: 'high',
       statusChangedAt: new Date(),
       assignee: 'Rowan',

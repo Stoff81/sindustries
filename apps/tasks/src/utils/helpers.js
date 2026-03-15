@@ -48,7 +48,7 @@ export function normalizeTaskForEditor(task) {
   return {
     title: task.title ?? '',
     description: task.description ?? '',
-    status: task.status ?? 'todo',
+    status: task.status ?? 'open',
     priority: task.priority ?? 'medium',
     assignee: task.assignee ?? '',
     dueAt: task.dueAt ? String(task.dueAt).slice(0, 10) : '',
