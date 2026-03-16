@@ -633,14 +633,13 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel-2); outlin
 
 .board-wrap { overflow-x: auto; margin-top: 8px; position: relative; z-index: 1; }
 .board {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(var(--visible-columns, 5), 1fr);
   gap: 12px;
 }
 .column {
-  flex: 1;
   min-height: 260px;
-  min-width: 200px;
-  max-width: 320px;
+  min-width: 0;
   background: var(--panel);
   border: 2px solid var(--panel-2);
   border-radius: 0;
@@ -649,6 +648,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel-2); outlin
   position: relative;
   z-index: 2;
 }
+.column.hidden { display: none; }
 .column-head {
   display: flex;
   justify-content: space-between;

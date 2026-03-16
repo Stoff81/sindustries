@@ -12,9 +12,10 @@ export function App() {
   const [view, setView] = useState(getStoredView);
   const [selectedId, setSelectedId] = useState(null);
   const [filters, setFilters] = useState({ q: '', status: '', priority: '', tag: '', includeArchived: false });
-  const [collapsedColumns, setCollapsedColumns] = useState({ done: false });
-  // Default selected statuses for Kanban - all except done (which is collapsed)
-  const [selectedStatuses, setSelectedStatuses] = useState(new Set(['open', 'ready', 'doing', 'acceptance']));
+  const [selectedStatuses, setSelectedStatuses] = useState(new Set(['open', 'ready', 'doing', 'acceptance', 'done']));
+
+  // Calculate number of visible columns for CSS grid
+  const visibleColumnCount = STATUSES.filter(status => selectedStatuses.has(status)).length;
   
   // Default backlog view to Status: Open
   useEffect(() => {
@@ -595,12 +596,12 @@ export function App() {
           </section>
         ) : (
           <section aria-label="Kanban board" className="board-wrap">
-            <div className="board">
+            <div className="board" style={{ '--visible-columns': visibleColumnCount }}>
               {STATUSES.map((status) => (
                 <div
                   key={status}
                   data-testid={`column-${status}`}
-                  className={`column ${collapsedColumns[status] ? 'collapsed' : ''} ${!selectedStatuses.has(status) ? 'hidden' : ''}`}
+                  className={`column ${!selectedStatuses.has(status) ? 'hidden' : ''}`}
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={(e) => {
                     const id = e.dataTransfer.getData('text/plain');
@@ -610,19 +611,8 @@ export function App() {
                   <div className="column-head">
                     <h3 className="font-display">{STATUS_LABELS[status]}</h3>
                     <span className="count-pill">{boardColumns[status].length}</span>
-                    {status === 'done' && (
-                      <button
-                        type="button"
-                        className="collapse-btn"
-                        onClick={() => setCollapsedColumns((prev) => ({ ...prev, done: !prev.done }))}
-                        aria-label={collapsedColumns[status] ? 'Expand Done column' : 'Collapse Done column'}
-                      >
-                        {collapsedColumns[status] ? '▶' : '▼'}
-                      </button>
-                    )}
                   </div>
-                  {!collapsedColumns[status] && (
-                    <ol>
+                  <ol>
                       {boardColumns[status].map((task, index) => {
                         const isSelected = selectedId === task.id;
                         const draft = getDraft(task);
@@ -695,7 +685,6 @@ export function App() {
                         );
                       })}
                     </ol>
-                  )}
                 </div>
               ))}
             </div>
