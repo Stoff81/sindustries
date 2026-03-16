@@ -12,7 +12,7 @@ export function App() {
   const [view, setView] = useState(getStoredView);
   const [selectedId, setSelectedId] = useState(null);
   const [filters, setFilters] = useState({ q: '', status: '', priority: '', tag: '', includeArchived: false });
-  const [collapsedColumns, setCollapsedColumns] = useState({ done: true });
+  const [collapsedColumns, setCollapsedColumns] = useState({ done: false });
   // Default selected statuses for Kanban - all except done (which is collapsed)
   const [selectedStatuses, setSelectedStatuses] = useState(new Set(['open', 'ready', 'doing', 'acceptance']));
   
