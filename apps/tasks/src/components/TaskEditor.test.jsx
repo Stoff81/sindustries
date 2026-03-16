@@ -34,9 +34,45 @@ describe('TaskEditor', () => {
     expect(screen.getByLabelText('Detail title')).toHaveValue('Test Task');
   });
 
-  it('renders task description', () => {
+  it('renders description in view mode by default', () => {
     render(<TaskEditor {...defaultProps} />);
+    // View mode shows rendered markdown, not a textarea
+    expect(screen.queryByLabelText('Detail description')).not.toBeInTheDocument();
+    expect(screen.getByText('Test description')).toBeInTheDocument();
+  });
+
+  it('switches to edit mode when Edit button is clicked', () => {
+    render(<TaskEditor {...defaultProps} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Edit description' }));
     expect(screen.getByLabelText('Detail description')).toHaveValue('Test description');
+  });
+
+  it('switches back to preview mode when Preview button is clicked', () => {
+    render(<TaskEditor {...defaultProps} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Edit description' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Preview description' }));
+    expect(screen.queryByLabelText('Detail description')).not.toBeInTheDocument();
+    expect(screen.getByText('Test description')).toBeInTheDocument();
+  });
+
+  it('switches to edit mode when clicking description preview', () => {
+    render(<TaskEditor {...defaultProps} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Click to edit description' }));
+    expect(screen.getByLabelText('Detail description')).toBeInTheDocument();
+  });
+
+  it('renders empty description placeholder', () => {
+    const props = { ...defaultProps, draft: { ...defaultProps.draft, description: '' } };
+    render(<TaskEditor {...props} />);
+    expect(screen.getByText('No description. Click to add one.')).toBeInTheDocument();
+  });
+
+  it('renders markdown in description view mode', () => {
+    const props = { ...defaultProps, draft: { ...defaultProps.draft, description: '**bold** and *italic*' } };
+    render(<TaskEditor {...props} />);
+    const rendered = screen.getByRole('button', { name: 'Click to edit description' });
+    expect(rendered.innerHTML).toContain('<strong>bold</strong>');
+    expect(rendered.innerHTML).toContain('<em>italic</em>');
   });
 
   it('renders status select', () => {
@@ -58,6 +94,19 @@ describe('TaskEditor', () => {
 
     expect(onDraftChange).toHaveBeenCalledWith(
       expect.objectContaining({ title: 'New Title' })
+    );
+  });
+
+  it('calls onDraftChange when description changes in edit mode', () => {
+    const onDraftChange = vi.fn();
+    render(<TaskEditor {...defaultProps} onDraftChange={onDraftChange} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Edit description' }));
+    const descInput = screen.getByLabelText('Detail description');
+    fireEvent.change(descInput, { target: { value: 'Updated description' } });
+
+    expect(onDraftChange).toHaveBeenCalledWith(
+      expect.objectContaining({ description: 'Updated description' })
     );
   });
 
@@ -130,6 +179,23 @@ describe('TaskEditor', () => {
 
     expect(screen.getByText('John')).toBeInTheDocument();
     expect(screen.getByText('Great work!')).toBeInTheDocument();
+  });
+
+  it('renders markdown in comments', () => {
+    const propsWithComments = {
+      ...defaultProps,
+      task: {
+        id: 1,
+        title: 'Test Task',
+        comments: [
+          { id: 1, author: 'John', text: '**bold** text', createdAt: '2024-01-15T10:00:00Z' }
+        ]
+      }
+    };
+    render(<TaskEditor {...propsWithComments} />);
+
+    const commentBody = screen.getByLabelText('Task comments').querySelector('.comment-body');
+    expect(commentBody.innerHTML).toContain('<strong>bold</strong>');
   });
 
   it('can toggle comment composer', () => {

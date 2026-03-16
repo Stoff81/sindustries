@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { STATUSES, STATUS_LABELS, PRIORITIES } from '../utils/constants.js';
 import { normalizeComments, formatCommentTimestamp } from '../utils/helpers.js';
+import { MarkdownContent } from './MarkdownContent.jsx';
 
 /**
  * TaskEditor - Inline editor for task details
@@ -27,6 +28,7 @@ export function TaskEditor({ draft, task, isDirty, onDraftChange, onSave, onArch
   const readyRef = useRef(null);
   const [commentDraft, setCommentDraft] = useState({ author: '', text: '' });
   const [isCommentComposerOpen, setIsCommentComposerOpen] = useState(false);
+  const [isDescriptionEditing, setIsDescriptionEditing] = useState(false);
 
   useEffect(() => {
     const textarea = descriptionRef.current;
@@ -141,20 +143,47 @@ export function TaskEditor({ draft, task, isDirty, onDraftChange, onSave, onArch
           <button className="tertiary-btn title-close-btn" onClick={onClose}>Close</button>
         </div>
 
-        <label>
-          <span className="small">Description</span>
-          <textarea
-            ref={descriptionRef}
-            className="edit-control auto-grow-textarea"
-            aria-label="Detail description"
-            value={draft.description}
-            rows={1}
-            onChange={(e) => update('description', e.target.value)}
-            onMouseDown={stopPropagation}
-            onTouchStart={stopPropagation}
-            onKeyDown={(e) => handleKeyDown(e, descriptionRef, true)}
-          />
-        </label>
+        <div className="description-field">
+          <div className="description-header">
+            <span className="small">Description</span>
+            <button
+              className="tertiary-btn description-toggle-btn"
+              type="button"
+              onClick={() => setIsDescriptionEditing((v) => !v)}
+              aria-label={isDescriptionEditing ? 'Preview description' : 'Edit description'}
+            >
+              {isDescriptionEditing ? 'Preview' : 'Edit'}
+            </button>
+          </div>
+          {isDescriptionEditing ? (
+            <textarea
+              ref={descriptionRef}
+              className="edit-control auto-grow-textarea"
+              aria-label="Detail description"
+              value={draft.description}
+              rows={3}
+              onChange={(e) => update('description', e.target.value)}
+              onMouseDown={stopPropagation}
+              onTouchStart={stopPropagation}
+              onKeyDown={(e) => handleKeyDown(e, descriptionRef, true)}
+            />
+          ) : (
+            <div
+              className="description-preview"
+              onClick={() => setIsDescriptionEditing(true)}
+              role="button"
+              tabIndex={0}
+              aria-label="Click to edit description"
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setIsDescriptionEditing(true); } }}
+            >
+              {draft.description ? (
+                <MarkdownContent markdown={draft.description} />
+              ) : (
+                <p className="description-empty">No description. Click to add one.</p>
+              )}
+            </div>
+          )}
+        </div>
 
         <div className="editor-grid">
           <label>
@@ -294,7 +323,7 @@ export function TaskEditor({ draft, task, isDirty, onDraftChange, onSave, onArch
                     <strong>{comment.author}</strong>
                     <time className="small" dateTime={comment.createdAt}>{formatCommentTimestamp(comment.createdAt)}</time>
                   </div>
-                  <p>{comment.text}</p>
+                  <MarkdownContent markdown={comment.text} className="comment-body" />
                 </li>
               ))}
             </ol>
