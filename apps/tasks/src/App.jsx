@@ -12,7 +12,7 @@ export function App() {
   const [view, setView] = useState(getStoredView);
   const [selectedId, setSelectedId] = useState(null);
   const [filters, setFilters] = useState({ q: '', status: '', priority: '', tag: '', includeArchived: false });
-  const [selectedStatuses, setSelectedStatuses] = useState(new Set(['open', 'ready', 'doing', 'acceptance', 'done']));
+  const [selectedStatuses, setSelectedStatuses] = useState(new Set(['open', 'ready', 'doing', 'acceptance']));
 
   // Calculate number of visible columns for CSS grid
   const visibleColumnCount = STATUSES.filter(status => selectedStatuses.has(status)).length;
