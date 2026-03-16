@@ -362,6 +362,20 @@ export function App() {
       <section className="content">
         <div className="filter-row panel">
           <div className="filter-controls">
+            {allTags.length > 0 && (
+              <label className="select-wrap">
+                <select
+                  aria-label="Tag filter"
+                  value={filters.tag}
+                  onChange={(e) => setFilters((current) => ({ ...current, tag: e.target.value }))}
+                >
+                  <option value="">Tag: All tags</option>
+                  {allTags.map((tag) => (
+                    <option key={tag} value={tag}>{`Tag: ${tag}`}</option>
+                  ))}
+                </select>
+              </label>
+            )}
             <label className="select-wrap">
               <select
                 aria-label="Status filter"
@@ -412,20 +426,6 @@ export function App() {
                 ))}
               </select>
             </label>
-            {allTags.length > 0 && (
-              <label className="select-wrap">
-                <select
-                  aria-label="Tag filter"
-                  value={filters.tag}
-                  onChange={(e) => setFilters((current) => ({ ...current, tag: e.target.value }))}
-                >
-                  <option value="">Tag: All tags</option>
-                  {allTags.map((tag) => (
-                    <option key={tag} value={tag}>{`Tag: ${tag}`}</option>
-                  ))}
-                </select>
-              </label>
-            )}
           </div>
           <div className="filter-actions">
             <button
