@@ -1,24 +1,24 @@
-// Migration script to update existing tasks from todo -> ready
+// Migration script to update existing tasks from todo -> open
 // Run this once to migrate existing data
 
 import { prisma } from '../src/lib/prisma.ts';
 
 async function migrate() {
-  console.log('Starting migration: todo -> ready');
+  console.log('Starting migration: todo -> open');
   
-  // Update tasks with status 'todo' to 'ready'
+  // Update tasks with status 'todo' to 'open'
   const result = await prisma.task.updateMany({
     where: { status: 'todo' },
-    data: { status: 'ready' }
+    data: { status: 'open' }
   });
   
-  console.log(`Updated ${result.count} tasks from 'todo' to 'ready'`);
+  console.log(`Updated ${result.count} tasks from 'todo' to 'open'`);
   
   // Verify the migration
   const todoCount = await prisma.task.count({ where: { status: 'todo' } });
-  const readyCount = await prisma.task.count({ where: { status: 'ready' } });
+  const openCount = await prisma.task.count({ where: { status: 'open' } });
   
-  console.log(`Verification: ${todoCount} tasks still have 'todo', ${readyCount} have 'ready'`);
+  console.log(`Verification: ${todoCount} tasks still have 'todo', ${openCount} have 'open'`);
   
   await prisma.$disconnect();
   console.log('Migration complete');

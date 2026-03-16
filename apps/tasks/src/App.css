@@ -634,7 +634,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel-2); outlin
 .board-wrap { overflow-x: auto; margin-top: 8px; position: relative; z-index: 1; }
 .board {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 12px;
 }
 .column {
