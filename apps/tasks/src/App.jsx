@@ -129,7 +129,8 @@ export function App() {
 
   const boardColumns = useMemo(() => {
     const columns = { open: [], ready: [], doing: [], acceptance: [], done: [] };
-    for (const task of tasks) columns[task.status]?.push(task);
+    const filtered = filters.priority ? tasks.filter((t) => t.priority === filters.priority) : tasks;
+    for (const task of filtered) columns[task.status]?.push(task);
     for (const status of STATUSES) {
       columns[status].sort((a, b) => {
         const priorityDiff = (PRIORITY_SCORE[a.priority] ?? 99) - (PRIORITY_SCORE[b.priority] ?? 99);
@@ -140,17 +141,18 @@ export function App() {
       });
     }
     return columns;
-  }, [tasks]);
+  }, [tasks, filters.priority]);
 
   // Backlog list uses same sort order: priority, readiness, date created
   const sortedBacklogTasks = useMemo(() => {
-    return [...tasks].sort((a, b) => {
+    const filtered = filters.priority ? tasks.filter((t) => t.priority === filters.priority) : tasks;
+    return [...filtered].sort((a, b) => {
       const priorityDiff = (PRIORITY_SCORE[a.priority] ?? 99) - (PRIORITY_SCORE[b.priority] ?? 99);
       if (priorityDiff !== 0) return priorityDiff;
       if (a.ready !== b.ready) return a.ready ? -1 : 1;
       return new Date(a.createdAt) - new Date(b.createdAt);
     });
-  }, [tasks]);
+  }, [tasks, filters.priority]);
 
   async function createTask(event) {
     event.preventDefault();
