@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { STATUSES, STATUS_LABELS, PRIORITIES } from '../utils/constants.js';
 import { normalizeComments, formatCommentTimestamp } from '../utils/helpers.js';
 
@@ -27,6 +29,7 @@ export function TaskEditor({ draft, task, isDirty, onDraftChange, onSave, onArch
   const readyRef = useRef(null);
   const [commentDraft, setCommentDraft] = useState({ author: '', text: '' });
   const [isCommentComposerOpen, setIsCommentComposerOpen] = useState(false);
+  const [isDescriptionEditing, setIsDescriptionEditing] = useState(true);
 
   useEffect(() => {
     const textarea = descriptionRef.current;
@@ -142,18 +145,45 @@ export function TaskEditor({ draft, task, isDirty, onDraftChange, onSave, onArch
         </div>
 
         <label>
-          <span className="small">Description</span>
-          <textarea
-            ref={descriptionRef}
-            className="edit-control auto-grow-textarea"
-            aria-label="Detail description"
-            value={draft.description}
-            rows={1}
-            onChange={(e) => update('description', e.target.value)}
-            onMouseDown={stopPropagation}
-            onTouchStart={stopPropagation}
-            onKeyDown={(e) => handleKeyDown(e, descriptionRef, true)}
-          />
+          <div className="description-header">
+            <span className="small">Description</span>
+            {draft.description && (
+              <button
+                type="button"
+                className="tertiary-btn small-btn"
+                onClick={() => setIsDescriptionEditing((prev) => !prev)}
+              >
+                {isDescriptionEditing ? 'Preview' : 'Edit'}
+              </button>
+            )}
+          </div>
+          {isDescriptionEditing ? (
+            <textarea
+              ref={descriptionRef}
+              className="edit-control auto-grow-textarea"
+              aria-label="Detail description"
+              value={draft.description}
+              rows={1}
+              onChange={(e) => update('description', e.target.value)}
+              onMouseDown={stopPropagation}
+              onTouchStart={stopPropagation}
+              onKeyDown={(e) => handleKeyDown(e, descriptionRef, true)}
+            />
+          ) : (
+            <div
+              className="markdown-preview"
+              onClick={() => setIsDescriptionEditing(true)}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setIsDescriptionEditing(true); }}
+              role="button"
+              tabIndex={0}
+            >
+              {draft.description ? (
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{draft.description}</ReactMarkdown>
+              ) : (
+                <span className="empty-preview">No description</span>
+              )}
+            </div>
+          )}
         </label>
 
         <div className="editor-grid">
@@ -294,7 +324,9 @@ export function TaskEditor({ draft, task, isDirty, onDraftChange, onSave, onArch
                     <strong>{comment.author}</strong>
                     <time className="small" dateTime={comment.createdAt}>{formatCommentTimestamp(comment.createdAt)}</time>
                   </div>
-                  <p>{comment.text}</p>
+                  <div className="comment-text">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{comment.text}</ReactMarkdown>
+                  </div>
                 </li>
               ))}
             </ol>
