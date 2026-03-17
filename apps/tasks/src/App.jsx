@@ -17,12 +17,12 @@ export function App() {
   // Calculate number of visible columns for CSS grid
   const visibleColumnCount = STATUSES.filter(status => selectedStatuses.has(status)).length;
   
-  // Default backlog view to Status: Open
+  // Default backlog view to Status: Open (only when switching to backlog)
   useEffect(() => {
     if (view === 'backlog' && filters.status === '') {
       setFilters((current) => ({ ...current, status: 'open' }));
     }
-  }, [view, filters.status]);
+  }, [view]);
 
   // Persist view to localStorage
   useEffect(() => {
