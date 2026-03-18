@@ -130,13 +130,9 @@
   align-items: center;
 }
 
-.description-toggle-btn {
-  font-size: 0.8rem;
-  padding: 2px 8px;
-}
-
 .description-preview {
-  background: var(--panel-2);
+  background: color-mix(in srgb, var(--text) 95%, var(--panel) 5%);
+  color: var(--panel);
   border: 2px solid var(--line);
   border-radius: 6px;
   padding: 10px 12px;
@@ -166,6 +162,7 @@
   font-size: 0.95rem;
   line-height: 1.5;
   word-wrap: break-word;
+  color: inherit;
 }
 
 .markdown-body h1,
@@ -211,8 +208,9 @@
 }
 
 .markdown-body code {
-  background: var(--panel);
-  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--muted) 92%, var(--panel-2) 8%);
+  border: 1px solid color-mix(in srgb, var(--muted) 80%, var(--line) 20%);
+  color: var(--panel-2);
   border-radius: 3px;
   padding: 1px 5px;
   font-size: 0.88em;
@@ -220,8 +218,9 @@
 }
 
 .markdown-body pre {
-  background: var(--panel);
-  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--muted) 92%, var(--panel-2) 8%);
+  border: 1px solid color-mix(in srgb, var(--muted) 80%, var(--line) 20%);
+  color: var(--panel-2);
   border-radius: 6px;
   padding: 10px 12px;
   overflow-x: auto;
@@ -232,6 +231,7 @@
   background: none;
   border: none;
   padding: 0;
+  color: inherit;
   font-size: 0.85em;
 }
 
@@ -246,13 +246,26 @@
   margin: 0.15em 0;
 }
 
-.markdown-body li input[type="checkbox"] {
-  margin-right: 6px;
-  accent-color: var(--accent);
+.markdown-body ul.contains-task-list,
+.markdown-body ol.contains-task-list {
+  padding-left: 0;
 }
 
-.markdown-body li input[type="checkbox"]:checked {
-  accent-color: #ffc935;
+.markdown-body li.task-list-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  list-style: none;
+  margin: 0.25em 0;
+  padding: 0;
+}
+
+.markdown-body input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--amber);
+  margin: 0;
+  margin-top: 0.2em;
 }
 
 .markdown-body blockquote {

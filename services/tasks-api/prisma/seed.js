@@ -122,7 +122,80 @@ async function main() {
     }
   });
 
-  console.log('Seed complete: 25 tasks, 8 tags, Seed Task 15 comments, Comment Test Task.');
+  await prisma.task.create({
+    data: {
+      title: 'Markdown Showcase Task',
+      description: [
+        '# Markdown showcase',
+        '',
+        'Use this task to validate **markdown rendering** in the Description preview.',
+        '',
+        '## Basics',
+        '',
+        '- **Bold** and _italic_ and ~~strikethrough~~',
+        '- Inline code: `const ready = true`',
+        '- Link: [Sindustries](https://example.com)',
+        '',
+        '## Checklists',
+        '',
+        '- [ ] Unchecked item',
+        '- [x] Checked item (should be amber)',
+        '- [ ] Another unchecked item',
+        '',
+        '## Lists',
+        '',
+        '1. Ordered item one',
+        '2. Ordered item two',
+        '   - Nested bullet',
+        '',
+        '> Blockquote should be muted with accent bar.',
+        '',
+        '---',
+        '',
+        '## Code',
+        '',
+        '```js',
+        "export function greet(name) {",
+        "  return `Hello, ${name}!`;",
+        '}',
+        '```',
+        '',
+        '## Table',
+        '',
+        '| Feature | Expected |',
+        '| --- | --- |',
+        '| Checkboxes | Amber when checked |',
+        '| Code blocks | Sage bg + porcelain text |',
+        '| Background | Matches edit field |'
+      ].join('\n'),
+      status: 'open',
+      priority: 'urgent',
+      statusChangedAt: new Date(),
+      assignee: 'Tom',
+      ready: true,
+      comments: {
+        create: [
+          {
+            author: 'Rowan',
+            body: [
+              'Markdown comment showcase:',
+              '',
+              '- [ ] Comment checklist item',
+              '- [x] Checked comment item',
+              '',
+              '```bash',
+              'echo \"sage background, porcelain text\"',
+              '```',
+              '',
+              '> Comment blockquote rendering check.'
+            ].join('\n')
+          }
+        ]
+      }
+    }
+  });
+
+  console.log('Seed complete: 26 tasks, 8 tags, Seed Task 15 comments, Comment Test Task, Markdown Showcase Task.');
 }
 
 main()

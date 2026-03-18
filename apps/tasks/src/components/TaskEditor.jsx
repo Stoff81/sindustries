@@ -35,7 +35,18 @@ export function TaskEditor({ draft, task, isDirty, onDraftChange, onSave, onArch
     if (!textarea) return;
     textarea.style.height = 'auto';
     textarea.style.height = `${textarea.scrollHeight}px`;
-  }, [draft.description]);
+  }, [draft.description, isDescriptionEditing]);
+
+  useEffect(() => {
+    if (!isDescriptionEditing) return;
+    // Ensure the textarea is mounted before measuring.
+    requestAnimationFrame(() => {
+      const textarea = descriptionRef.current;
+      if (!textarea) return;
+      textarea.style.height = 'auto';
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    });
+  }, [isDescriptionEditing]);
 
   /** @param {string} field */
   /** @param {any} value */
@@ -146,14 +157,6 @@ export function TaskEditor({ draft, task, isDirty, onDraftChange, onSave, onArch
         <div className="description-field">
           <div className="description-header">
             <span className="small">Description</span>
-            <button
-              className="tertiary-btn description-toggle-btn"
-              type="button"
-              onClick={() => setIsDescriptionEditing((v) => !v)}
-              aria-label={isDescriptionEditing ? 'Preview description' : 'Edit description'}
-            >
-              {isDescriptionEditing ? 'Preview' : 'Edit'}
-            </button>
           </div>
           {isDescriptionEditing ? (
             <textarea
@@ -161,11 +164,25 @@ export function TaskEditor({ draft, task, isDirty, onDraftChange, onSave, onArch
               className="edit-control auto-grow-textarea"
               aria-label="Detail description"
               value={draft.description}
-              rows={3}
+              rows={1}
               onChange={(e) => update('description', e.target.value)}
               onMouseDown={stopPropagation}
               onTouchStart={stopPropagation}
-              onKeyDown={(e) => handleKeyDown(e, descriptionRef, true)}
+              onFocus={() => {
+                const textarea = descriptionRef.current;
+                if (!textarea) return;
+                textarea.style.height = 'auto';
+                textarea.style.height = `${textarea.scrollHeight}px`;
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') {
+                  e.preventDefault();
+                  setIsDescriptionEditing(false);
+                  return;
+                }
+                handleKeyDown(e, descriptionRef, true);
+              }}
+              onBlur={() => setIsDescriptionEditing(false)}
             />
           ) : (
             <div

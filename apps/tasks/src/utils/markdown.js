@@ -15,7 +15,7 @@ marked.setOptions({
 export function renderMarkdown(markdown) {
   if (!markdown || typeof markdown !== 'string') return '';
   const rawHtml = marked.parse(markdown);
-  return DOMPurify.sanitize(rawHtml, {
+  const sanitized = DOMPurify.sanitize(rawHtml, {
     ALLOWED_TAGS: [
       'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
       'p', 'br', 'hr',
@@ -30,4 +30,9 @@ export function renderMarkdown(markdown) {
     ],
     ALLOWED_ATTR: ['href', 'target', 'rel', 'class', 'type', 'checked', 'disabled', 'src', 'alt'],
   });
+
+  // `marked` emits disabled checkboxes for task lists. We want them to visually match
+  // the rest of the app's checkboxes (amber accent) which some browsers don't apply
+  // when the input is disabled.
+  return sanitized.replaceAll(' disabled=""', '').replaceAll(' disabled', '');
 }
