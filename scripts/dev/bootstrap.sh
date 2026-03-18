@@ -61,6 +61,7 @@ else
 fi
 
 echo "📦 Installing npm dependencies..."
+(cd "$ROOT_DIR/apps/tasks" && rm -rf .vite node_modules/.vite)
 (cd "$ROOT_DIR/services/tasks-api" && npm install)
 (cd "$ROOT_DIR/apps/tasks" && npm install)
 
