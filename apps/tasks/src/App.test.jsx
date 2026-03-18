@@ -52,7 +52,7 @@ describe('tasks ui', () => {
     expect(screen.getByText('1 comment')).toBeInTheDocument();
     expect(screen.getByRole('list', { name: 'Task comments' })).toBeInTheDocument();
     expect(screen.getByText('Backend slice is in.')).toBeInTheDocument();
-    expect(screen.getByText('Quinn')).toBeInTheDocument();
+    expect(screen.getByRole('list', { name: 'Task comments' })).toHaveTextContent('Quinn');
     expect(screen.getByRole('button', { name: 'Comment', exact: true })).toHaveAttribute('aria-expanded', 'false');
   });
 

@@ -156,10 +156,10 @@ describe('TaskEditor', () => {
   it('renders assignee input', () => {
     const propsWithAssignee = {
       ...defaultProps,
-      draft: { ...defaultProps.draft, assignee: 'John' }
+      draft: { ...defaultProps.draft, assignee: 'Rowan' }
     };
     render(<TaskEditor {...propsWithAssignee} />);
 
-    expect(screen.getByLabelText('Detail assignee')).toHaveValue('John');
+    expect(screen.getByLabelText('Detail assignee')).toHaveValue('Rowan');
   });
 });
