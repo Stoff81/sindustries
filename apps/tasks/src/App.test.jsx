@@ -378,7 +378,7 @@ describe('tasks ui', () => {
     const titleInput = screen.getByLabelText('Detail title');
     titleInput.focus();
     // Enter edit mode for description first
-    fireEvent.click(screen.getByRole('button', { name: 'Edit description' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Click to edit description' }));
     fireEvent.keyDown(titleInput, { key: 'Enter', code: 'Enter', charCode: 13 });
     expect(screen.getByLabelText('Detail description')).toHaveFocus();
 
@@ -430,7 +430,7 @@ describe('tasks ui', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Multiline task' }));
 
     // Enter edit mode for description
-    fireEvent.click(screen.getByRole('button', { name: 'Edit description' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Click to edit description' }));
     const descriptionInput = screen.getByLabelText('Detail description');
     descriptionInput.focus();
     fireEvent.change(descriptionInput, { target: { value: 'Line one\nLine two' } });

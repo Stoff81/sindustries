@@ -41,16 +41,16 @@ describe('TaskEditor', () => {
     expect(screen.getByText('Test description')).toBeInTheDocument();
   });
 
-  it('switches to edit mode when Edit button is clicked', () => {
+  it('switches to edit mode when description preview is clicked', () => {
     render(<TaskEditor {...defaultProps} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Edit description' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Click to edit description' }));
     expect(screen.getByLabelText('Detail description')).toHaveValue('Test description');
   });
 
-  it('switches back to preview mode when Preview button is clicked', () => {
+  it('switches back to preview mode when description loses focus', () => {
     render(<TaskEditor {...defaultProps} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Edit description' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Preview description' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Click to edit description' }));
+    fireEvent.blur(screen.getByLabelText('Detail description'));
     expect(screen.queryByLabelText('Detail description')).not.toBeInTheDocument();
     expect(screen.getByText('Test description')).toBeInTheDocument();
   });
@@ -101,7 +101,7 @@ describe('TaskEditor', () => {
     const onDraftChange = vi.fn();
     render(<TaskEditor {...defaultProps} onDraftChange={onDraftChange} />);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Edit description' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Click to edit description' }));
     const descInput = screen.getByLabelText('Detail description');
     fireEvent.change(descInput, { target: { value: 'Updated description' } });
 
