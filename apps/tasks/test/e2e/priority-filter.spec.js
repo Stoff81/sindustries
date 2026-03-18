@@ -98,7 +98,8 @@ test('priority filter on Kanban board filters displayed tasks', async ({ page })
   await expect(page.getByRole('button', { name: 'Write docs' })).toBeVisible();
 
   // Select "urgent" priority filter
-  await page.getByLabel('Priority filter').selectOption('urgent');
+  await page.getByLabel('Priority filter').click();
+  await page.getByRole('menuitemradio', { name: 'URGENT' }).click();
 
   // Only the urgent task should be visible
   await expect(page.getByRole('button', { name: 'Fix login crash' })).toBeVisible();
@@ -107,7 +108,8 @@ test('priority filter on Kanban board filters displayed tasks', async ({ page })
   await expect(page.getByRole('button', { name: 'Nice to have feature' })).toHaveCount(0);
 
   // Switch to "high" priority filter
-  await page.getByLabel('Priority filter').selectOption('high');
+  await page.getByLabel('Priority filter').click();
+  await page.getByRole('menuitemradio', { name: 'HIGH' }).click();
 
   // Only the high priority task should be visible
   await expect(page.getByRole('button', { name: 'Update dependencies' })).toBeVisible();
@@ -116,7 +118,8 @@ test('priority filter on Kanban board filters displayed tasks', async ({ page })
   await expect(page.getByRole('button', { name: 'Nice to have feature' })).toHaveCount(0);
 
   // Switch back to "All priorities"
-  await page.getByLabel('Priority filter').selectOption('');
+  await page.getByLabel('Priority filter').click();
+  await page.getByRole('menuitemradio', { name: 'ALL PRIORITIES' }).click();
 
   // All tasks should be visible again
   await expect(page.getByRole('button', { name: 'Fix login crash' })).toBeVisible();
@@ -185,7 +188,8 @@ test('priority filter combines with status column visibility on Kanban board', a
   await page.goto('/');
 
   // Filter to urgent
-  await page.getByLabel('Priority filter').selectOption('urgent');
+  await page.getByLabel('Priority filter').click();
+  await page.getByRole('menuitemradio', { name: 'URGENT' }).click();
 
   // Todo column should show urgent todo task
   await expect(page.getByRole('button', { name: 'Urgent todo task' })).toBeVisible();
@@ -251,7 +255,8 @@ test('priority filter works on backlog view', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Minor cleanup' })).toBeVisible();
 
   // Filter to urgent
-  await page.getByLabel('Priority filter').selectOption('urgent');
+  await page.getByLabel('Priority filter').click();
+  await page.getByRole('menuitemradio', { name: 'URGENT' }).click();
 
   // Only urgent task visible
   await expect(page.getByRole('button', { name: 'Critical bug' })).toBeVisible();

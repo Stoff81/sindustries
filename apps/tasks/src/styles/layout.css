@@ -166,9 +166,10 @@
 }
 
 .filter-controls {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(240px, 1.35fr) repeat(3, minmax(170px, 1fr));
   gap: 8px;
-  flex-wrap: wrap;
+  align-items: center;
 }
 
 .filter-actions {
@@ -176,33 +177,92 @@
   gap: 8px;
 }
 
-/* Status filter chips */
-.status-filter-chips {
+/* Status filter (multi-select dropdown) */
+.status-filter {
+  position: relative;
+  display: inline-flex;
+}
+
+.status-filter-trigger {
+  appearance: none;
+  background: var(--panel);
+  border: 2px solid var(--line);
+  border-radius: 6px;
+  padding: 8px 32px 8px 10px;
+  color: var(--text);
+  font-size: 0.9rem;
+  cursor: pointer;
+  width: 100%;
+  min-width: 0;
+  text-align: left;
+  text-transform: uppercase;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.status-filter-trigger.is-filtered {
+  border-color: var(--amber);
+}
+
+.status-filter-trigger::after {
+  content: '▾';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--muted);
+}
+
+.status-filter-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 50;
+  background: var(--panel);
+  border: 2px solid var(--line);
+  border-radius: 8px;
+  padding: 8px;
+  min-width: 220px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+  display: grid;
+  gap: 4px;
+}
+
+.status-filter-option {
   display: flex;
   align-items: center;
-  gap: 4px;
-  flex-wrap: wrap;
-}
-
-.status-chip {
-  padding: 4px 8px;
-  border: 1px solid var(--line);
-  border-radius: 4px;
-  background: var(--panel);
-  color: var(--muted);
-  font-size: 0.75rem;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  user-select: none;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 0.85rem;
+  border: 0;
+  width: 100%;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
 }
 
-.status-chip:hover {
-  border-color: var(--muted);
+.status-filter-option:hover {
+  background: rgba(128, 128, 128, 0.08);
 }
 
-.status-chip.active {
-  background: var(--amber);
-  color: var(--panel-2);
-  border-color: var(--amber);
+.status-filter-option input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--amber);
+}
+
+.status-filter-divider {
+  height: 1px;
+  background: var(--line);
+  margin: 4px 2px;
 }
 
 /* Mobile navigation */
@@ -269,6 +329,7 @@
 
   .filter-controls {
     width: 100%;
+    grid-template-columns: 1fr;
   }
 
   .filter-controls .select-wrap,

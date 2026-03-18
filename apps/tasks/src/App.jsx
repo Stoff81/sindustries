@@ -11,17 +11,58 @@ import { getStoredView, setStoredView } from './utils/storage.js';
 export function App() {
   const [view, setView] = useState(getStoredView);
   const [selectedId, setSelectedId] = useState(null);
-  const [filters, setFilters] = useState({ q: '', status: '', priority: '', tag: '', assignee: '', includeArchived: false });
-  const [selectedStatuses, setSelectedStatuses] = useState(new Set(['open', 'ready', 'doing', 'acceptance']));
+  const initialStatusSelection = ['open', 'ready', 'doing', 'acceptance'];
+  const [filters, setFilters] = useState({ q: '', status: initialStatusSelection.join(','), priority: '', tag: '', assignee: '', includeArchived: false });
+  const [selectedStatuses, setSelectedStatuses] = useState(() => new Set(initialStatusSelection));
+  const [openFilterMenu, setOpenFilterMenu] = useState(null);
+  const statusMenuRef = useRef(null);
+  const priorityMenuRef = useRef(null);
+  const assigneeMenuRef = useRef(null);
+  const tagMenuRef = useRef(null);
 
   // Calculate number of visible columns for CSS grid
   const visibleColumnCount = STATUSES.filter(status => selectedStatuses.has(status)).length;
+
+  useEffect(() => {
+    const nextStatusFilter = selectedStatuses.size === STATUSES.length ? '' : [...selectedStatuses].join(',');
+    setFilters((current) => (current.status === nextStatusFilter ? current : { ...current, status: nextStatusFilter }));
+  }, [selectedStatuses]);
+
+  useEffect(() => {
+    const menuByKey = {
+      status: statusMenuRef,
+      priority: priorityMenuRef,
+      assignee: assigneeMenuRef,
+      tag: tagMenuRef
+    };
+
+    function handleClickOutside(event) {
+      const menu = menuByKey[openFilterMenu]?.current;
+      if (!menu) return;
+      if (event.target instanceof Node && !menu.contains(event.target)) {
+        setOpenFilterMenu(null);
+      }
+    }
+
+    function handleEscape(event) {
+      if (event.key === 'Escape') setOpenFilterMenu(null);
+    }
+
+    if (openFilterMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleEscape);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [openFilterMenu]);
   
   // Default backlog view to Status: Open (only when switching to backlog)
   useEffect(() => {
-    if (view === 'backlog' && filters.status === '') {
-      setFilters((current) => ({ ...current, status: 'open' }));
-    }
+    if (view !== 'backlog') return;
+    setSelectedStatuses((current) => (current.size === 0 ? new Set(['open']) : current));
   }, [view]);
 
   // Persist view to localStorage
@@ -365,83 +406,215 @@ export function App() {
       <section className="content">
         <div className="filter-row panel">
           <div className="filter-controls">
-            {allTags.length > 0 && (
-              <label className="select-wrap">
-                <select
-                  aria-label="Tag filter"
-                  value={filters.tag}
-                  onChange={(e) => setFilters((current) => ({ ...current, tag: e.target.value }))}
-                >
-                  <option value="">Tag: All tags</option>
-                  {allTags.map((tag) => (
-                    <option key={tag} value={tag}>{`Tag: ${tag}`}</option>
-                  ))}
-                </select>
-              </label>
-            )}
-            <label className="select-wrap">
-              <select
+            <div className="status-filter" ref={statusMenuRef}>
+              <button
+                type="button"
+                className={`status-filter-trigger ${selectedStatuses.size === STATUSES.length ? '' : 'is-filtered'}`.trim()}
                 aria-label="Status filter"
-                value={filters.status}
-                onChange={(e) => setFilters((current) => ({ ...current, status: e.target.value }))}
+                aria-haspopup="menu"
+                aria-expanded={openFilterMenu === 'status'}
+                onClick={() => setOpenFilterMenu((current) => (current === 'status' ? null : 'status'))}
               >
-                <option value="">Status: All statuses</option>
-                {STATUSES.map((status) => (
-                  <option key={status} value={status}>{`Status: ${STATUS_LABELS[status]}`}</option>
-                ))}
-              </select>
-            </label>
-            {/* Multi-select status filter for Kanban */}
-            {view === 'board' && (
-              <div className="status-filter-chips">
-                <span className="small">Show:</span>
-                {STATUSES.map((status) => (
+                {(() => {
+                  const selected = STATUSES.filter((s) => selectedStatuses.has(s));
+                  const label = selected.length === 0 || selected.length === STATUSES.length
+                    ? 'All statuses'
+                    : selected.map((s) => STATUS_LABELS[s]).join(', ');
+                  return `STATUS: ${label.toUpperCase()}`;
+                })()}
+              </button>
+
+              {openFilterMenu === 'status' ? (
+                <div className="status-filter-menu" role="menu" aria-label="Status filter menu">
+                  <label className="status-filter-option" role="menuitemcheckbox" aria-checked={selectedStatuses.size === STATUSES.length}>
+                    <input
+                      type="checkbox"
+                      checked={selectedStatuses.size === STATUSES.length}
+                      onChange={(e) => {
+                        const checked = e.target.checked;
+                        const next = checked ? new Set(STATUSES) : new Set(['open']);
+                        setSelectedStatuses(next);
+                        setFilters((current) => ({ ...current, status: checked ? '' : 'open' }));
+                      }}
+                    />
+                    <span>All</span>
+                  </label>
+
+                  <div className="status-filter-divider" aria-hidden="true" />
+
+                  {STATUSES.map((status) => (
+                    <label key={status} className="status-filter-option" role="menuitemcheckbox" aria-checked={selectedStatuses.has(status)}>
+                      <input
+                        type="checkbox"
+                        checked={selectedStatuses.has(status)}
+                        onChange={() => {
+                          setSelectedStatuses((prev) => {
+                            const next = new Set(prev);
+                            if (next.has(status)) {
+                              if (next.size === 1) return prev;
+                              next.delete(status);
+                            } else {
+                              next.add(status);
+                            }
+                            setFilters((current) => ({ ...current, status: next.size === STATUSES.length ? '' : [...next].join(',') }));
+                            return next;
+                          });
+                        }}
+                      />
+                      <span>{STATUS_LABELS[status].toUpperCase()}</span>
+                    </label>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+            <div className="status-filter" ref={priorityMenuRef}>
+              <button
+                type="button"
+                className={`status-filter-trigger ${filters.priority ? 'is-filtered' : ''}`.trim()}
+                aria-label="Priority filter"
+                aria-haspopup="menu"
+                aria-expanded={openFilterMenu === 'priority'}
+                onClick={() => setOpenFilterMenu((current) => (current === 'priority' ? null : 'priority'))}
+              >
+                {`PRIORITY: ${(filters.priority ? filters.priority : 'All priorities').toUpperCase()}`}
+              </button>
+              {openFilterMenu === 'priority' ? (
+                <div className="status-filter-menu" role="menu" aria-label="Priority filter menu">
                   <button
-                    key={status}
                     type="button"
-                    className={`status-chip ${selectedStatuses.has(status) ? 'active' : ''}`}
+                    className="status-filter-option"
+                    role="menuitemradio"
+                    aria-checked={!filters.priority}
                     onClick={() => {
-                      setSelectedStatuses((prev) => {
-                        const next = new Set(prev);
-                        if (next.has(status)) {
-                          next.delete(status);
-                        } else {
-                          next.add(status);
-                        }
-                        return next;
-                      });
+                      setFilters((current) => ({ ...current, priority: '' }));
+                      setOpenFilterMenu(null);
                     }}
                   >
-                    {STATUS_LABELS[status]}
+                    ALL PRIORITIES
                   </button>
-                ))}
-              </div>
-            )}
-            <label className="select-wrap">
-              <select
-                aria-label="Priority filter"
-                value={filters.priority}
-                onChange={(e) => setFilters((current) => ({ ...current, priority: e.target.value }))}
-              >
-                <option value="">Priority: All priorities</option>
-                {PRIORITIES.map((priority) => (
-                  <option key={priority} value={priority}>{`Priority: ${priority}`}</option>
-                ))}
-              </select>
-            </label>
-            <label className="select-wrap">
-              <select
+                  <div className="status-filter-divider" aria-hidden="true" />
+                  {PRIORITIES.map((priority) => (
+                    <button
+                      key={priority}
+                      type="button"
+                      className="status-filter-option"
+                      role="menuitemradio"
+                      aria-checked={filters.priority === priority}
+                      onClick={() => {
+                        setFilters((current) => ({ ...current, priority }));
+                        setOpenFilterMenu(null);
+                      }}
+                    >
+                      {priority.toUpperCase()}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+
+            <div className="status-filter" ref={assigneeMenuRef}>
+              <button
+                type="button"
+                className={`status-filter-trigger ${filters.assignee ? 'is-filtered' : ''}`.trim()}
                 aria-label="Assignee filter"
-                value={filters.assignee}
-                onChange={(e) => setFilters((current) => ({ ...current, assignee: e.target.value }))}
+                aria-haspopup="menu"
+                aria-expanded={openFilterMenu === 'assignee'}
+                onClick={() => setOpenFilterMenu((current) => (current === 'assignee' ? null : 'assignee'))}
               >
-                <option value="">Assignee: All</option>
-                <option value="unassigned">Assignee: Unassigned</option>
-                {ASSIGNEE_OPTIONS.map((assignee) => (
-                  <option key={assignee} value={assignee}>{`Assignee: ${assignee}`}</option>
-                ))}
-              </select>
-            </label>
+                {`ASSIGNEE: ${(filters.assignee ? (filters.assignee === 'unassigned' ? 'Unassigned' : filters.assignee) : 'All').toUpperCase()}`}
+              </button>
+              {openFilterMenu === 'assignee' ? (
+                <div className="status-filter-menu" role="menu" aria-label="Assignee filter menu">
+                  <button
+                    type="button"
+                    className="status-filter-option"
+                    role="menuitemradio"
+                    aria-checked={!filters.assignee}
+                    onClick={() => {
+                      setFilters((current) => ({ ...current, assignee: '' }));
+                      setOpenFilterMenu(null);
+                    }}
+                  >
+                    ALL
+                  </button>
+                  <button
+                    type="button"
+                    className="status-filter-option"
+                    role="menuitemradio"
+                    aria-checked={filters.assignee === 'unassigned'}
+                    onClick={() => {
+                      setFilters((current) => ({ ...current, assignee: 'unassigned' }));
+                      setOpenFilterMenu(null);
+                    }}
+                  >
+                    UNASSIGNED
+                  </button>
+                  <div className="status-filter-divider" aria-hidden="true" />
+                  {ASSIGNEE_OPTIONS.map((assignee) => (
+                    <button
+                      key={assignee}
+                      type="button"
+                      className="status-filter-option"
+                      role="menuitemradio"
+                      aria-checked={filters.assignee === assignee}
+                      onClick={() => {
+                        setFilters((current) => ({ ...current, assignee }));
+                        setOpenFilterMenu(null);
+                      }}
+                    >
+                      {assignee.toUpperCase()}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+
+            {allTags.length > 0 ? (
+              <div className="status-filter" ref={tagMenuRef}>
+                <button
+                  type="button"
+                  className={`status-filter-trigger ${filters.tag ? 'is-filtered' : ''}`.trim()}
+                  aria-label="Tag filter"
+                  aria-haspopup="menu"
+                  aria-expanded={openFilterMenu === 'tag'}
+                  onClick={() => setOpenFilterMenu((current) => (current === 'tag' ? null : 'tag'))}
+                >
+                  {`TAG: ${(filters.tag ? filters.tag : 'All tags').toUpperCase()}`}
+                </button>
+                {openFilterMenu === 'tag' ? (
+                  <div className="status-filter-menu" role="menu" aria-label="Tag filter menu">
+                    <button
+                      type="button"
+                      className="status-filter-option"
+                      role="menuitemradio"
+                      aria-checked={!filters.tag}
+                      onClick={() => {
+                        setFilters((current) => ({ ...current, tag: '' }));
+                        setOpenFilterMenu(null);
+                      }}
+                    >
+                      ALL TAGS
+                    </button>
+                    <div className="status-filter-divider" aria-hidden="true" />
+                    {allTags.map((tag) => (
+                      <button
+                        key={tag}
+                        type="button"
+                        className="status-filter-option"
+                        role="menuitemradio"
+                        aria-checked={filters.tag === tag}
+                        onClick={() => {
+                          setFilters((current) => ({ ...current, tag }));
+                          setOpenFilterMenu(null);
+                        }}
+                      >
+                        {tag.toUpperCase()}
+                      </button>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
           </div>
           <div className="filter-actions">
             <button
@@ -549,9 +722,8 @@ export function App() {
                 const assignee = task.assignee ?? 'Unassigned';
                 return (
                   <li key={task.id}>
-                    ref={(el) => { if (el) taskCardRefs.current[String(task.id)] = el; }}
                     <article 
-                      ref={(el) => { taskCardRefs.current[task.id] = el; }}
+                      ref={(el) => { if (el) taskCardRefs.current[String(task.id)] = el; }}
                       className={`task-card ${task.archivedAt ? 'archived' : ''} ${task.blocked ? 'blocked' : ''} ${task.ready ? 'ready' : ''} ${isSelected ? 'is-editing' : ''} card-tilt-${index % 3}`}
                       onClick={() => {
                         if (!isSelected) openTask(task.id);
