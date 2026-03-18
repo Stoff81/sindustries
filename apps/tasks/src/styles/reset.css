@@ -1,0 +1,35 @@
+* { box-sizing: border-box; }
+
+body {
+  font-family: var(--font-body);
+  background: linear-gradient(180deg, var(--si-color-bg-canvas) 0%, var(--bg) 8%, var(--panel-2) 95%);
+  color: var(--text);
+  margin: 0;
+}
+
+.nav-btn,
+.primary-btn,
+.secondary-btn,
+.tertiary-btn,
+.ghost-btn,
+.pill,
+select,
+input,
+textarea,
+button {
+  font: inherit;
+}
+
+.font-display { font-family: var(--font-display); }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

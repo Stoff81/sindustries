@@ -10,7 +10,7 @@ function sanitizeTaskDraft(draft) {
   return {
     title: sanitizeDraftValue(draft?.title),
     description: sanitizeDraftValue(draft?.description),
-    status: sanitizeDraftValue(draft?.status, 'todo'),
+    status: sanitizeDraftValue(draft?.status, 'open'),
     priority: sanitizeDraftValue(draft?.priority, 'medium'),
     assignee: sanitizeDraftValue(draft?.assignee),
     dueAt: sanitizeDraftValue(draft?.dueAt),

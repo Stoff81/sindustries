@@ -1,0 +1,15 @@
+:root {
+  --bg: var(--si-color-border-strong);
+  --panel: var(--si-color-bg-surface);
+  --panel-2: var(--si-color-bg-canvas);
+  --text: var(--si-color-text-primary);
+  --muted: var(--si-color-sage-500);
+  --line: var(--si-color-border-strong);
+  --amber: var(--si-color-brand-500);
+  --cyan: var(--si-color-info-500);
+  --pink: var(--si-color-accent-500);
+  --green: var(--si-color-success-500);
+  --danger: var(--si-color-danger-500);
+  --font-body: var(--si-font-body);
+  --font-display: var(--si-font-display);
+}

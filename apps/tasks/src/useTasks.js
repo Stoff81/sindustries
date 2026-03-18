@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { archiveTask as archiveTaskRequest, createTask as createTaskRequest, createTaskComment as createTaskCommentRequest, fetchTask as fetchTaskRequest, fetchTasks, updateTask as updateTaskRequest } from './tasksApi.js';
+import { archiveTask as archiveTaskRequest, createTask as createTaskRequest, createTaskComment as createTaskCommentRequest, fetchTask as fetchTaskRequest, fetchTasks, updateTask as updateTaskRequest } from './tasksApi';
 
 const DEFAULT_REFRESH_INTERVAL_MS = 3000;
 
@@ -12,21 +12,25 @@ export function useTasks(filters, options = {}) {
 
   const [tasks, setTasks] = useState([]);
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
   const latestRequestRef = useRef(0);
 
   const reloadTasks = useCallback(async ({ suppressErrors = false } = {}) => {
     const requestId = latestRequestRef.current + 1;
     latestRequestRef.current = requestId;
+    setIsLoading(true);
 
     try {
       const nextTasks = await fetchTasks(filters);
       if (latestRequestRef.current !== requestId) return nextTasks;
       setTasks(nextTasks);
       setError('');
+      setIsLoading(false);
       return nextTasks;
     } catch (e) {
       if (latestRequestRef.current !== requestId) throw e;
       if (!suppressErrors) setError(e.message);
+      setIsLoading(false);
       throw e;
     }
   }, [filters]);
@@ -85,6 +89,7 @@ export function useTasks(filters, options = {}) {
   return {
     tasks,
     error,
+    isLoading,
     reloadTasks,
     createTask,
     updateTask,

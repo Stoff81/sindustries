@@ -7,7 +7,7 @@ test('happy path: create task, move to doing, archive', async ({ page }) => {
     {
       id: 'task-1',
       title: 'Task 1',
-      status: 'todo',
+      status: 'ready',
       statusChangedAt: now,
       priority: 'medium',
       archivedAt: null,
@@ -37,7 +37,7 @@ test('happy path: create task, move to doing, archive', async ({ page }) => {
         id: `task-${Date.now()}`,
         title: body.title,
         description: body.description ?? null,
-        status: 'todo',
+        status: 'ready',
         statusChangedAt: new Date().toISOString(),
         priority: body.priority ?? 'medium',
         assignee: body.assignee ?? null,
@@ -107,7 +107,7 @@ test('archived filter stays right-aligned on narrow screens', async ({ page }) =
           {
             id: 'task-1',
             title: 'Task 1',
-            status: 'todo',
+            status: 'ready',
             statusChangedAt: new Date().toISOString(),
             priority: 'medium',
             archivedAt: null,
@@ -144,7 +144,7 @@ test('happy path: create and render a task comment', async ({ page }) => {
       id: 'task-with-comments',
       title: 'Comment target',
       description: 'Used for comment e2e coverage',
-      status: 'todo',
+      status: 'ready',
       statusChangedAt: createdAt,
       priority: 'medium',
       archivedAt: null,
@@ -201,7 +201,7 @@ test('happy path: create and render a task comment', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Comments' })).toBeVisible();
   await expect(page.getByText('No comments yet')).toBeVisible();
 
-  const toggleButton = page.getByRole('button', { name: '+', exact: true });
+  const toggleButton = page.getByRole('button', { name: 'Comment', exact: true });
   await expect(toggleButton).toHaveAttribute('aria-expanded', 'false');
   await toggleButton.click();
   await expect(page.locator('button[aria-controls="task-comment-composer"]')).toHaveAttribute('aria-expanded', 'true');

@@ -195,6 +195,7 @@ button {
   padding: 8px 10px;
   cursor: pointer;
   box-shadow: 2px 2px 0 var(--panel-2);
+  min-width: 80px;
 }
 .secondary-btn:hover {
   background: color-mix(in srgb, var(--muted) 88%, var(--text) 2%);
@@ -207,6 +208,7 @@ button {
   padding: 8px 10px;
   cursor: pointer;
   box-shadow: 2px 2px 0 var(--panel-2);
+  min-width: 80px;
 }
 .tertiary-btn:hover {
   background: color-mix(in srgb, var(--panel) 88%, var(--text) 2%);
@@ -219,6 +221,7 @@ button {
   padding: 8px 10px;
   cursor: pointer;
   box-shadow: 2px 2px 0 var(--panel-2);
+  min-width: 80px;
 }
 .ghost-btn.archived-active {
   background: var(--muted);
@@ -301,6 +304,10 @@ input, select, textarea {
 .edit-control::placeholder {
   color: var(--line);
 }
+.edit-control:focus {
+  border-color: var(--panel-2);
+  outline: none;
+}
 
 .auto-grow-textarea {
   resize: none;
@@ -329,7 +336,7 @@ input, select, textarea {
   color: var(--line);
   pointer-events: none;
 }
-input:focus, select:focus, textarea:focus { border-color: var(--panel); outline: none; }
+input:focus, select:focus, textarea:focus { border-color: var(--panel-2); outline: none; }
 
 .small { font-size: 0.82rem; color: var(--muted); }
 .error { 
@@ -423,12 +430,21 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel); outline:
 }
 
 .badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-.pill { border: 2px solid var(--si-color-bg-canvas); font-size: 0.72rem; text-transform: uppercase; padding: 2px 7px; background: var(--si-color-paper-200); font-weight: 700; }
-.pill.urgent { background: var(--si-color-accent-200); }
-.pill.high { background: var(--si-color-brand-200); }
-.pill.medium { background: var(--si-color-info-200); }
-.pill.low { background: var(--si-color-neutral-300); }
-.pill.status { background: var(--si-color-neutral-200); }
+/* AC1: Priority labels should have panel-2 border */
+.pill { 
+  border: 2px solid var(--panel-2); 
+  border-radius: 0; 
+  font-size: 0.72rem; 
+  text-transform: uppercase; 
+  padding: 2px 7px; 
+  background: var(--si-color-paper-200); 
+  font-weight: 700; 
+}
+.pill.urgent { background: var(--si-color-accent-200); border-color: var(--panel-2); }
+.pill.high { background: var(--si-color-brand-200); border-color: var(--panel-2); }
+.pill.medium { background: var(--si-color-info-200); border-color: var(--panel-2); }
+.pill.low { background: var(--si-color-neutral-300); border-color: var(--panel-2); }
+.pill.status { background: var(--si-color-neutral-200); border-color: var(--si-color-slate-500); }
 .pill.draft-pill {
   background: var(--pink);
   color: var(--panel-2);
@@ -439,39 +455,43 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel); outline:
 }
 
 .editor {
-  margin-top: 10px;
   display: grid;
-  gap: 8px;
+}
+
+/* AC3: Remove dashed line underneath edit title field */
+.editor-title-divider {
+  display: none;
+}
+
+/* AC4: Remove solid line above COMMENTS */
+.editor-comments-divider {
+  display: none;
 }
 .editor-fields {
   display: grid;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  border-top: 2px dashed var(--muted);
-  border-bottom: 2px dashed var(--muted);
-  gap: 8px;
+  gap: 6px;
 }
-.editor-grid { display: grid; gap: 8px; grid-template-columns: repeat(4, minmax(120px, 1fr)); }
-.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+/* AC2: Line underneath labels, when in edit mode, should be dashed and sage grey */
+.editor-fields > label {
+  padding-bottom: 4px;
+}
+.editor-grid { display: grid; grid-template-columns: repeat(4, minmax(120px, 1fr)); }
+.actions { display: flex; flex-wrap: wrap; }
 .editor-actions {
-  padding-top: 4px;
   flex-direction: column;
   align-items: stretch;
 }
 
 .editor-primary-actions {
   display: flex;
-  gap: 8px;
   flex-wrap: wrap;
   align-items: center;
   padding-bottom: 10px;
-  border-bottom: 2px dashed var(--muted);
   justify-content: space-between;
 }
 
 .editor-secondary-actions {
   display: flex;
-  gap: 8px;
   flex-wrap: wrap;
   align-items: center;
 }
@@ -489,6 +509,14 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel); outline:
 
 .title-close-btn {
   margin-top: 18px;
+  min-width: 80px;
+  /* AC7: Ensure consistent styling with other close buttons */
+  border: 2px solid var(--panel-2);
+  background: var(--panel);
+  color: var(--text);
+  padding: 8px 10px;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 var(--panel-2);
 }
 
 .comments-section {
@@ -500,14 +528,12 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel); outline:
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 8px;
   flex-wrap: wrap;
 }
 
 .comments-header-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
   margin-left: auto;
 }
 
@@ -519,14 +545,9 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel); outline:
 .comment-card p {
   margin: 0;
 }
-
-.comment-toggle-btn {
-  min-width: 42px;
-  min-height: 42px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 12px;
+/* AC5: COMMENTS Title should be panel-2 */
+.comments-header h4 {
+  color: var(--panel-2);
 }
 
 .comments-list {
@@ -550,7 +571,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel); outline:
 .comment-meta {
   display: flex;
   justify-content: space-between;
-  gap: 8px;
   align-items: baseline;
   flex-wrap: wrap;
 }
@@ -559,9 +579,15 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel); outline:
   color: color-mix(in srgb, var(--panel) 72%, var(--line) 28%);
 }
 
+/* AC10: Remove New Comments container so fields sit on the card directly, like other edit fields */
 .comment-composer {
   display: grid;
   gap: 8px;
+  /* Remove any container styling to match other edit fields */
+  background: transparent;
+  border: none;
+  padding: 0;
+  border-radius: 0;
 }
 
 .comment-composer-actions {
@@ -608,7 +634,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel); outline:
 .board-wrap { overflow-x: auto; margin-top: 8px; position: relative; z-index: 1; }
 .board {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(var(--visible-columns, 5), 1fr);
   gap: 12px;
 }
 .column {
@@ -622,6 +648,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel); outline:
   position: relative;
   z-index: 2;
 }
+.column.hidden { display: none; }
 .column-head {
   display: flex;
   justify-content: space-between;
@@ -807,4 +834,86 @@ input:focus, select:focus, textarea:focus { border-color: var(--panel); outline:
   .board { display: flex; }
   .column { min-width: 88vw; }
   .mobile-nav { display: flex; }
+}
+
+/* Loading spinner */
+.loading-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--line);
+  border-top-color: var(--amber);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Screen reader only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Toast notifications */
+.toast-container {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+
+.toast {
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: toast-in 0.2s ease-out;
+}
+
+.toast-success {
+  background: var(--green);
+  color: white;
+}
+
+.toast-error {
+  background: var(--danger);
+  color: white;
+}
+
+.toast-info {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--line);
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

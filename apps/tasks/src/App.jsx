@@ -1,342 +1,39 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import './App.css';
 import { useTasks } from './useTasks.js';
 import { useTaskDrafts } from './useTaskDrafts.js';
-const STATUSES = ['todo', 'doing', 'done'];
-const PRIORITIES = ['urgent', 'high', 'medium', 'low'];
-const PRIORITY_SCORE = { urgent: 0, high: 1, medium: 2, low: 3 };
-const CONFETTI_COLORS = ['#ffc935', '#00d4ff', '#ff3e8a', '#31c76a', '#f3f1ec', '#7d5dff'];
-
-function createConfettiPieces(pieceCount = 120) {
-  return Array.from({ length: pieceCount }, (_, index) => ({
-    id: index,
-    color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
-    startX: 5 + Math.random() * 90,
-    drift: -180 + Math.random() * 360,
-    rotation: -520 + Math.random() * 1040,
-    size: 6 + Math.random() * 8,
-    duration: 1200 + Math.random() * 1300,
-    delay: Math.random() * 220
-  }));
-}
-
-function normalizeComments(comments) {
-  return Array.isArray(comments) ? comments : [];
-}
-
-function formatCommentTimestamp(value) {
-  if (!value) return '';
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return '';
-  return date.toLocaleString();
-}
-
-function normalizeTaskForEditor(task) {
-  return {
-    title: task.title ?? '',
-    description: task.description ?? '',
-    status: task.status ?? 'todo',
-    priority: task.priority ?? 'medium',
-    assignee: task.assignee ?? '',
-    dueAt: task.dueAt ? String(task.dueAt).slice(0, 10) : '',
-    tagsText: Array.isArray(task.tags) ? task.tags.map((tag) => tag.name ?? tag).join(', ') : '',
-    blocked: task.blocked ?? false,
-    ready: task.ready ?? false
-  };
-}
-
-function TaskEditor({ draft, task, isDirty, onDraftChange, onSave, onArchive, onClose, onAddComment, isSubmittingComment }) {
-  const descriptionRef = useRef(null);
-  const titleRef = useRef(null);
-  const statusRef = useRef(null);
-  const priorityRef = useRef(null);
-  const assigneeRef = useRef(null);
-  const dueAtRef = useRef(null);
-  const tagsRef = useRef(null);
-  const blockedRef = useRef(null);
-  const readyRef = useRef(null);
-  const [commentDraft, setCommentDraft] = useState({ author: '', text: '' });
-  const [isCommentComposerOpen, setIsCommentComposerOpen] = useState(false);
-
-  useEffect(() => {
-    const textarea = descriptionRef.current;
-    if (!textarea) return;
-    textarea.style.height = 'auto';
-    textarea.style.height = `${textarea.scrollHeight}px`;
-  }, [draft.description]);
-
-  function update(field, value) {
-    onDraftChange({ ...draft, [field]: value });
-  }
-
-  function stopPropagation(e) {
-    e.stopPropagation();
-  }
-
-  function buildSavePayload() {
-    return {
-      title: draft.title.trim(),
-      description: draft.description.trim() || null,
-      status: draft.status,
-      priority: draft.priority,
-      assignee: draft.assignee.trim() || null,
-      dueAt: draft.dueAt ? new Date(`${draft.dueAt}T00:00:00`).toISOString() : null,
-      tags: draft.tagsText
-        .split(',')
-        .map((tag) => tag.trim())
-        .filter(Boolean),
-      blocked: draft.blocked,
-      ready: draft.ready
-    };
-  }
-
-  const focusOrder = [
-    titleRef,
-    descriptionRef,
-    statusRef,
-    priorityRef,
-    assigneeRef,
-    dueAtRef,
-    tagsRef,
-    blockedRef,
-    readyRef
-  ];
-
-  function focusNextField(currentRef) {
-    const currentIndex = focusOrder.findIndex((ref) => ref === currentRef);
-    const nextRef = focusOrder[currentIndex + 1];
-    if (nextRef?.current) {
-      nextRef.current.focus();
-      if (typeof nextRef.current.select === 'function') {
-        nextRef.current.select();
-      }
-      return true;
-    }
-    return false;
-  }
-
-  function handleKeyDown(e, currentRef, isMultiLine = false) {
-    if (e.key !== 'Enter' || e.shiftKey) {
-      return;
-    }
-
-    e.preventDefault();
-
-    if (!focusNextField(currentRef)) {
-      onSave(buildSavePayload());
-    }
-  }
-
-  async function handleAddComment() {
-    const payload = {
-      author: commentDraft.author.trim(),
-      text: commentDraft.text.trim()
-    };
-
-    if (!payload.author || !payload.text) return;
-
-    const didCreate = await onAddComment(payload);
-    if (!didCreate) return;
-    setCommentDraft({ author: '', text: '' });
-    setIsCommentComposerOpen(false);
-  }
-
-  const comments = [...normalizeComments(task.comments)].sort((a, b) => {
-    const timeDiff = new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    if (timeDiff !== 0) return timeDiff;
-    return String(b.id ?? '').localeCompare(String(a.id ?? ''));
-  });
-
-  return (
-    <div className="editor" onClick={(e) => e.stopPropagation()}>
-      <div className="editor-fields">
-        <div className="title-row">
-          <label>
-            <span className="small">Title</span>
-            <input ref={titleRef} className="edit-control" aria-label="Detail title" value={draft.title} onChange={(e) => update('title', e.target.value)} onMouseDown={stopPropagation} onTouchStart={stopPropagation} onKeyDown={(e) => handleKeyDown(e, titleRef, false)} autoFocus />
-          </label>
-          <button className="tertiary-btn title-close-btn" onClick={onClose}>Close</button>
-        </div>
-
-        <label>
-          <span className="small">Description</span>
-          <textarea
-            ref={descriptionRef}
-            className="edit-control auto-grow-textarea"
-            aria-label="Detail description"
-            value={draft.description}
-            rows={1}
-            onChange={(e) => update('description', e.target.value)}
-            onMouseDown={stopPropagation}
-            onTouchStart={stopPropagation}
-            onKeyDown={(e) => handleKeyDown(e, descriptionRef, true)}
-          />
-        </label>
-
-        <div className="editor-grid">
-          <label>
-            <span className="small">Status</span>
-            <select ref={statusRef} className="edit-control" aria-label="Detail status" value={draft.status} onChange={(e) => update('status', e.target.value)} onMouseDown={stopPropagation} onTouchStart={stopPropagation} onKeyDown={(e) => handleKeyDown(e, statusRef)}>
-              {STATUSES.map((status) => (
-                <option key={status} value={status}>{status}</option>
-              ))}
-            </select>
-          </label>
-
-          <label>
-            <span className="small">Priority</span>
-            <select ref={priorityRef} className="edit-control" aria-label="Detail priority" value={draft.priority} onChange={(e) => update('priority', e.target.value)} onMouseDown={stopPropagation} onTouchStart={stopPropagation} onKeyDown={(e) => handleKeyDown(e, priorityRef)}>
-              {PRIORITIES.map((priority) => (
-                <option key={priority} value={priority}>{priority}</option>
-              ))}
-            </select>
-          </label>
-
-          <label>
-            <span className="small">Assignee</span>
-            <input ref={assigneeRef} className="edit-control" aria-label="Detail assignee" value={draft.assignee} onChange={(e) => update('assignee', e.target.value)} onMouseDown={stopPropagation} onTouchStart={stopPropagation} onKeyDown={(e) => handleKeyDown(e, assigneeRef, false)} />
-          </label>
-
-          <label>
-            <span className="small">Due date</span>
-            <input ref={dueAtRef} className="edit-control" aria-label="Detail due date" type="date" value={draft.dueAt} onChange={(e) => update('dueAt', e.target.value)} onMouseDown={stopPropagation} onTouchStart={stopPropagation} onKeyDown={(e) => handleKeyDown(e, dueAtRef)} />
-          </label>
-        </div>
-
-        <label>
-          <span className="small">Tags (comma separated)</span>
-          <input ref={tagsRef} className="edit-control" aria-label="Detail tags" value={draft.tagsText} onChange={(e) => update('tagsText', e.target.value)} placeholder="api, ui, urgent" onMouseDown={stopPropagation} onTouchStart={stopPropagation} onKeyDown={(e) => handleKeyDown(e, tagsRef, false)} />
-        </label>
-
-        <div className="editor-toggles">
-          <label className="toggle-label">
-            <input
-              ref={blockedRef}
-              aria-label="Detail blocked"
-              type="checkbox"
-              checked={draft.blocked}
-              onChange={(e) => update('blocked', e.target.checked)}
-              onKeyDown={(e) => handleKeyDown(e, blockedRef)}
-            />
-            <span>Blocked</span>
-          </label>
-          <label className="toggle-label">
-            <input
-              ref={readyRef}
-              aria-label="Detail ready"
-              type="checkbox"
-              checked={draft.ready}
-              onChange={(e) => update('ready', e.target.checked)}
-              onKeyDown={(e) => handleKeyDown(e, readyRef)}
-            />
-            <span>Ready</span>
-          </label>
-        </div>
-      </div>
-
-      <div className="actions editor-actions">
-        <div className="editor-primary-actions">
-          <button
-            className="primary-btn font-display"
-            onClick={() => onSave(buildSavePayload())}
-          >
-            Save changes
-          </button>
-          <div className="editor-secondary-actions">
-            <button className="secondary-btn font-display" onClick={onArchive}>Archive task</button>
-            <button className="tertiary-btn" onClick={onClose}>Close</button>
-          </div>
-        </div>
-
-        <div className="comments-section">
-          <div className="comments-header">
-            <h4 className="font-display">Comments</h4>
-            <div className="comments-header-actions">
-              <span className="small comments-count">{comments.length === 0 ? 'No comments yet' : `${comments.length} comment${comments.length === 1 ? '' : 's'}`}</span>
-              <button
-                className={`${isCommentComposerOpen ? 'tertiary-btn' : 'primary-btn font-display'} comment-toggle-btn`}
-                type="button"
-                aria-expanded={isCommentComposerOpen}
-                aria-controls="task-comment-composer"
-                onClick={() => setIsCommentComposerOpen((current) => !current)}
-              >
-                {isCommentComposerOpen ? 'Close' : '+'}
-              </button>
-            </div>
-          </div>
-
-          {isCommentComposerOpen ? (
-            <div id="task-comment-composer" className="comment-composer">
-              <label>
-                <span className="small">Comment author</span>
-                <input
-                  className="edit-control"
-                  aria-label="Comment author"
-                  value={commentDraft.author}
-                  onChange={(e) => setCommentDraft((current) => ({ ...current, author: e.target.value }))}
-                  onMouseDown={stopPropagation}
-                  onTouchStart={stopPropagation}
-                />
-              </label>
-              <label>
-                <span className="small">Comment</span>
-                <textarea
-                  className="edit-control"
-                  aria-label="Comment text"
-                  value={commentDraft.text}
-                  rows={3}
-                  onChange={(e) => setCommentDraft((current) => ({ ...current, text: e.target.value }))}
-                  onMouseDown={stopPropagation}
-                  onTouchStart={stopPropagation}
-                />
-              </label>
-              <div className="actions">
-                <button
-                  className="primary-btn font-display"
-                  type="button"
-                  onClick={() => void handleAddComment()}
-                  disabled={isSubmittingComment || !commentDraft.author.trim() || !commentDraft.text.trim()}
-                >
-                  {isSubmittingComment ? 'Adding…' : 'Add comment'}
-                </button>
-              </div>
-            </div>
-          ) : null}
-
-          {comments.length > 0 ? (
-            <ol className="comments-list" aria-label="Task comments">
-              {comments.map((comment) => (
-                <li key={comment.id} className="comment-card">
-                  <div className="comment-meta">
-                    <strong>{comment.author}</strong>
-                    <time className="small" dateTime={comment.createdAt}>{formatCommentTimestamp(comment.createdAt)}</time>
-                  </div>
-                  <p>{comment.text}</p>
-                </li>
-              ))}
-            </ol>
-          ) : null}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function assigneeInitial(assignee) {
-  return assignee?.trim()?.charAt(0)?.toUpperCase() ?? null;
-}
+import { useDebounce } from './hooks/useDebounce.js';
+import { useToast } from './hooks/useToast.js';
+import { TaskEditor } from './components/TaskEditor.jsx';
+import { STATUSES, STATUS_LABELS, PRIORITIES, PRIORITY_SCORE, ASSIGNEE_OPTIONS } from './utils/constants.js';
+import { createConfettiPieces, normalizeTaskForEditor, assigneeInitial } from './utils/helpers.js';
+import { getStoredView, setStoredView } from './utils/storage.js';
 
 export function App() {
-  const [view, setView] = useState('board');
+  const [view, setView] = useState(getStoredView);
   const [selectedId, setSelectedId] = useState(null);
-  const [filters, setFilters] = useState({ q: '', status: '', priority: '', tag: '', includeArchived: false });
+  const [filters, setFilters] = useState({ q: '', status: '', priority: '', tag: '', assignee: '', includeArchived: false });
+  const [selectedStatuses, setSelectedStatuses] = useState(new Set(['open', 'ready', 'doing', 'acceptance']));
+
+  // Calculate number of visible columns for CSS grid
+  const visibleColumnCount = STATUSES.filter(status => selectedStatuses.has(status)).length;
   
-  // Default backlog view to Status: Todo
+  // Default backlog view to Status: Open (only when switching to backlog)
   useEffect(() => {
     if (view === 'backlog' && filters.status === '') {
-      setFilters((current) => ({ ...current, status: 'todo' }));
+      setFilters((current) => ({ ...current, status: 'open' }));
     }
-  }, [view, filters.status]);
+  }, [view]);
+
+  // Persist view to localStorage
+  useEffect(() => {
+    setStoredView(view);
+  }, [view]);
+
+  // Debounce search filter
+  const debouncedSearch = useDebounce(filters.q, 300);
+
+  // Toast notifications
+  const { toasts, showToast } = useToast();
 
   const [newTask, setNewTask] = useState({ title: '', expanded: false, description: '', priority: 'medium', assignee: '', dueAt: '', tagsText: '', blocked: false, ready: false });
   const [confettiBursts, setConfettiBursts] = useState([]);
@@ -346,28 +43,41 @@ export function App() {
   const taskCardRefs = useRef({});
 
   // Scroll to task card after save/close if needed
+  // AC9: When closing a task that has a long card (top above window), scroll should reset accounting for header
   function scrollToTaskIfNeeded(taskId) {
-    const cardEl = taskCardRefs.current[taskId];
-    if (!cardEl) return;
-    
-    const cardRect = cardEl.getBoundingClientRect();
-    const headerHeight = document.querySelector('header')?.offsetHeight || 0;
-    
-    // If the top of the card is above the visible area (below header), scroll it into view
-    if (cardRect.top < headerHeight) {
-      cardEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    // Wait for React to commit (editor unmounted, card visible) and ref to be set
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const key = String(taskId);
+        const cardEl = taskCardRefs.current[key] ?? taskCardRefs.current[taskId];
+        if (!cardEl) return;
+
+        const cardRect = cardEl.getBoundingClientRect();
+        const headerHeight = document.querySelector('header')?.offsetHeight ?? 0;
+        const buffer = 8;
+
+        const targetScrollY = cardRect.top + window.scrollY - headerHeight - buffer;
+        window.scrollTo({ top: Math.max(0, targetScrollY), behavior: 'smooth' });
+      });
+    });
   }
+
+  // Compute filters with debounced search for API calls
+  const apiFilters = useMemo(() => ({
+    ...filters,
+    q: debouncedSearch
+  }), [filters, debouncedSearch]);
 
   const {
     tasks,
     error,
+    isLoading,
     createTask: createTaskRequest,
     updateTask: patchTaskRequest,
     archiveTask: archiveTaskRequest,
     createTaskComment: createTaskCommentRequest,
     refreshTask
-  } = useTasks(filters, {
+  } = useTasks(apiFilters, {
     pauseAutoRefresh: selectedId !== null,
     refreshIntervalMs: 3000
   });
@@ -418,8 +128,9 @@ export function App() {
   }, [hasUnsavedDrafts]);
 
   const boardColumns = useMemo(() => {
-    const columns = { todo: [], doing: [], done: [] };
-    for (const task of tasks) columns[task.status]?.push(task);
+    const columns = { open: [], ready: [], doing: [], acceptance: [], done: [] };
+    const filtered = filters.priority ? tasks.filter((t) => t.priority === filters.priority) : tasks;
+    for (const task of filtered) columns[task.status]?.push(task);
     for (const status of STATUSES) {
       columns[status].sort((a, b) => {
         const priorityDiff = (PRIORITY_SCORE[a.priority] ?? 99) - (PRIORITY_SCORE[b.priority] ?? 99);
@@ -430,17 +141,18 @@ export function App() {
       });
     }
     return columns;
-  }, [tasks]);
+  }, [tasks, filters.priority]);
 
   // Backlog list uses same sort order: priority, readiness, date created
   const sortedBacklogTasks = useMemo(() => {
-    return [...tasks].sort((a, b) => {
+    const filtered = filters.priority ? tasks.filter((t) => t.priority === filters.priority) : tasks;
+    return [...filtered].sort((a, b) => {
       const priorityDiff = (PRIORITY_SCORE[a.priority] ?? 99) - (PRIORITY_SCORE[b.priority] ?? 99);
       if (priorityDiff !== 0) return priorityDiff;
       if (a.ready !== b.ready) return a.ready ? -1 : 1;
       return new Date(a.createdAt) - new Date(b.createdAt);
     });
-  }, [tasks]);
+  }, [tasks, filters.priority]);
 
   async function createTask(event) {
     event.preventDefault();
@@ -459,14 +171,19 @@ export function App() {
         ready: newTask.ready
       });
       setNewTask({ title: '', expanded: false, description: '', priority: 'medium', assignee: '', dueAt: '', tagsText: '', blocked: false, ready: false });
-    } catch {}
+      showToast('Task created', 'success');
+    } catch {
+      showToast('Failed to create task', 'error');
+    }
   }
 
   async function patchTask(id, patch) {
     try {
       await patchTaskRequest(id, patch);
+      showToast('Task updated', 'success');
       return true;
     } catch {
+      showToast('Failed to update task', 'error');
       return false;
     }
   }
@@ -476,8 +193,10 @@ export function App() {
       await archiveTaskRequest(id);
       clearDraft(id);
       setSelectedId(null);
+      showToast('Task archived', 'success');
       return true;
     } catch {
+      showToast('Failed to archive task', 'error');
       return false;
     }
   }
@@ -637,7 +356,7 @@ export function App() {
               />
             </label>
             <button className={`nav-btn ${view === 'backlog' ? 'active' : ''}`} onClick={() => setView('backlog')}>Backlog</button>
-            <button className={`nav-btn ${view === 'board' ? 'active' : ''}`} onClick={() => setView('board')}>Kanban</button>
+            <button className={`nav-btn ${view === 'board' ? 'active' : ''}`} onClick={() => { setView('board'); setFilters((current) => ({ ...current, status: '' })); }}>Kanban</button>
             <button type="button" className="primary-btn font-display" onClick={() => setNewTask((current) => ({ ...current, expanded: true }))}>+ New Task</button>
           </div>
         </div>
@@ -646,30 +365,6 @@ export function App() {
       <section className="content">
         <div className="filter-row panel">
           <div className="filter-controls">
-            <label className="select-wrap">
-              <select
-                aria-label="Status filter"
-                value={filters.status}
-                onChange={(e) => setFilters((current) => ({ ...current, status: e.target.value }))}
-              >
-                <option value="">Status: All statuses</option>
-                {STATUSES.map((status) => (
-                  <option key={status} value={status}>{`Status: ${status}`}</option>
-                ))}
-              </select>
-            </label>
-            <label className="select-wrap">
-              <select
-                aria-label="Priority filter"
-                value={filters.priority}
-                onChange={(e) => setFilters((current) => ({ ...current, priority: e.target.value }))}
-              >
-                <option value="">Priority: All priorities</option>
-                {PRIORITIES.map((priority) => (
-                  <option key={priority} value={priority}>{`Priority: ${priority}`}</option>
-                ))}
-              </select>
-            </label>
             {allTags.length > 0 && (
               <label className="select-wrap">
                 <select
@@ -684,6 +379,69 @@ export function App() {
                 </select>
               </label>
             )}
+            <label className="select-wrap">
+              <select
+                aria-label="Status filter"
+                value={filters.status}
+                onChange={(e) => setFilters((current) => ({ ...current, status: e.target.value }))}
+              >
+                <option value="">Status: All statuses</option>
+                {STATUSES.map((status) => (
+                  <option key={status} value={status}>{`Status: ${STATUS_LABELS[status]}`}</option>
+                ))}
+              </select>
+            </label>
+            {/* Multi-select status filter for Kanban */}
+            {view === 'board' && (
+              <div className="status-filter-chips">
+                <span className="small">Show:</span>
+                {STATUSES.map((status) => (
+                  <button
+                    key={status}
+                    type="button"
+                    className={`status-chip ${selectedStatuses.has(status) ? 'active' : ''}`}
+                    onClick={() => {
+                      setSelectedStatuses((prev) => {
+                        const next = new Set(prev);
+                        if (next.has(status)) {
+                          next.delete(status);
+                        } else {
+                          next.add(status);
+                        }
+                        return next;
+                      });
+                    }}
+                  >
+                    {STATUS_LABELS[status]}
+                  </button>
+                ))}
+              </div>
+            )}
+            <label className="select-wrap">
+              <select
+                aria-label="Priority filter"
+                value={filters.priority}
+                onChange={(e) => setFilters((current) => ({ ...current, priority: e.target.value }))}
+              >
+                <option value="">Priority: All priorities</option>
+                {PRIORITIES.map((priority) => (
+                  <option key={priority} value={priority}>{`Priority: ${priority}`}</option>
+                ))}
+              </select>
+            </label>
+            <label className="select-wrap">
+              <select
+                aria-label="Assignee filter"
+                value={filters.assignee}
+                onChange={(e) => setFilters((current) => ({ ...current, assignee: e.target.value }))}
+              >
+                <option value="">Assignee: All</option>
+                <option value="unassigned">Assignee: Unassigned</option>
+                {ASSIGNEE_OPTIONS.map((assignee) => (
+                  <option key={assignee} value={assignee}>{`Assignee: ${assignee}`}</option>
+                ))}
+              </select>
+            </label>
           </div>
           <div className="filter-actions">
             <button
@@ -772,11 +530,18 @@ export function App() {
 
         {error ? <p role="alert" className="error">{error}</p> : null}
 
+        {isLoading && tasks.length === 0 ? (
+          <div className="loading-spinner" role="status" aria-label="Loading tasks">
+            <div className="spinner" />
+            <span className="sr-only">Loading tasks...</span>
+          </div>
+        ) : null}
+
         {view === 'backlog' ? (
           <section>
 
             <ul aria-label="Backlog list" className="task-list">
-              {sortedBacklogTasks.map((task, index) => {
+               {sortedBacklogTasks.map((task, index) => {  
                 const isSelected = selectedId === task.id;
                 const draft = getDraft(task);
                 const hasDraft = isTaskDirty(task);
@@ -784,6 +549,7 @@ export function App() {
                 const assignee = task.assignee ?? 'Unassigned';
                 return (
                   <li key={task.id}>
+                    ref={(el) => { if (el) taskCardRefs.current[String(task.id)] = el; }}
                     <article 
                       ref={(el) => { taskCardRefs.current[task.id] = el; }}
                       className={`task-card ${task.archivedAt ? 'archived' : ''} ${task.blocked ? 'blocked' : ''} ${task.ready ? 'ready' : ''} ${isSelected ? 'is-editing' : ''} card-tilt-${index % 3}`}
@@ -845,12 +611,12 @@ export function App() {
           </section>
         ) : (
           <section aria-label="Kanban board" className="board-wrap">
-            <div className="board">
+            <div className="board" style={{ '--visible-columns': visibleColumnCount }}>
               {STATUSES.map((status) => (
                 <div
                   key={status}
                   data-testid={`column-${status}`}
-                  className="column"
+                  className={`column ${!selectedStatuses.has(status) ? 'hidden' : ''}`}
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={(e) => {
                     const id = e.dataTransfer.getData('text/plain');
@@ -858,81 +624,82 @@ export function App() {
                   }}
                 >
                   <div className="column-head">
-                    <h3 className="font-display">{status}</h3>
+                    <h3 className="font-display">{STATUS_LABELS[status]}</h3>
                     <span className="count-pill">{boardColumns[status].length}</span>
                   </div>
                   <ol>
-                    {boardColumns[status].map((task, index) => {
-                      const isSelected = selectedId === task.id;
-                      const draft = getDraft(task);
-                      const hasDraft = isTaskDirty(task);
-                      const assigneeLetter = assigneeInitial(task.assignee);
-                      const assignee = task.assignee?.trim() || 'Unassigned';
-                      const taskTags = Array.isArray(task.tags) ? task.tags.map((tag) => tag.name ?? String(tag)) : [];
-                      return (
-                        <li key={task.id}>
-                          <article
-                            data-testid={`card-${task.id}`}
-                            className={`board-card ${task.archivedAt ? 'archived' : ''} ${task.blocked ? 'blocked' : ''} ${task.ready ? 'ready' : ''} ${isSelected ? 'is-editing' : ''} card-tilt-${index % 3}`}
-                            draggable={!isSelected}
-                            onDragStart={(e) => {
-                              if (!isSelected) e.dataTransfer.setData('text/plain', task.id);
-                            }}
-                            onClick={(e) => {
-                              if (!isSelected) {
-                                e.stopPropagation();
-                                openTask(task.id);
-                              }
-                            }}
-                          >
-                            <div className="task-row board-card-row">
-                              <button 
-                                className="task-title-btn" 
-                                onClick={(e) => {
+                      {boardColumns[status].map((task, index) => {
+                        const isSelected = selectedId === task.id;
+                        const draft = getDraft(task);
+                        const hasDraft = isTaskDirty(task);
+                        const assigneeLetter = assigneeInitial(task.assignee);
+                        const assignee = task.assignee?.trim() || 'Unassigned';
+                        const taskTags = Array.isArray(task.tags) ? task.tags.map((tag) => tag.name ?? String(tag)) : [];
+                        return (
+                          <li key={task.id}>
+                            <article
+                              ref={(el) => { if (el) taskCardRefs.current[String(task.id)] = el; }}
+                              data-testid={`card-${task.id}`}
+                              className={`board-card ${task.archivedAt ? 'archived' : ''} ${task.blocked ? 'blocked' : ''} ${task.ready ? 'ready' : ''} ${isSelected ? 'is-editing' : ''} card-tilt-${index % 3}`}
+                              draggable={!isSelected}
+                              onDragStart={(e) => {
+                                if (!isSelected) e.dataTransfer.setData('text/plain', task.id);
+                              }}
+                              onClick={(e) => {
+                                if (!isSelected) {
                                   e.stopPropagation();
-                                  toggleTask(task.id, isSelected);
-                                }}
-                              >
-                                {task.title}
-                              </button>
-                            </div>
-                            <div className="board-card-meta">
-                              <span className={`pill ${task.priority}`}>{task.priority}</span>
-                              {taskTags.map((tag) => <span key={tag} className="pill tag-pill">#{tag}</span>)}
-                              <div className="board-card-meta-right">
-                                {hasDraft ? <span className="pill draft-pill">Unsaved</span> : null}
-                                {task.ready ? <span className="ready-dot" aria-label="Ready">✓</span> : null}
-                                {assigneeLetter ? <span className="avatar-dot" title={assignee} aria-label={`Assignee ${assignee}`}>{assigneeLetter}</span> : null}
-                                <span className="small">{String(task.statusChangedAt).slice(0, 10)}</span>
+                                  openTask(task.id);
+                                }
+                              }}
+                            >
+                              <div className="task-row board-card-row">
+                                <button 
+                                  className="task-title-btn" 
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleTask(task.id, isSelected);
+                                  }}
+                                >
+                                  {task.title}
+                                </button>
                               </div>
-                            </div>
-                            {isSelected ? (
-                              <TaskEditor
-                                draft={draft}
-                                task={task}
-                                isDirty={hasDraft}
-                                onDraftChange={(nextDraft) => storeDraft(task, nextDraft)}
-                                onSave={async (patch) => {
-                                  const didSave = await patchTask(task.id, patch);
-                                  if (!didSave) return;
-                                  clearDraft(task.id);
-                                  setSelectedId(null);
-                                  scrollToTaskIfNeeded(task.id);
-                                }}
-                                onArchive={() => archiveTask(task.id)}
-                                onClose={() => {
-                                  setSelectedId(null);
-                                  scrollToTaskIfNeeded(task.id);
-                                }}
-                                onAddComment={(payload) => createTaskComment(task.id, payload)}
-                                isSubmittingComment={submittingCommentForTaskId === task.id}
-                              />
-                            ) : null}
-                          </article>
-                        </li>
-                      );
-                    })}
-                  </ol>
+                              <div className="board-card-meta">
+                                <span className={`pill ${task.priority}`}>{task.priority}</span>
+                                {taskTags.map((tag) => <span key={tag} className="pill tag-pill">#{tag}</span>)}
+                                <div className="board-card-meta-right">
+                                  {hasDraft ? <span className="pill draft-pill">Unsaved</span> : null}
+                                  {task.ready ? <span className="ready-dot" aria-label="Ready">✓</span> : null}
+                                  {assigneeLetter ? <span className="avatar-dot" title={assignee} aria-label={`Assignee ${assignee}`}>{assigneeLetter}</span> : null}
+                                  <span className="small">{String(task.statusChangedAt).slice(0, 10)}</span>
+                                </div>
+                              </div>
+                              {isSelected ? (
+                                <TaskEditor
+                                  draft={draft}
+                                  task={task}
+                                  isDirty={hasDraft}
+                                  onDraftChange={(nextDraft) => storeDraft(task, nextDraft)}
+                                  onSave={async (patch) => {
+                                    const didSave = await patchTask(task.id, patch);
+                                    if (!didSave) return;
+                                    clearDraft(task.id);
+                                    setSelectedId(null);
+                                    scrollToTaskIfNeeded(task.id);
+                                  }}
+                                  onArchive={() => archiveTask(task.id)}
+                                  onClose={() => {
+                                    setSelectedId(null);
+                                    scrollToTaskIfNeeded(task.id);
+                                  }}
+                                  onAddComment={(payload) => createTaskComment(task.id, payload)}
+                                  isSubmittingComment={submittingCommentForTaskId === task.id}
+                                />
+                              ) : null}
+                            </article>
+                          </li>
+                        );
+                      })}
+                    </ol>
                 </div>
               ))}
             </div>
@@ -943,8 +710,22 @@ export function App() {
       <nav className="mobile-nav" aria-label="Primary">
         <button className={view === 'backlog' ? 'active' : ''} onClick={() => setView('backlog')}>List</button>
         <button className="fab font-display" onClick={() => setNewTask((current) => ({ ...current, expanded: true }))}>＋</button>
-        <button className={view === 'board' ? 'active' : ''} onClick={() => setView('board')}>Board</button>
+        <button className={view === 'board' ? 'active' : ''} onClick={() => { setView('board'); setFilters((current) => ({ ...current, status: '' })); }}>Board</button>
       </nav>
+
+      {/* Toast notifications */}
+      <div className="toast-container" aria-live="polite" aria-atomic="true">
+        {toasts.map((toast) => (
+          <div key={toast.id} className={`toast toast-${toast.type}`}>
+            {toast.message}
+          </div>
+        ))}
+      </div>
+
+      {/* Accessibility: announce task count to screen readers */}
+      <div className="sr-only" role="status" aria-live="polite">
+        {isLoading ? 'Loading tasks...' : `${tasks.length} tasks`}
+      </div>
 
       <div className="confetti-layer" aria-hidden="true">
         {confettiBursts.map((burst) => (
