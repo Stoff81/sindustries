@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { STATUSES, STATUS_LABELS, PRIORITIES } from '../utils/constants.js';
+import { STATUSES, STATUS_LABELS, PRIORITIES, ASSIGNEE_OPTIONS } from '../utils/constants.js';
 import { normalizeComments, formatCommentTimestamp } from '../utils/helpers.js';
 import { MarkdownContent } from './MarkdownContent.jsx';
 
@@ -223,7 +223,12 @@ export function TaskEditor({ draft, task, isDirty, onDraftChange, onSave, onArch
 
           <label>
             <span className="small">Assignee</span>
-            <input ref={assigneeRef} className="edit-control" aria-label="Detail assignee" value={draft.assignee} onChange={(e) => update('assignee', e.target.value)} onMouseDown={stopPropagation} onTouchStart={stopPropagation} onKeyDown={(e) => handleKeyDown(e, assigneeRef, false)} />
+            <select ref={assigneeRef} className="edit-control" aria-label="Detail assignee" value={draft.assignee} onChange={(e) => update('assignee', e.target.value)} onMouseDown={stopPropagation} onTouchStart={stopPropagation} onKeyDown={(e) => handleKeyDown(e, assigneeRef, false)}>
+              <option value="">Unassigned</option>
+              {ASSIGNEE_OPTIONS.map((assignee) => (
+                <option key={assignee} value={assignee}>{assignee}</option>
+              ))}
+            </select>
           </label>
 
           <label>
