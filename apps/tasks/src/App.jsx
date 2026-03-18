@@ -4,25 +4,25 @@ import { useTaskDrafts } from './useTaskDrafts.js';
 import { useDebounce } from './hooks/useDebounce.js';
 import { useToast } from './hooks/useToast.js';
 import { TaskEditor } from './components/TaskEditor.jsx';
-import { STATUSES, STATUS_LABELS, PRIORITIES, PRIORITY_SCORE } from './utils/constants.js';
+import { STATUSES, STATUS_LABELS, PRIORITIES, PRIORITY_SCORE, ASSIGNEE_OPTIONS } from './utils/constants.js';
 import { createConfettiPieces, normalizeTaskForEditor, assigneeInitial } from './utils/helpers.js';
 import { getStoredView, setStoredView } from './utils/storage.js';
 
 export function App() {
   const [view, setView] = useState(getStoredView);
   const [selectedId, setSelectedId] = useState(null);
-  const [filters, setFilters] = useState({ q: '', status: '', priority: '', tag: '', includeArchived: false });
+  const [filters, setFilters] = useState({ q: '', status: '', priority: '', tag: '', assignee: '', includeArchived: false });
   const [selectedStatuses, setSelectedStatuses] = useState(new Set(['open', 'ready', 'doing', 'acceptance']));
 
   // Calculate number of visible columns for CSS grid
   const visibleColumnCount = STATUSES.filter(status => selectedStatuses.has(status)).length;
   
-  // Default backlog view to Status: Open
+  // Default backlog view to Status: Open (only when switching to backlog)
   useEffect(() => {
     if (view === 'backlog' && filters.status === '') {
       setFilters((current) => ({ ...current, status: 'open' }));
     }
-  }, [view, filters.status]);
+  }, [view]);
 
   // Persist view to localStorage
   useEffect(() => {
@@ -129,7 +129,8 @@ export function App() {
 
   const boardColumns = useMemo(() => {
     const columns = { open: [], ready: [], doing: [], acceptance: [], done: [] };
-    for (const task of tasks) columns[task.status]?.push(task);
+    const filtered = filters.priority ? tasks.filter((t) => t.priority === filters.priority) : tasks;
+    for (const task of filtered) columns[task.status]?.push(task);
     for (const status of STATUSES) {
       columns[status].sort((a, b) => {
         const priorityDiff = (PRIORITY_SCORE[a.priority] ?? 99) - (PRIORITY_SCORE[b.priority] ?? 99);
@@ -140,17 +141,18 @@ export function App() {
       });
     }
     return columns;
-  }, [tasks]);
+  }, [tasks, filters.priority]);
 
   // Backlog list uses same sort order: priority, readiness, date created
   const sortedBacklogTasks = useMemo(() => {
-    return [...tasks].sort((a, b) => {
+    const filtered = filters.priority ? tasks.filter((t) => t.priority === filters.priority) : tasks;
+    return [...filtered].sort((a, b) => {
       const priorityDiff = (PRIORITY_SCORE[a.priority] ?? 99) - (PRIORITY_SCORE[b.priority] ?? 99);
       if (priorityDiff !== 0) return priorityDiff;
       if (a.ready !== b.ready) return a.ready ? -1 : 1;
       return new Date(a.createdAt) - new Date(b.createdAt);
     });
-  }, [tasks]);
+  }, [tasks, filters.priority]);
 
   async function createTask(event) {
     event.preventDefault();
@@ -424,6 +426,19 @@ export function App() {
                 <option value="">Priority: All priorities</option>
                 {PRIORITIES.map((priority) => (
                   <option key={priority} value={priority}>{`Priority: ${priority}`}</option>
+                ))}
+              </select>
+            </label>
+            <label className="select-wrap">
+              <select
+                aria-label="Assignee filter"
+                value={filters.assignee}
+                onChange={(e) => setFilters((current) => ({ ...current, assignee: e.target.value }))}
+              >
+                <option value="">Assignee: All</option>
+                <option value="unassigned">Assignee: Unassigned</option>
+                {ASSIGNEE_OPTIONS.map((assignee) => (
+                  <option key={assignee} value={assignee}>{`Assignee: ${assignee}`}</option>
                 ))}
               </select>
             </label>

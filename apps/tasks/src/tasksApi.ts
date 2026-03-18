@@ -4,6 +4,7 @@ export interface TaskFilters {
   status?: string;
   priority?: string;
   tag?: string;
+  assignee?: string;
   includeArchived?: boolean;
 }
 
@@ -97,6 +98,7 @@ export async function fetchTasks(filters: TaskFilters): Promise<Task[]> {
   if (filters.status) query.set('status', filters.status);
   if (filters.priority) query.set('priority', filters.priority);
   if (filters.tag) query.set('tag', filters.tag);
+  if (filters.assignee) query.set('assignee', filters.assignee);
   if (filters.includeArchived) query.set('includeArchived', 'true');
 
   return api<Task[]>('/tasks?' + query.toString());
