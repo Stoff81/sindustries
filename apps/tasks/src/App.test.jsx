@@ -208,18 +208,19 @@ describe('tasks ui', () => {
   });
 
   it('refreshes tasks when the window regains focus', async () => {
+    localStorage.setItem('tasks-app-view', 'board');
     const fetchMock = vi
       .fn()
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
-          data: [mockTask({ id: 'focus-task', title: 'Before refresh' })]
+          data: [mockTask({ id: 'focus-task', title: 'Before refresh', status: 'open' })]
         })
       })
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
-          data: [mockTask({ id: 'focus-task', title: 'After refresh' })]
+          data: [mockTask({ id: 'focus-task', title: 'After refresh', status: 'open' })]
         })
       });
 

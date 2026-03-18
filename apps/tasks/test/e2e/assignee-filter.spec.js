@@ -24,7 +24,8 @@ function mockTasks(tasks) {
 
       const status = url.searchParams.get('status');
       if (status) {
-        filtered = filtered.filter((t) => t.status === status);
+        const statuses = status.split(',').map((value) => value.trim()).filter(Boolean);
+        filtered = filtered.filter((t) => statuses.includes(t.status));
       }
 
       const priority = url.searchParams.get('priority');
@@ -44,7 +45,10 @@ function mockTasks(tasks) {
           let match = true;
           if (assignee === 'unassigned') match = match && !t.assignee;
           else if (assignee) match = match && t.assignee?.toLowerCase() === assignee.toLowerCase();
-          if (status) match = match && t.status === status;
+          if (status) {
+            const statuses = status.split(',').map((value) => value.trim()).filter(Boolean);
+            match = match && statuses.includes(t.status);
+          }
           return match;
         });
       }
@@ -141,8 +145,8 @@ test('AC1: assignee filter dropdown is visible', async ({ page }) => {
   const filterRow = page.locator('.filter-row');
   await expect(filterRow).toBeVisible();
 
-  const assigneeSelect = page.locator('select[aria-label="Assignee filter"]');
-  await expect(assigneeSelect).toBeVisible();
+  const assigneeTrigger = page.getByLabel('Assignee filter');
+  await expect(assigneeTrigger).toBeVisible();
 });
 
 // AC2: Options include all assignees plus "All" and "Unassigned"
@@ -151,22 +155,18 @@ test('AC2: dropdown options include all assignees', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Backlog' }).click();
 
-  const assigneeSelect = page.locator('select[aria-label="Assignee filter"]');
-  await expect(assigneeSelect).toBeVisible();
+  const assigneeTrigger = page.getByLabel('Assignee filter');
+  await expect(assigneeTrigger).toBeVisible();
+  await assigneeTrigger.click();
 
-  // Check "All" option
-  const allOption = assigneeSelect.locator('option[value=""]');
-  await expect(allOption).toHaveText('Assignee: All');
+  await expect(page.getByRole('menuitemradio', { name: 'ALL' })).toBeVisible();
+  await expect(page.getByRole('menuitemradio', { name: 'UNASSIGNED' })).toBeVisible();
 
-  // Check "Unassigned" option
-  const unassignedOption = assigneeSelect.locator('option[value="unassigned"]');
-  await expect(unassignedOption).toHaveText('Assignee: Unassigned');
-
-  // Check all assignee options
   for (const assignee of ASSIGNEE_OPTIONS) {
-    const option = assigneeSelect.locator(`option[value="${assignee}"]`);
-    await expect(option).toHaveText(`Assignee: ${assignee}`);
+    await expect(page.getByRole('menuitemradio', { name: assignee.toUpperCase() })).toBeVisible();
   }
+
+  await page.keyboard.press('Escape');
 });
 
 // AC4: Real-time filtering when assignee is selected
@@ -183,8 +183,9 @@ test('AC4: filtering happens in real-time', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Unassigned task' })).toBeVisible();
 
   // Select "Quinn" assignee
-  const assigneeSelect = page.locator('select[aria-label="Assignee filter"]');
-  await assigneeSelect.selectOption('Quinn');
+  const assigneeTrigger = page.getByLabel('Assignee filter');
+  await assigneeTrigger.click();
+  await page.getByRole('menuitemradio', { name: 'QUINN' }).click();
 
   // Only Quinn's task visible
   await expect(page.getByRole('button', { name: 'Quinn task' })).toBeVisible();
@@ -194,7 +195,8 @@ test('AC4: filtering happens in real-time', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Unassigned task' })).toBeHidden();
 
   // Switch to "Unassigned"
-  await assigneeSelect.selectOption('unassigned');
+  await assigneeTrigger.click();
+  await page.getByRole('menuitemradio', { name: 'UNASSIGNED' }).click();
   await expect(page.getByRole('button', { name: 'Quinn task' })).toBeHidden();
   await expect(page.getByRole('button', { name: 'Unassigned task' })).toBeVisible();
 });
@@ -244,17 +246,23 @@ test('AC3: combinable with other filters', async ({ page }) => {
   await page.goto('/');
   // Use board view (all statuses visible by default)
 
-  const assigneeSelect = page.locator('select[aria-label="Assignee filter"]');
-  const statusSelect = page.locator('select[aria-label="Status filter"]');
+  const assigneeTrigger = page.getByLabel('Assignee filter');
+  const statusTrigger = page.getByLabel('Status filter');
 
   // Filter by assignee "Quinn" first
-  await assigneeSelect.selectOption('Quinn');
+  await assigneeTrigger.click();
+  await page.getByRole('menuitemradio', { name: 'QUINN' }).click();
   await expect(page.getByRole('button', { name: 'Quinn open task' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Quinn ready task' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Rowan open task' })).toBeHidden();
 
   // Then also filter by status "open" — should show only Quinn's open task
-  await statusSelect.selectOption('open');
+  await statusTrigger.click();
+  // Leave only "Open" selected.
+  await page.getByRole('menuitemcheckbox', { name: 'Ready' }).click();
+  await page.getByRole('menuitemcheckbox', { name: 'Doing' }).click();
+  await page.getByRole('menuitemcheckbox', { name: 'Acceptance' }).click();
+  await page.keyboard.press('Escape');
   await expect(page.getByRole('button', { name: 'Quinn open task' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Quinn ready task' })).toBeHidden();
   await expect(page.getByRole('button', { name: 'Rowan open task' })).toBeHidden();
@@ -266,19 +274,22 @@ test('AC5: selecting "All" resets assignee filter', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Backlog' }).click();
 
-  // Reset status filter so all tasks are visible
-  const statusSelect = page.locator('select[aria-label="Status filter"]');
-  await statusSelect.selectOption('');
+  // Select all statuses so all tasks are visible
+  await page.getByLabel('Status filter').click();
+  await page.getByRole('menuitemcheckbox', { name: 'All' }).click();
+  await page.keyboard.press('Escape');
 
-  const assigneeSelect = page.locator('select[aria-label="Assignee filter"]');
+  const assigneeTrigger = page.getByLabel('Assignee filter');
 
   // Filter by "Rowan"
-  await assigneeSelect.selectOption('Rowan');
+  await assigneeTrigger.click();
+  await page.getByRole('menuitemradio', { name: 'ROWAN' }).click();
   await expect(page.getByRole('button', { name: 'Rowan task' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Quinn task' })).toBeHidden();
 
   // Reset to "All"
-  await assigneeSelect.selectOption('');
+  await assigneeTrigger.click();
+  await page.getByRole('menuitemradio', { name: 'ALL' }).click();
   await expect(page.getByRole('button', { name: 'Quinn task' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Rowan task' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Lox task' })).toBeVisible();
@@ -292,21 +303,22 @@ test('AC6: filter state persists across view switches', async ({ page }) => {
   await page.goto('/');
 
   // Start in board view, set assignee filter
-  const assigneeSelect = page.locator('select[aria-label="Assignee filter"]');
-  await assigneeSelect.selectOption('Lox');
+  const assigneeTrigger = page.getByLabel('Assignee filter');
+  await assigneeTrigger.click();
+  await page.getByRole('menuitemradio', { name: 'LOX' }).click();
   await expect(page.getByRole('button', { name: 'Lox task' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Quinn task' })).toBeHidden();
 
   // Switch to backlog view
   await page.getByRole('button', { name: 'Backlog' }).click();
 
-  // Reset status filter so all statuses show (backlog defaults to "open")
-  const backlogStatusSelect = page.locator('select[aria-label="Status filter"]');
-  await backlogStatusSelect.selectOption('');
+  // Select all statuses so all tasks show
+  await page.getByLabel('Status filter').click();
+  await page.getByRole('menuitemcheckbox', { name: 'All' }).click();
+  await page.keyboard.press('Escape');
 
   // Assignee filter should still be set to "Lox"
-  const backlogAssigneeSelect = page.locator('select[aria-label="Assignee filter"]');
-  await expect(backlogAssigneeSelect).toHaveValue('Lox');
+  await expect(assigneeTrigger).toContainText('ASSIGNEE: LOX');
   await expect(page.getByRole('button', { name: 'Lox task' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Quinn task' })).toBeHidden();
 
@@ -314,6 +326,5 @@ test('AC6: filter state persists across view switches', async ({ page }) => {
   await page.getByRole('button', { name: 'Kanban' }).click();
 
   // Filter should still be "Lox"
-  const boardAssigneeSelect = page.locator('select[aria-label="Assignee filter"]');
-  await expect(boardAssigneeSelect).toHaveValue('Lox');
+  await expect(assigneeTrigger).toContainText('ASSIGNEE: LOX');
 });

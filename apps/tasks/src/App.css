@@ -235,6 +235,7 @@ button {
   background: var(--panel);
   border: 2px solid var(--muted);
   padding: 12px;
+  border-radius: 0;
 }
 
 .create-panel { margin-top: 0; }
@@ -257,7 +258,7 @@ button {
 
 .filter-controls {
   display: grid;
-  grid-template-columns: repeat(3, minmax(170px, auto));
+  grid-template-columns: minmax(260px, 1.35fr) repeat(3, minmax(170px, 1fr));
   gap: 8px;
   align-items: center;
   justify-content: start;
@@ -273,6 +274,8 @@ button {
 
 .archived-toggle {
   white-space: nowrap;
+  width: 160px;
+  justify-content: center;
 }
 
 .filter-row select,
@@ -280,6 +283,28 @@ button {
   font-family: var(--font-body);
   font-weight: 700;
   text-transform: uppercase;
+}
+
+.filter-row .select-wrap select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: var(--panel);
+  background-image: none;
+  border: 2px solid var(--line);
+  border-radius: 6px;
+  padding: 8px 32px 8px 10px;
+  color: var(--text);
+  font-size: 0.9rem;
+  box-shadow: none;
+}
+
+.filter-row .select-wrap::after {
+  color: var(--muted);
+}
+
+.filter-row select.is-filtered {
+  border-color: var(--amber);
 }
 .create-card {
   margin-top: 0;
