@@ -5,5 +5,8 @@
     "apps/*",
     "packages/*",
     "services/*"
-  ]
+  ],
+  "devDependencies": {
+    "jsdom": "^29.0.1"
+  }
 }
