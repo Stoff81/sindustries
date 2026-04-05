@@ -6,6 +6,7 @@ export interface TaskFilters {
   tag?: string;
   assignee?: string;
   includeArchived?: boolean;
+  ready?: boolean;
 }
 
 export interface Comment {
@@ -100,6 +101,7 @@ export async function fetchTasks(filters: TaskFilters): Promise<Task[]> {
   if (filters.tag) query.set('tag', filters.tag);
   if (filters.assignee) query.set('assignee', filters.assignee);
   if (filters.includeArchived) query.set('includeArchived', 'true');
+  if (filters.ready !== undefined) query.set('ready', String(filters.ready));
 
   return api<Task[]>('/tasks?' + query.toString());
 }
