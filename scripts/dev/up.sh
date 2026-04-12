@@ -5,6 +5,11 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
 # shellcheck source=./mode-env.sh
 source "$ROOT_DIR/scripts/dev/mode-env.sh"
+
+# argv from Makefile > env var > default on
+OBSERVABILITY="${1:-${OBSERVABILITY:-1}}"
+export OBSERVABILITY
+
 # shellcheck source=./port-cleanup.sh
 source "$ROOT_DIR/scripts/dev/port-cleanup.sh"
 
@@ -60,10 +65,37 @@ DATABASE_URL="$DATABASE_URL"
 CORS_ALLOWED_ORIGINS="$CORS_ALLOWED_ORIGINS"
 EOF
 
+if [[ "$OBSERVABILITY" == "1" ]]; then
+  cat >> "$ROOT_DIR/$TASKS_API_ENV_FILE" <<EOF
+
+# OpenTelemetry (on: stack infra/docker-compose.observability.yml; default unless OBSERVABILITY=0)
+OTEL_SERVICE_NAME=tasks-api
+OTEL_SERVICE_NAMESPACE=sindustries
+OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:$OTLP_HTTP_PORT
+OTEL_TRACES_EXPORTER=otlp
+OTEL_METRICS_EXPORTER=otlp
+OTEL_LOGS_EXPORTER=none
+OTEL_ENVIRONMENT=$MODE
+EOF
+else
+  cat >> "$ROOT_DIR/$TASKS_API_ENV_FILE" <<EOF
+
+# OpenTelemetry off (make up OBSERVABILITY=0; avoids export errors when collector is down)
+OTEL_SDK_DISABLED=1
+EOF
+fi
+
 echo "Starting $MODE stack"
 echo "  API: $TASKS_API_BASE_URL"
 echo "  App: http://localhost:$TASKS_APP_PORT"
 echo "  Postgres: localhost:$POSTGRES_PORT/$POSTGRES_DB"
+if [[ "$OBSERVABILITY" == "1" ]]; then
+  echo "  Observability: Grafana http://localhost:$GRAFANA_PORT (Tempo :$TEMPO_PORT, Prometheus :$PROMETHEUS_PORT, OTLP :$OTLP_HTTP_PORT)"
+fi
 
 cd "$ROOT_DIR"
-exec tilt up --file infra/tilt/Tiltfile --port "$TILT_PORT"
+exec env \
+  TILT_OBSERVABILITY="$OBSERVABILITY" \
+  OBSERVABILITY="$OBSERVABILITY" \
+  MODE="$MODE" \
+  tilt up --file infra/tilt/Tiltfile --port "$TILT_PORT"

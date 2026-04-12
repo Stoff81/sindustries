@@ -1,13 +1,27 @@
+# TILT_OBSERVABILITY=0 to disable; default is on.
+observability_enabled = os.getenv('TILT_OBSERVABILITY', '1').strip() != '0'
+
 mode = os.getenv('MODE', 'dev')
 tasks_api_port = os.getenv('TASKS_API_PORT', '4000')
 tasks_app_port = os.getenv('TASKS_APP_PORT', '5173')
 tasks_api_base_url = os.getenv('TASKS_API_BASE_URL', 'http://localhost:4000/api/v1')
 tasks_api_env_file = os.getenv('TASKS_API_ENV_FILE', 'services/tasks-api/.env.dev')
+compose_project = os.getenv('COMPOSE_PROJECT_NAME', 'sindustries-' + mode)
 
-docker_compose('../docker-compose.dev.yml', project_name=os.getenv('COMPOSE_PROJECT_NAME', 'sindustries-' + mode))
+docker_compose('../docker-compose.dev.yml', project_name=compose_project)
+
+o11y_project = os.getenv('O11Y_PROJECT_NAME', 'sindustries-' + mode + '-o11y')
+
+if observability_enabled:
+  docker_compose('../docker-compose.observability.yml', project_name=o11y_project)
+  dc_resource('tempo', project_name=o11y_project, labels=['infra', 'observability', mode])
+  dc_resource('otel-collector', project_name=o11y_project, labels=['infra', 'observability', mode])
+  dc_resource('prometheus', project_name=o11y_project, labels=['infra', 'observability', mode])
+  dc_resource('grafana', project_name=o11y_project, labels=['infra', 'observability', mode])
 
 dc_resource(
   'postgres',
+  project_name=compose_project,
   labels=['infra', 'db', mode],
 )
 
@@ -20,6 +34,8 @@ local_resource(
     os.getenv('CORS_ALLOWED_ORIGINS', ''),
   ),
   deps=[
+    '../../packages/otel-node/src',
+    '../../packages/otel-node/package.json',
     '../../services/tasks-api/src',
     '../../services/tasks-api/prisma',
     '../../services/tasks-api/package.json',

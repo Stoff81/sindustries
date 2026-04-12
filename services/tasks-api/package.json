@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
-    "start": "tsx src/server.ts",
+    "dev": "tsx watch --require @sindustries/otel-node/register src/server.ts",
+    "start": "tsx --require @sindustries/otel-node/register src/server.ts",
     "test": "vitest run --exclude test/db-integration.test.ts",
     "test:watch": "vitest",
     "test:integration": "vitest run --config vitest.integration.config.ts",
@@ -19,6 +19,7 @@
     "seed": "tsx prisma/seed.js"
   },
   "dependencies": {
+    "@sindustries/otel-node": "file:../../packages/otel-node",
     "@prisma/client": "^5.20.0",
     "dotenv": "^16.4.5",
     "express": "^4.21.0"

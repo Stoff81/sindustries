@@ -41,43 +41,57 @@ This installs local tooling (`colima`, `docker` CLI, `tilt`, `node` if missing) 
 
 `make up`, `make down`, and `make reset-db` are mode-aware via `MODE=<dev|prodlike>`.
 
-| Mode | Compose project | Postgres | API | App | Tilt control port | API base URL |
-| --- | --- | --- | --- | --- | --- | --- |
-| `dev` | `sindustries-dev` | `localhost:6432` (`sindustries_dev`) | `localhost:4000` | `localhost:5173` | `10350` | `http://localhost:4000/api/v1` |
-| `prodlike` | `sindustries-prodlike` | `localhost:7432` (`sindustries_prodlike`) | `localhost:4001` | `localhost:5174` | `10351` | `http://localhost:4001/api/v1` |
+| | dev | prodlike |
+| --- | --- | --- |
+| Compose project | `sindustries-dev` | `sindustries-prodlike` |
+| Postgres | `localhost:6432` | `localhost:7432` |
+| API | `localhost:4000` | `localhost:4001` |
+| App | `localhost:5173` | `localhost:5174` |
+| Tilt port | `10350` | `10351` |
+| Grafana | `localhost:3000` | `localhost:3001` |
+| Prometheus | `localhost:9090` | `localhost:9091` |
+| Tempo | `localhost:3200` | `localhost:3201` |
+| OTLP (HTTP/gRPC) | `localhost:4318` / `4317` | `localhost:4328` / `4327` |
+
+### `make up` parameters
+
+| Parameter | Values | Default | Description |
+| --- | --- | --- | --- |
+| `MODE` | `dev`, `prodlike` | `dev` | Which stack to start (separate ports, DB, Compose project) |
+| `OBSERVABILITY` | `0`, `1` | `1` | Enable the per-mode Grafana/Tempo/Prometheus/OTel Collector stack |
+
+Examples:
+
+```bash
+make up                              # dev + observability
+make up MODE=prodlike                # prodlike + observability
+make up OBSERVABILITY=0              # dev, no observability containers
+make up MODE=prodlike OBSERVABILITY=0
+```
+
+### Observability
+
+Each mode gets its own isolated observability stack (`sindustries-dev-o11y`, `sindustries-prodlike-o11y`) with separate host ports so both can run simultaneously. See the port table above.
+
+When observability is off (`OBSERVABILITY=0`), `up.sh` sets `OTEL_SDK_DISABLED=1` so the API doesn't spam export errors.
+
+**Follow-ups:** Loki/Promtail for logs, `trace_id` in structured logs, `traceparent` from the tasks app for browser-linked traces.
 
 ### Start stacks
 
-Default (dev):
-
 ```bash
-make up
+make up                    # dev
+make up MODE=prodlike      # prodlike
 ```
 
-Prod-like stack:
-
-```bash
-make up MODE=prodlike
-```
-
-Run both simultaneously from two terminals:
-
-```bash
-# Terminal 1
-make up MODE=dev
-
-# Terminal 2
-make up MODE=prodlike
-```
+Run both simultaneously from two terminals.
 
 ### Stop stacks
 
 ```bash
-make down MODE=dev
-make down MODE=prodlike
+make down                  # dev
+make down MODE=prodlike    # prodlike
 ```
-
-`make up` and `make down` also clean up stale listeners on the mode-owned app, API, and Tilt ports before starting or after stopping the stack.
 
 ### Reset DB (mode-aware)
 

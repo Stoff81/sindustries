@@ -16,9 +16,11 @@ tilt down --file infra/tilt/Tiltfile --port "$TILT_PORT" || true
 cleanup_mode_ports
 
 if docker compose version >/dev/null 2>&1; then
-  docker compose -f infra/docker-compose.dev.yml down --remove-orphans
+  docker compose -p "$COMPOSE_PROJECT_NAME" -f infra/docker-compose.dev.yml down --remove-orphans
+  docker compose -p "$O11Y_PROJECT_NAME" -f infra/docker-compose.observability.yml down --remove-orphans || true
 elif command -v docker-compose >/dev/null 2>&1; then
-  docker-compose -f infra/docker-compose.dev.yml down --remove-orphans
+  docker-compose -p "$COMPOSE_PROJECT_NAME" -f infra/docker-compose.dev.yml down --remove-orphans
+  docker-compose -p "$O11Y_PROJECT_NAME" -f infra/docker-compose.observability.yml down --remove-orphans || true
 else
   echo "docker compose (plugin) or docker-compose is required." >&2
   exit 1
