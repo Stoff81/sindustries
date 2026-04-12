@@ -2,8 +2,8 @@ import { Router } from 'express';
 import { prisma } from '../lib/prisma.ts';
 import { badRequest, notFound } from '../lib/http.ts';
 
-const DEFAULT_LIMIT = 20;
-const MAX_LIMIT = 100;
+const DEFAULT_LIMIT = 100;
+const MAX_LIMIT = 10000;
 
 const validStatuses = new Set(['open', 'ready', 'doing', 'acceptance', 'done']);
 const validPriorities = new Set(['low', 'medium', 'high', 'urgent']);
