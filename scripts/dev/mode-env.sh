@@ -18,6 +18,13 @@ case "$MODE" in
     export TASKS_API_BASE_URL="http://localhost:${TASKS_API_PORT}/api/v1"
     export TASKS_API_ENV_FILE="services/tasks-api/.env.dev"
     export RESET_DB_SEED_DEFAULT="true"
+    # Observability ports (per-mode isolation)
+    export O11Y_PROJECT_NAME="sindustries-dev-o11y"
+    export GRAFANA_PORT="3000"
+    export PROMETHEUS_PORT="9090"
+    export TEMPO_PORT="3200"
+    export OTLP_GRPC_PORT="4317"
+    export OTLP_HTTP_PORT="4318"
     ;;
   prodlike)
     export MODE
@@ -33,6 +40,13 @@ case "$MODE" in
     export TASKS_API_BASE_URL="http://localhost:${TASKS_API_PORT}/api/v1"
     export TASKS_API_ENV_FILE="services/tasks-api/.env.prodlike"
     export RESET_DB_SEED_DEFAULT="false"
+    # Observability ports (per-mode isolation)
+    export O11Y_PROJECT_NAME="sindustries-prodlike-o11y"
+    export GRAFANA_PORT="3001"
+    export PROMETHEUS_PORT="9091"
+    export TEMPO_PORT="3201"
+    export OTLP_GRPC_PORT="4327"
+    export OTLP_HTTP_PORT="4328"
     ;;
   *)
     echo "Unsupported MODE: $MODE (expected: dev | prodlike)" >&2

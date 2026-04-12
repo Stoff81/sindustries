@@ -2,11 +2,13 @@
 
 MODE ?= dev
 
+# $(OBSERVABILITY) passed as argv so BSD make (macOS default) works.
+
 bootstrap:
 	./scripts/dev/bootstrap.sh
 
 up:
-	MODE=$(MODE) ./scripts/dev/up.sh
+	MODE=$(MODE) ./scripts/dev/up.sh $(OBSERVABILITY)
 
 down:
 	MODE=$(MODE) ./scripts/dev/down.sh
