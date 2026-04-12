@@ -6,6 +6,26 @@ on:
     branches: [main]
 
 jobs:
+  otel-node-tests:
+    name: otel-node unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install workspace dependencies
+        run: npm ci
+
+      - name: Run otel-node tests
+        run: npm test --workspace @sindustries/otel-node
+
   tasks-api-tests:
     name: tasks-api tests (unit + db integration)
     runs-on: ubuntu-latest
