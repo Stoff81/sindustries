@@ -1,6 +1,11 @@
 // CJS preload for --require: hooks require() before ESM loaders run.
 // This ensures Express/pg/etc. are patched before any application code loads them.
+//
+// dotenv/config is loaded first so that OTEL_* values from the service's
+// .env file (pointed to by DOTENV_CONFIG_PATH) are available before SDK init.
 'use strict';
+
+require('dotenv/config');
 
 if (process.env.OTEL_SDK_DISABLED === '1' || process.env.OTEL_SDK_DISABLED === 'true') {
   return;
