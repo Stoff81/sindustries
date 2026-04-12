@@ -93,7 +93,7 @@ async function api<T>(path: string, options?: RequestInit): Promise<T> {
  * Fetch tasks with optional filters
  */
 export async function fetchTasks(filters: TaskFilters): Promise<Task[]> {
-  const query = new URLSearchParams({ sort: 'priority' });
+  const query = new URLSearchParams({ sort: 'priority', limit: '10000' });
   if (filters.q) query.set('q', filters.q);
   if (filters.status) query.set('status', filters.status);
   if (filters.priority) query.set('priority', filters.priority);
