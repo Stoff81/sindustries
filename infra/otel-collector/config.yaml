@@ -6,8 +6,23 @@ receivers:
       http:
         endpoint: 0.0.0.0:4318
 
+# Derive Prometheus RED-style metrics from traces (used by Grafana dashboard plano-requests-overview).
+connectors:
+  spanmetrics:
+    dimensions:
+      - name: llm.model
+      - name: agent_id
+      - name: selection.listener
+      - name: http.method
+      - name: http.status_code
+    histogram:
+      explicit:
+        buckets: [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000]
+
 processors:
   batch:
+    timeout: 5s
+    send_batch_size: 1024
 
 exporters:
   otlp/tempo:
@@ -29,8 +44,11 @@ service:
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/tempo]
+      exporters: [otlp/tempo, spanmetrics]
     metrics:
       receivers: [otlp]
       processors: [batch]
+      exporters: [prometheus]
+    metrics/spanmetrics:
+      receivers: [spanmetrics]
       exporters: [prometheus]
