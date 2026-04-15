@@ -19,8 +19,8 @@ listeners:
     name: safe_model
     port: 12000
     timeout: 180s
-    input_filters:
-      - content_guard
+    # input_filters:
+    #   - content_guard
 
 tracing:
   random_sampling: 100

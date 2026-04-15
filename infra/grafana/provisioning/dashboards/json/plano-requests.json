@@ -164,8 +164,8 @@
       ]
     },
     {
-      "title": "LLM Request Latency p50 / p95 / p99 by Model",
-      "description": "Request duration percentiles from trace-derived histograms, broken down by model.",
+      "title": "Plano Request Latency p50 / p95 / p99",
+      "description": "Latency from spanmetrics: histogram_quantile uses le (seconds on the wire for duration_milliseconds_* metrics) ×1000 → ms. Mean is sum(rate(_sum))/sum(rate(_count)) and is already in ms for traces_span_metrics_duration_milliseconds_* — do not multiply by 1000.",
       "type": "timeseries",
       "gridPos": { "h": 10, "w": 12, "x": 0, "y": 20 },
       "datasource": { "type": "prometheus", "uid": "${datasource}" },
@@ -193,21 +193,27 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "histogram_quantile(0.50, sum(rate(traces_span_metrics_duration_milliseconds_bucket{service_name=\"plano(llm)\"}[$__rate_interval])) by (le, llm_model))",
-          "legendFormat": "p50 {{ llm_model }}",
+          "expr": "(1000 * histogram_quantile(0.50, sum(rate(traces_span_metrics_duration_milliseconds_bucket{service_name=~\"plano.*\"}[$__rate_interval])) by (le, service_name))) or (1000 * histogram_quantile(0.50, sum(rate(traces_span_metrics_duration_seconds_bucket{service_name=~\"plano.*\"}[$__rate_interval])) by (le, service_name))) or (1000 * histogram_quantile(0.50, sum(rate(traces_span_metrics_duration_bucket{service_name=~\"plano.*\"}[$__rate_interval])) by (le, service_name)))",
+          "legendFormat": "p50 {{ service_name }}",
           "refId": "A"
         },
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "histogram_quantile(0.95, sum(rate(traces_span_metrics_duration_milliseconds_bucket{service_name=\"plano(llm)\"}[$__rate_interval])) by (le, llm_model))",
-          "legendFormat": "p95 {{ llm_model }}",
+          "expr": "(1000 * histogram_quantile(0.95, sum(rate(traces_span_metrics_duration_milliseconds_bucket{service_name=~\"plano.*\"}[$__rate_interval])) by (le, service_name))) or (1000 * histogram_quantile(0.95, sum(rate(traces_span_metrics_duration_seconds_bucket{service_name=~\"plano.*\"}[$__rate_interval])) by (le, service_name))) or (1000 * histogram_quantile(0.95, sum(rate(traces_span_metrics_duration_bucket{service_name=~\"plano.*\"}[$__rate_interval])) by (le, service_name)))",
+          "legendFormat": "p95 {{ service_name }}",
           "refId": "B"
         },
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "histogram_quantile(0.99, sum(rate(traces_span_metrics_duration_milliseconds_bucket{service_name=\"plano(llm)\"}[$__rate_interval])) by (le, llm_model))",
-          "legendFormat": "p99 {{ llm_model }}",
+          "expr": "(1000 * histogram_quantile(0.99, sum(rate(traces_span_metrics_duration_milliseconds_bucket{service_name=~\"plano.*\"}[$__rate_interval])) by (le, service_name))) or (1000 * histogram_quantile(0.99, sum(rate(traces_span_metrics_duration_seconds_bucket{service_name=~\"plano.*\"}[$__rate_interval])) by (le, service_name))) or (1000 * histogram_quantile(0.99, sum(rate(traces_span_metrics_duration_bucket{service_name=~\"plano.*\"}[$__rate_interval])) by (le, service_name)))",
+          "legendFormat": "p99 {{ service_name }}",
           "refId": "C"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum(rate(traces_span_metrics_duration_milliseconds_sum{service_name=~\"plano.*\"}[$__rate_interval])) by (service_name) / sum(rate(traces_span_metrics_duration_milliseconds_count{service_name=~\"plano.*\"}[$__rate_interval])) by (service_name)",
+          "legendFormat": "mean {{ service_name }}",
+          "refId": "D"
         }
       ]
     },
@@ -250,8 +256,8 @@
       ]
     },
     {
-      "title": "LLM Errors / sec by Model",
-      "description": "Rate of failed LLM requests broken down by model. Filters on OTEL span status STATUS_CODE_ERROR.",
+      "title": "Span status errors / sec",
+      "description": "Rate of spans with OTEL status ERROR (includes upstream LLM failures and client-side failures such as filter chain / content_guard rejections when Plano marks the span as error). Broken down by Plano service and model when present.",
       "type": "timeseries",
       "gridPos": { "h": 10, "w": 12, "x": 0, "y": 30 },
       "datasource": { "type": "prometheus", "uid": "${datasource}" },
@@ -279,15 +285,15 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "sum(rate(traces_span_metrics_calls_total{service_name=\"plano(llm)\", status_code=\"STATUS_CODE_ERROR\"}[$__rate_interval])) by (llm_model)",
-          "legendFormat": "{{ llm_model }}",
+          "expr": "sum(rate(traces_span_metrics_calls_total{service_name=~\"plano.*\", status_code=\"STATUS_CODE_ERROR\"}[$__rate_interval])) by (service_name, llm_model)",
+          "legendFormat": "{{ service_name }} {{ llm_model }}",
           "refId": "A"
         }
       ]
     },
     {
-      "title": "Errors by HTTP Status Code",
-      "description": "Upstream error rate broken down by HTTP status code and model. Surfaces provider failures like 529 overloaded, 429 rate-limited, 500 internal, etc.",
+      "title": "Errors by HTTP status (4xx/5xx)",
+      "description": "Non-success HTTP status on trace spans: legacy http.status_code, stable semconv http.response.status_code, and span ERROR when neither HTTP code dimension is set (covers filter chain 400s that only set span status). Same underlying request can appear in at most one of these series.",
       "type": "timeseries",
       "gridPos": { "h": 10, "w": 12, "x": 12, "y": 30 },
       "datasource": { "type": "prometheus", "uid": "${datasource}" },
@@ -315,9 +321,21 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "sum(rate(traces_span_metrics_calls_total{service_name=~\"plano.*\", http_status_code!=\"200\", http_status_code!=\"\"}[$__rate_interval])) by (http_status_code, llm_model)",
-          "legendFormat": "{{ http_status_code }} {{ llm_model }}",
+          "expr": "sum(rate(traces_span_metrics_calls_total{service_name=~\"plano.*\", http_status_code=~\"[45]..\"}[$__rate_interval])) by (http_status_code, llm_model)",
+          "legendFormat": "http.status_code={{ http_status_code }} {{ llm_model }}",
           "refId": "A"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum(rate(traces_span_metrics_calls_total{service_name=~\"plano.*\", http_response_status_code=~\"[45]..\"}[$__rate_interval])) by (http_response_status_code, llm_model)",
+          "legendFormat": "http.response.status_code={{ http_response_status_code }} {{ llm_model }}",
+          "refId": "B"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum(rate(traces_span_metrics_calls_total{service_name=~\"plano.*\", status_code=\"STATUS_CODE_ERROR\", http_status_code=\"\", http_response_status_code=\"\"}[$__rate_interval])) by (service_name, llm_model)",
+          "legendFormat": "span_error (no HTTP code) {{ service_name }} {{ llm_model }}",
+          "refId": "C"
         }
       ]
     }
@@ -348,5 +366,5 @@
   "timezone": "browser",
   "title": "Plano - Requests Overview",
   "uid": "plano-requests-overview",
-  "version": 3
+  "version": 10
 }
