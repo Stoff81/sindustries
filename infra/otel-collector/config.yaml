@@ -15,9 +15,29 @@ connectors:
       - name: selection.listener
       - name: http.method
       - name: http.status_code
+      # Stable HTTP semconv (OTel 1.23+); Plano/filter spans often only set this, not legacy http.status_code.
+      - name: http.response.status_code
+    # Record span duration in seconds (OTel semconv). Without wide enough buckets, LLM spans
+    # all land in +Inf and histogram_quantile clamps to the last finite le (~10ms).
     histogram:
+      unit: s
       explicit:
-        buckets: [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000]
+        buckets:
+          - 10ms
+          - 50ms
+          - 100ms
+          - 250ms
+          - 500ms
+          - 1s
+          - 2s
+          - 5s
+          - 10s
+          - 30s
+          - 60s
+          - 120s
+          - 300s
+          - 600s
+          - 1800s
 
 processors:
   batch:
