@@ -13,6 +13,7 @@ model_providers:
     default: true
 
   - model: chatgpt/*
+    access_key: $CHATGPT_ACCESS_TOKEN
 
 listeners:
   - type: model
