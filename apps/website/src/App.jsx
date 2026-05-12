@@ -1,211 +1,424 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
-const NAV_ITEMS = [
-  { label: 'Home', path: '/' },
-  { label: 'About', path: '/about' },
-  { label: 'Contact', path: '/contact' }
-];
+const SECTIONS = ['SIN', 'Signals', 'Systems', 'Stacks', 'Ships', 'Stories', 'Studio', 'Summon'];
 
-const SITE_COPY = {
-  heroTitle: 'Build useful things. Run them well.',
-  heroBody:
-    'Stoffer Industries is a builder\'s workshop for digital products, systems, and experiments designed to compound over time.',
-  positioning:
-    'We build practical digital products, internal tools, and operating systems for better work — with speed, precision, and long-term thinking.',
-  principles: [
-    'Start simple, then sharpen what proves useful.',
-    'Ship early enough to learn, but not so early it wastes trust.',
-    'Turn messy workflows into durable systems.',
-    'Use automation to remove repetition and free up focus.'
-  ],
-  focus: [
-    'Focused software products',
-    'Internal tools and workflow automation',
-    'Experiments that can grow into durable digital businesses'
-  ],
-  aboutBody:
-    'Stoffer Industries is the company behind Tom Stoffer\'s builder-operator work: a home for software products, workflow systems, and experiments that solve real problems without unnecessary complexity.',
-  contactBody:
-    'If you want to collaborate, compare notes, or see what is being built, get in touch.'
+const SOCIAL_LINKS = {
+  x: 'https://x.com/stoff81?s=21&t=RdCkvkBscucBkM7Fx5wurg',
+  tiktok: 'https://www.tiktok.com/@sindustries1?_r=1&_t=ZS-96GZycL6JzM'
 };
 
-function getPathname() {
-  if (typeof window === 'undefined') return '/';
-  return window.location.pathname || '/';
-}
+const CONTACT_EMAIL = 'hello@sindustries.co.nz';
 
-function usePathname() {
-  const [pathname, setPathname] = useState(getPathname());
+const SIGNALS = [
+  { label: 'commits', value: '1,247', note: 'last 90 days' },
+  { label: 'projects', value: '08', note: 'active threads' },
+  { label: 'systems', value: '04', note: 'online / forming' },
+  { label: 'ships', value: '23', note: 'released or merged' }
+];
 
-  useEffect(() => {
-    function handlePopState() {
-      setPathname(getPathname());
-    }
-
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
-
-  function navigate(path) {
-    if (path === pathname) return;
-    window.history.pushState({}, '', path);
-    setPathname(path);
-    window.scrollTo({ top: 0, behavior: 'auto' });
+const SYSTEMS = [
+  {
+    name: 'OpenClaw',
+    tag: 'Chief-of-staff OS',
+    body: 'Agent orchestration, memory, tasks, and the operating layer around Tom’s work.'
+  },
+  {
+    name: 'Agent Ops',
+    tag: 'Quinn / Rowan / Lox',
+    body: 'Specialist agents with roles, workflows, reviews, and delivery discipline.'
+  },
+  {
+    name: 'Software Factory',
+    tag: 'Shape → build → review',
+    body: 'A repeatable loop for turning loose intent into executable, reviewed work.'
+  },
+  {
+    name: 'Commerce Loops',
+    tag: 'Drops / tests / learning',
+    body: 'Lightweight experiments for products, waitlists, content, and revenue signals.'
   }
+];
 
-  return { pathname, navigate };
+const STACKS = ['OpenClaw', 'Plano', 'Local models', 'Codex', 'MiniMax', 'Telegram', 'Tasks API', 'Vite', 'React'];
+
+const SHIPS = [
+  'SIndustries website v1',
+  'Tasks API prodlike workflow',
+  'Agent role split: Quinn / Rowan / Lox',
+  'Plano local model routing',
+  'Drop microsite prototype'
+];
+
+const STORIES = [
+  'The company-of-one operating system.',
+  'Turning an assistant into a chief of staff.',
+  'Building in public before the business is obvious.'
+];
+
+const STUDIO = ['Live signal feed', 'Agent workbench', 'First product drop', 'Founder log stream'];
+const HEADER_TAB_TRIGGER_OFFSET_PX = 56;
+const HEADER_TAB_TRANSITION_PX = 24;
+const COLLAPSED_TAB_WIDTH_PX = 12;
+/**
+ * Sticky section title opacity: stay fully opaque until the section’s top is within
+ * PAGE_HEADING_VISIBLE_PX of the viewport top, then fade over PAGE_HEADING_FADE_PX px.
+ * Increase VISIBLE to delay the fade; increase FADE for a slower ramp.
+ */
+const PAGE_HEADING_VISIBLE_PX = 0;
+const PAGE_HEADING_FADE_PX = 1;
+
+function slug(label) {
+  return label.toLowerCase();
 }
 
-function Shell({ pathname, navigate, children }) {
+function SectionNav({ current, tabProgress, tabRefs, tabsRef, headingTargets }) {
+  const visibleIndex = Math.round(tabProgress);
+  const activeIndex = SECTIONS.indexOf(current);
+
   return (
-    <div className="site-shell">
-      <header className="topbar">
-        <a className="brand" href="/" onClick={(event) => {
-          event.preventDefault();
-          navigate('/');
-        }}>
-          <span className="brand-kicker">SIN</span>
-          <span className="brand-name">Stoffer Industries</span>
+    <div className="section-nav-shell">
+      {SECTIONS.slice(1).map((section) => (
+        <span
+          key={section}
+          className="section-header-heading"
+          style={{
+            '--section-heading-target-x': `${headingTargets[section] ?? 0}px`,
+            '--section-header-opacity': section === current ? 1 : 0
+          }}
+          aria-hidden="true"
+        >
+          {section}
+        </span>
+      ))}
+      <nav className="section-nav" aria-label="Section navigation">
+        <a href="#sin" className="section-logo" aria-label="SIndustries home">
+          <LogoMark />
         </a>
-        <nav className="nav" aria-label="Primary">
-          {NAV_ITEMS.map((item) => (
-            <a
-              key={item.path}
-              href={item.path}
-              className={pathname === item.path ? 'nav-link active' : 'nav-link'}
-              onClick={(event) => {
-                event.preventDefault();
-                navigate(item.path);
-              }}
-            >
-              {item.label}
-            </a>
-          ))}
-        </nav>
-      </header>
-      <main>{children}</main>
-      <footer className="footer">
-        <p>Built with intent in Auckland, New Zealand.</p>
-        <a href="mailto:tom@stofferindustries.com">tom@stofferindustries.com</a>
-      </footer>
+        <div className="section-tabs" ref={tabsRef}>
+          {SECTIONS.map((section, index) => {
+            const distance = Math.abs(index - tabProgress);
+            const expansion = Math.max(0, 1 - distance);
+            const isVisible = index === visibleIndex;
+
+            return (
+              <a
+                key={section}
+                ref={(element) => {
+                  tabRefs.current[section] = element;
+                }}
+                href={`#${slug(section)}`}
+                className={`section-tab ${expansion > 0.01 ? 'active' : 'collapsed'} ${index < activeIndex ? 'arrived' : ''}`}
+                style={{ '--tab-expansion': expansion }}
+                aria-current={section === current ? 'page' : undefined}
+                aria-label={isVisible ? section : `Go to ${section}`}
+              >
+                <span>{section}</span>
+              </a>
+            );
+          })}
+        </div>
+      </nav>
     </div>
   );
 }
 
-function HomePage({ navigate }) {
-  return (
-    <>
-      <section className="hero panel">
-        <p className="eyebrow">Builder-operator company</p>
-        <h1>{SITE_COPY.heroTitle}</h1>
-        <p className="lede">{SITE_COPY.heroBody}</p>
-        <div className="hero-actions">
-          <a className="btn primary" href="mailto:tom@stofferindustries.com">Start a conversation</a>
-          <button className="btn secondary" onClick={() => navigate('/about')}>How we work</button>
-        </div>
-      </section>
+function useSectionProgress() {
+  const [sectionState, setSectionState] = useState({
+    activeSection: SECTIONS[0],
+    tabProgress: 0,
+    pageHeadingOpacities: {}
+  });
 
-      <section className="grid two-up">
-        <article className="panel">
-          <p className="eyebrow">What Stoffer Industries is</p>
-          <h2>Practical systems over performative noise.</h2>
-          <p>{SITE_COPY.positioning}</p>
-        </article>
-        <article className="panel accent-panel">
-          <p className="eyebrow">Current focus</p>
-          <ul>
-            {SITE_COPY.focus.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        </article>
-      </section>
+  useEffect(() => {
+    let animationFrame = null;
 
-      <section className="panel">
-        <p className="eyebrow">Operating principles</p>
-        <div className="principles-grid">
-          {SITE_COPY.principles.map((principle) => (
-            <article key={principle} className="principle-card">
-              <span className="principle-marker" aria-hidden="true">▸</span>
-              <p>{principle}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-    </>
-  );
+    const updateActiveSection = () => {
+      const nav = document.querySelector('.section-nav-shell');
+      const activationLine = nav?.getBoundingClientRect().bottom ?? 0;
+      const tabTriggerLine = activationLine - HEADER_TAB_TRIGGER_OFFSET_PX;
+      let activeIndex = 0;
+      const sectionTops = SECTIONS.map((section) => {
+        const element = document.getElementById(slug(section));
+        return element ? element.getBoundingClientRect().top : Infinity;
+      });
+
+      for (let index = 0; index < sectionTops.length; index += 1) {
+        if (sectionTops[index] <= tabTriggerLine + 1) activeIndex = index;
+        else break;
+      }
+
+      const nextIndex = Math.min(activeIndex + 1, SECTIONS.length - 1);
+      let tabProgress = activeIndex;
+
+      if (nextIndex !== activeIndex) {
+        const nextTop = sectionTops[nextIndex];
+        const distanceToNext = nextTop - tabTriggerLine;
+        const band = HEADER_TAB_TRANSITION_PX;
+        let rawProgress;
+        if (band <= 0) {
+          rawProgress = distanceToNext <= 0 ? 1 : 0;
+        } else {
+          rawProgress = (band - distanceToNext) / band;
+        }
+        tabProgress = activeIndex + Math.min(1, Math.max(0, rawProgress));
+      }
+
+      const pageHeadingOpacities = Object.fromEntries(
+        SECTIONS.slice(1).map((section) => {
+          const top = sectionTops[SECTIONS.indexOf(section)];
+          const fadeStart = PAGE_HEADING_VISIBLE_PX;
+          let opacity;
+          if (PAGE_HEADING_FADE_PX <= 0) {
+            opacity = top >= fadeStart ? 1 : 0;
+          } else {
+            const fadeEnd = fadeStart - PAGE_HEADING_FADE_PX;
+            if (top >= fadeStart) opacity = 1;
+            else if (top <= fadeEnd) opacity = 0;
+            else opacity = (top - fadeEnd) / PAGE_HEADING_FADE_PX;
+          }
+
+          return [section, opacity];
+        })
+      );
+
+      setSectionState({ activeSection: SECTIONS[activeIndex], tabProgress, pageHeadingOpacities });
+    };
+
+    const requestUpdate = () => {
+      if (animationFrame !== null) return;
+      animationFrame = window.requestAnimationFrame(() => {
+        animationFrame = null;
+        updateActiveSection();
+      });
+    };
+
+    updateActiveSection();
+    window.addEventListener('scroll', requestUpdate, { passive: true });
+    window.addEventListener('resize', requestUpdate);
+
+    return () => {
+      if (animationFrame !== null) window.cancelAnimationFrame(animationFrame);
+      window.removeEventListener('scroll', requestUpdate);
+      window.removeEventListener('resize', requestUpdate);
+    };
+  }, []);
+
+  return sectionState;
 }
 
-function AboutPage() {
+function Section({ name, eyebrow, title, headingTarget, pageHeadingOpacity, children }) {
   return (
-    <section className="page-stack">
-      <div className="panel page-intro">
-        <p className="eyebrow">About</p>
-        <h1>A builder\'s shop for modern software.</h1>
-        <p className="lede">{SITE_COPY.aboutBody}</p>
+    <section
+      id={slug(name)}
+      className="home-section"
+      style={{ '--section-heading-target-x': `${headingTarget ?? 0}px` }}
+    >
+      {name !== SECTIONS[0] ? (
+        <div
+          className="section-page-heading"
+          style={{ '--section-page-heading-opacity': pageHeadingOpacity ?? 1 }}
+          aria-hidden="true"
+        >
+          <span>{name}</span>
+        </div>
+      ) : null}
+      <div className="section-inner">
+        <p className="eyebrow">{eyebrow}</p>
+        <h2>{title}</h2>
+        {children}
       </div>
-      <div className="grid two-up">
-        <article className="panel">
-          <p className="eyebrow">Why it exists</p>
-          <p>
-            The goal is simple: create useful tools, products, and systems that make work clearer,
-            faster, and more durable.
-          </p>
-        </article>
-        <article className="panel">
-          <p className="eyebrow">How it works</p>
-          <p>
-            Stoffer Industries ships in small, focused slices. Learn quickly. Keep what works. Build
-            the operating system behind better products.
-          </p>
-        </article>
-      </div>
-      <article className="panel founder-note">
-        <p className="eyebrow">Founder note</p>
-        <p>
-          Founded by Tom Stoffer — product-minded engineering leader, systems thinker, and builder.
-          This company is the home for the products and workflows he wants to own for the long term.
-        </p>
-      </article>
     </section>
   );
 }
 
-function ContactPage() {
-  return (
-    <section className="page-stack">
-      <div className="panel page-intro">
-        <p className="eyebrow">Contact</p>
-        <h1>Open line. Clear signal.</h1>
-        <p className="lede">{SITE_COPY.contactBody}</p>
-      </div>
-      <div className="grid two-up">
-        <article className="panel">
-          <p className="eyebrow">Email</p>
-          <a className="contact-link" href="mailto:tom@stofferindustries.com">tom@stofferindustries.com</a>
-          <p className="muted">Best for collaborations, intros, and product conversations.</p>
-        </article>
-        <article className="panel">
-          <p className="eyebrow">What to include</p>
-          <ul>
-            <li>What you are building or exploring</li>
-            <li>Why you think it overlaps</li>
-            <li>Any useful links or context</li>
-          </ul>
-        </article>
-      </div>
-    </section>
-  );
+function LogoMark() {
+  return <img className="brand-logo" src="/brand/sindustries-logo.webp" alt="SIndustries" />;
 }
 
 export function App() {
-  const { pathname, navigate } = usePathname();
+  const { activeSection, tabProgress, pageHeadingOpacities } = useSectionProgress();
+  const tabRefs = useRef({});
+  const tabsRef = useRef(null);
+  const [navHeadingTargets, setNavHeadingTargets] = useState({});
+  const [pageHeadingTargets, setPageHeadingTargets] = useState({});
 
-  const page = useMemo(() => {
-    if (pathname === '/about') return <AboutPage />;
-    if (pathname === '/contact') return <ContactPage />;
-    return <HomePage navigate={navigate} />;
-  }, [navigate, pathname]);
+  useLayoutEffect(() => {
+    const measureHeadingTargets = () => {
+      const shell = document.querySelector('.section-nav-shell');
+      const tabsEl = tabsRef.current;
+      if (!shell || !tabsEl) return;
 
-  return <Shell pathname={pathname} navigate={navigate}>{page}</Shell>;
+      const shellRect = shell.getBoundingClientRect();
+      const tabsRect = tabsEl.getBoundingClientRect();
+      const tabsLeftInShell = tabsRect.left - shellRect.left;
+
+      const expandedWidth = Math.max(
+        COLLAPSED_TAB_WIDTH_PX,
+        tabsRect.width - ((SECTIONS.length - 1) * COLLAPSED_TAB_WIDTH_PX)
+      );
+
+      setNavHeadingTargets(
+        Object.fromEntries(
+          SECTIONS.map((section) => {
+            const tabEl = tabRefs.current[section];
+            if (!tabEl) return [section, 0];
+            const r = tabEl.getBoundingClientRect();
+            const cx = r.left + r.width / 2 - shellRect.left;
+            return [section, cx];
+          })
+        )
+      );
+
+      setPageHeadingTargets(
+        Object.fromEntries(
+          SECTIONS.map((section, index) => [
+            section,
+            tabsLeftInShell + (index * COLLAPSED_TAB_WIDTH_PX) + (expandedWidth / 2)
+          ])
+        )
+      );
+    };
+
+    measureHeadingTargets();
+    window.addEventListener('resize', measureHeadingTargets);
+    return () => window.removeEventListener('resize', measureHeadingTargets);
+  }, [tabProgress, activeSection]);
+
+  return (
+    <div className="site-shell">
+      <SectionNav
+        current={activeSection}
+        tabProgress={tabProgress}
+        tabRefs={tabRefs}
+        tabsRef={tabsRef}
+        headingTargets={navHeadingTargets}
+      />
+      <main>
+        <section id="sin" className="hero-section">
+          <div className="hero-glow" aria-hidden="true" />
+          <div className="hero-grid">
+            <div className="hero-copy">
+              <a className="hero-brand" href="#sin" aria-label="SIndustries home">
+                <LogoMark />
+              </a>
+              <p className="status-line"><span /> SIndustries is online</p>
+              <h1>Build the systems. Ship the signal.</h1>
+              <p className="lede">
+                SIndustries is Tom Stoffer’s AI-native builder/operator company: tools, agents, workflows, and experiments that turn uncertainty into useful action.
+              </p>
+              <div className="hero-actions">
+                <a className="btn primary" href={SOCIAL_LINKS.x}>Follow Tom on X</a>
+                <a className="btn secondary" href="#signals">See the signal</a>
+              </div>
+            </div>
+
+            <aside className="live-card" aria-label="Current activity">
+              <div className="live-card-header">
+                <p>Live board</p>
+                <span>Active</span>
+              </div>
+              {['agent workflow', 'homepage iteration', 'first drop', 'infra review'].map((item) => (
+                <div className="live-row" key={item}>
+                  <span>{item}</span>
+                  <i aria-hidden="true" />
+                </div>
+              ))}
+            </aside>
+          </div>
+        </section>
+
+        <Section name="Signals" eyebrow="Live-ish proof" title="Numbers that make the work feel alive." headingTarget={pageHeadingTargets.Signals} pageHeadingOpacity={pageHeadingOpacities.Signals}>
+          <div className="signals-grid">
+            {SIGNALS.map((signal) => (
+              <article className="signal-card" key={signal.label}>
+                <p>{signal.label}</p>
+                <strong>{signal.value}</strong>
+                <span>{signal.note}</span>
+              </article>
+            ))}
+          </div>
+        </Section>
+
+        <Section name="Systems" eyebrow="What we are building" title="Hero cards for the machines in motion." headingTarget={pageHeadingTargets.Systems} pageHeadingOpacity={pageHeadingOpacities.Systems}>
+          <div className="systems-grid">
+            {SYSTEMS.map((system) => (
+              <article className="system-card" key={system.name}>
+                <div className="system-visual" aria-hidden="true" />
+                <p className="system-tag">{system.tag}</p>
+                <h3>{system.name}</h3>
+                <p>{system.body}</p>
+              </article>
+            ))}
+          </div>
+        </Section>
+
+        <Section name="Stacks" eyebrow="Operating model" title="The tools behind the output." headingTarget={pageHeadingTargets.Stacks} pageHeadingOpacity={pageHeadingOpacities.Stacks}>
+          <div className="stack-cloud">
+            {STACKS.map((stack) => <span key={stack}>{stack}</span>)}
+          </div>
+        </Section>
+
+        <Section name="Ships" eyebrow="Changelog" title="Things that have left the dock." headingTarget={pageHeadingTargets.Ships} pageHeadingOpacity={pageHeadingOpacities.Ships}>
+          <div className="ships-list">
+            {SHIPS.map((ship, index) => (
+              <article className="ship-row" key={ship}>
+                <span>{String(index + 1).padStart(2, '0')}</span>
+                <p>{ship}</p>
+              </article>
+            ))}
+          </div>
+        </Section>
+
+        <Section name="Stories" eyebrow="Founder log" title="Notes from the edge of the build." headingTarget={pageHeadingTargets.Stories} pageHeadingOpacity={pageHeadingOpacities.Stories}>
+          <div className="stories-grid">
+            {STORIES.map((story) => (
+              <article className="story-card" key={story}>
+                <h3>{story}</h3>
+                <p>Placeholder — draft story slot.</p>
+              </article>
+            ))}
+          </div>
+        </Section>
+
+        <Section name="Studio" eyebrow="Experiments" title="Prototypes, sparks, and unfinished machines." headingTarget={pageHeadingTargets.Studio} pageHeadingOpacity={pageHeadingOpacities.Studio}>
+          <div className="studio-grid">
+            {STUDIO.map((item) => (
+              <article className="studio-card" key={item}>
+                <span aria-hidden="true" />
+                <h3>{item}</h3>
+                <p>In the lab.</p>
+              </article>
+            ))}
+          </div>
+        </Section>
+
+        <Section name="Summon" eyebrow="Call to action" title="Follow the signal. Open the line." headingTarget={pageHeadingTargets.Summon} pageHeadingOpacity={pageHeadingOpacities.Summon}>
+          <div className="summon-grid">
+            <p className="lede">
+              If you are building, backing, or reshaping how organisations work, the line is open. Follow the experiments or start a conversation.
+            </p>
+            <div className="summon-actions">
+              <a className="btn primary" href={`mailto:${CONTACT_EMAIL}`}>Email Tom</a>
+              <a className="btn secondary light" href={SOCIAL_LINKS.x}>X</a>
+              <a className="btn secondary light" href={SOCIAL_LINKS.tiktok}>TikTok</a>
+            </div>
+          </div>
+        </Section>
+      </main>
+
+      <footer className="footer" id="about">
+        <div>
+          <LogoMark />
+          <p>
+            About: SIndustries builds practical digital products, agent systems, and operating loops in public from Auckland, New Zealand.
+          </p>
+          <p>Contact: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a></p>
+        </div>
+        <div className="footer-links">
+          <a href={SOCIAL_LINKS.x}>X</a>
+          <a href={SOCIAL_LINKS.tiktok}>TikTok</a>
+        </div>
+      </footer>
+    </div>
+  );
 }
