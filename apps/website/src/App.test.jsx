@@ -25,4 +25,13 @@ describe('website app', () => {
     expect(screen.getByText(/what to include/i)).toBeInTheDocument();
     expect(screen.getAllByRole('link', { name: /tom@stofferindustries.com/i }).length).toBeGreaterThan(0);
   });
+
+  test('renders token specimen route', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole('link', { name: /tokens/i }));
+    expect(screen.getByRole('heading', { name: /css token specimen/i })).toBeInTheDocument();
+    expect(screen.getByText(/component sample/i)).toBeInTheDocument();
+  });
 });

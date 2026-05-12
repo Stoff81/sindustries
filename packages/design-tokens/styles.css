@@ -22,16 +22,21 @@
   --si-color-success-500: #31c76a;
   --si-color-danger-500: #ff5252;
 
-  --si-color-bg-canvas: var(--si-color-ink-950);
-  --si-color-bg-canvas-alt: var(--si-color-ink-900);
-  --si-color-bg-surface: var(--si-color-surface-800);
-  --si-color-bg-glass: rgb(43 47 52 / 68%);
-  --si-color-text-primary: var(--si-color-cream-100);
-  --si-color-text-secondary: var(--si-color-cream-200);
-  --si-color-text-muted: var(--si-color-slate-500);
-  --si-color-border-strong: var(--si-color-slate-500);
-  --si-color-border-subtle: rgb(143 150 158 / 18%);
-  --si-color-focus: var(--si-color-info-500);
+  --si-color-bg-canvas: #111213;
+  --si-color-bg-canvas-alt: #161a1e;
+  --si-color-bg-surface: #2b2f34;
+  --si-color-bg-glass: rgba(43, 47, 52, 0.68);
+  --si-color-text-primary: #f3f1ec;
+  --si-color-text-secondary: #d5d3cd;
+  --si-color-text-muted: #8f969e;
+  --si-color-border-strong: #8f969e;
+  --si-color-border-subtle: rgba(143, 150, 158, 0.18);
+  --si-color-focus: #00d4ff;
+  --si-color-chart-groceries: #31c76a;
+  --si-color-chart-subscriptions: #60a5fa;
+  --si-color-chart-transport: #f59e0b;
+  --si-color-chart-dining: #a78bfa;
+  --si-color-chart-other: #8f969e;
 
   --si-font-body: 'Work Sans', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --si-font-ui: 'Inter', 'Work Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -54,7 +59,7 @@
   --si-radius-pill: 999px;
 
   --si-shadow-soft: 0 18px 60px rgb(0 0 0 / 22%);
-  --si-shadow-hard: 4px 4px 0 var(--si-color-ink-950);
+  --si-shadow-hard: 4px 4px 0 #111213;
 }
 
 *,

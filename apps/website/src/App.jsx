@@ -3,7 +3,8 @@ import { useEffect, useMemo, useState } from 'react';
 const NAV_ITEMS = [
   { label: 'Home', path: '/' },
   { label: 'About', path: '/about' },
-  { label: 'Contact', path: '/contact' }
+  { label: 'Contact', path: '/contact' },
+  { label: 'Tokens', path: '/tokens' }
 ];
 
 const SITE_COPY = {
@@ -198,12 +199,90 @@ function ContactPage() {
   );
 }
 
+const TOKEN_SWATCHES = [
+  ['Canvas', 'var(--si-color-bg-canvas)'],
+  ['Surface', 'var(--si-color-bg-surface)'],
+  ['Primary text', 'var(--si-color-text-primary)'],
+  ['Muted text', 'var(--si-color-text-muted)'],
+  ['Brand', 'var(--si-color-brand-500)'],
+  ['Success', 'var(--si-color-success-500)'],
+  ['Danger', 'var(--si-color-danger-500)'],
+  ['Other', 'var(--si-color-chart-other)']
+];
+
+const TOKEN_SPACES = ['1', '2', '3', '4', '5', '6', '7', '8', '10'];
+const TOKEN_RADII = ['sm', 'md', 'lg', 'xl', 'pill'];
+
+function TokensPage() {
+  return (
+    <section className="page-stack token-specimen">
+      <div className="panel page-intro">
+        <p className="eyebrow">Design tokens</p>
+        <h1>CSS token specimen.</h1>
+        <p className="lede">
+          This page renders the web view of the shared token contract from
+          <code>@sindustries/design-tokens/styles.css</code>.
+        </p>
+      </div>
+
+      <section className="panel token-section">
+        <p className="eyebrow">Color</p>
+        <div className="token-swatch-grid">
+          {TOKEN_SWATCHES.map(([label, value]) => (
+            <article className="token-swatch-card" key={label}>
+              <span className="token-swatch" style={{ background: value }} />
+              <strong>{label}</strong>
+              <code>{value}</code>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="grid two-up">
+        <article className="panel token-section">
+          <p className="eyebrow">Typography</p>
+          <p className="token-display">Display face</p>
+          <p className="token-ui">UI label and controls</p>
+          <p className="token-body">Body copy for longer readable text.</p>
+        </article>
+
+        <article className="panel token-section">
+          <p className="eyebrow">Shape and space</p>
+          <div className="space-stack">
+            {TOKEN_SPACES.map((space) => (
+              <span key={space} style={{ width: `var(--si-space-${space})` }} />
+            ))}
+          </div>
+          <div className="radius-grid">
+            {TOKEN_RADII.map((radius) => (
+              <span key={radius} style={{ borderRadius: `var(--si-radius-${radius})` }}>
+                {radius}
+              </span>
+            ))}
+          </div>
+        </article>
+      </section>
+
+      <section className="panel token-section token-component-row">
+        <p className="eyebrow">Component sample</p>
+        <div className="token-mini-card">
+          <strong>Budget card</strong>
+          <p>Shared surface, text, spacing, radius, and semantic status colors.</p>
+        </div>
+        <button className="btn primary">Primary action</button>
+        <span className="token-chip">Review needed</span>
+      </section>
+    </section>
+  );
+}
+
 export function App() {
   const { pathname, navigate } = usePathname();
 
   const page = useMemo(() => {
     if (pathname === '/about') return <AboutPage />;
     if (pathname === '/contact') return <ContactPage />;
+    if (pathname === '/tokens') return <TokensPage />;
     return <HomePage navigate={navigate} />;
   }, [navigate, pathname]);
 
