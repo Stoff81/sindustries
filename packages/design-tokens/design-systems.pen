@@ -1,22 +1,19 @@
 {
   "version": "2.10",
-  "imports": {
-    "si": "./tokens.pen"
-  },
   "children": [
     {
       "type": "frame",
       "id": "vtHps",
-      "x": 0,
+      "x": 1,
       "y": 0,
-      "name": "halo: design system components",
+      "name": "design system components",
       "theme": {
-        "Mode": "Light"
+        "Mode": "Dark"
       },
       "clip": true,
       "width": 3600,
       "height": 4800,
-      "fill": "$--background",
+      "fill": "$--ds-page",
       "layout": "none",
       "children": [
         {
@@ -29,8 +26,8 @@
           "clip": true,
           "width": 360,
           "height": 16,
-          "fill": "$--secondary",
-          "cornerRadius": "$--radius-pill",
+          "fill": "$--ds-surface",
+          "cornerRadius": "$--ds-radius-pill",
           "stroke": {
             "align": "inside",
             "thickness": 1
@@ -43,7 +40,7 @@
               "x": 0,
               "y": 0,
               "name": "Progress",
-              "fill": "$--primary",
+              "fill": "$--ds-brand",
               "width": 180,
               "height": 16,
               "stroke": {
@@ -90,12 +87,12 @@
                   "type": "text",
                   "id": "rxL1P",
                   "name": "Label Text",
-                  "fill": "$--foreground",
+                  "fill": "$--ds-text",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
                   "content": "Pathfinder Neo",
                   "lineHeight": 1.5,
-                  "fontFamily": "$--font-secondary",
+                  "fontFamily": "$--ds-font-body",
                   "fontSize": 16,
                   "fontWeight": "normal"
                 },
@@ -103,12 +100,12 @@
                   "type": "text",
                   "id": "xyq4X",
                   "name": "Supporting text",
-                  "fill": "$--muted-foreground",
+                  "fill": "$--ds-text-muted",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
                   "content": "Compact rover optimized for short-range missions.",
                   "lineHeight": 1.5,
-                  "fontFamily": "$--font-secondary",
+                  "fontFamily": "$--ds-font-body",
                   "fontSize": 16,
                   "fontWeight": "normal"
                 }
@@ -124,12 +121,12 @@
           "name": "Tooltip",
           "reusable": true,
           "clip": true,
-          "fill": "$--popover",
-          "cornerRadius": "$--radius-m",
+          "fill": "$--ds-surface",
+          "cornerRadius": "$--ds-radius-md",
           "stroke": {
             "align": "inside",
             "thickness": 1,
-            "fill": "$--border"
+            "fill": "$--ds-border"
           },
           "effect": {
             "type": "shadow",
@@ -153,10 +150,10 @@
               "type": "text",
               "id": "TCCRR",
               "name": "Tooltip Text",
-              "fill": "$--popover-foreground",
+              "fill": "$--ds-text",
               "content": "Tooltip",
               "lineHeight": 1.4285714285714286,
-              "fontFamily": "$--font-secondary",
+              "fontFamily": "$--ds-font-body",
               "fontSize": 14,
               "fontWeight": "500"
             }
@@ -182,8 +179,8 @@
               "name": "switch",
               "clip": true,
               "width": 40,
-              "fill": "$--primary",
-              "cornerRadius": "$--radius-pill",
+              "fill": "$--ds-brand",
+              "cornerRadius": "$--ds-radius-pill",
               "stroke": {
                 "align": "inside",
                 "thickness": 1
@@ -199,8 +196,8 @@
                   "clip": true,
                   "width": 20,
                   "height": 12,
-                  "fill": "$--primary-foreground",
-                  "cornerRadius": "$--radius-pill",
+                  "fill": "$--ds-ink",
+                  "cornerRadius": "$--ds-radius-pill",
                   "stroke": {
                     "align": "inside",
                     "thickness": 1
@@ -213,10 +210,10 @@
               "type": "text",
               "id": "8doiY",
               "name": "Switch Label",
-              "fill": "$--foreground",
+              "fill": "$--ds-text",
               "content": "Power-saving mode",
               "lineHeight": 1.5,
-              "fontFamily": "$--font-secondary",
+              "fontFamily": "$--ds-font-body",
               "fontSize": 16,
               "fontWeight": "normal"
             }
@@ -244,7 +241,7 @@
               "width": "fill_container",
               "fill": {
                 "type": "color",
-                "color": "$--white",
+                "color": "$--ds-cream",
                 "enabled": false
               },
               "stroke": {
@@ -258,13 +255,13 @@
                   "type": "text",
                   "id": "J6cRM",
                   "name": "Label Text",
-                  "fill": "$--foreground",
+                  "fill": "$--ds-text",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
                   "content": "Label Text",
                   "lineHeight": 1.4285714285714286,
                   "textAlignVertical": "middle",
-                  "fontFamily": "$--font-secondary",
+                  "fontFamily": "$--ds-font-body",
                   "fontSize": 14,
                   "fontWeight": "500"
                 }
@@ -276,12 +273,12 @@
               "name": "Textarea",
               "width": "fill_container",
               "height": 80,
-              "fill": "$--accent",
-              "cornerRadius": "$--radius-m",
+              "fill": "$--ds-canvas-alt",
+              "cornerRadius": "$--ds-radius-md",
               "stroke": {
                 "align": "inside",
                 "thickness": 1,
-                "fill": "$--border"
+                "fill": "$--ds-border"
               },
               "gap": 8,
               "padding": [
@@ -293,13 +290,13 @@
                   "type": "text",
                   "id": "7Lfkv",
                   "name": "Input Value",
-                  "fill": "$--muted-foreground",
+                  "fill": "$--ds-text-muted",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
                   "content": "Placeholder",
                   "lineHeight": 1.4285714285714286,
                   "textAlignVertical": "middle",
-                  "fontFamily": "$--font-secondary",
+                  "fontFamily": "$--ds-font-body",
                   "fontSize": 14,
                   "fontWeight": "normal"
                 }
@@ -329,7 +326,7 @@
               "width": "fill_container",
               "fill": {
                 "type": "color",
-                "color": "$--white",
+                "color": "$--ds-cream",
                 "enabled": false
               },
               "stroke": {
@@ -343,13 +340,13 @@
                   "type": "text",
                   "id": "j8fuP",
                   "name": "Label Text",
-                  "fill": "$--foreground",
+                  "fill": "$--ds-text",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
                   "content": "Label Text",
                   "lineHeight": 1.4285714285714286,
                   "textAlignVertical": "middle",
-                  "fontFamily": "$--font-secondary",
+                  "fontFamily": "$--ds-font-body",
                   "fontSize": 14,
                   "fontWeight": "500"
                 }
@@ -373,17 +370,17 @@
                   "clip": true,
                   "width": "fill_container",
                   "height": 56,
-                  "fill": "$--accent",
+                  "fill": "$--ds-canvas-alt",
                   "cornerRadius": [
-                    "$--radius-pill",
-                    "$--radius-xs",
-                    "$--radius-xs",
-                    "$--radius-pill"
+                    "$--ds-radius-pill",
+                    8,
+                    8,
+                    "$--ds-radius-pill"
                   ],
                   "stroke": {
                     "align": "inside",
                     "thickness": 1,
-                    "fill": "$--border"
+                    "fill": "$--ds-border"
                   },
                   "layout": "vertical",
                   "justifyContent": "center",
@@ -396,7 +393,7 @@
                       "y": 0,
                       "name": "0",
                       "enabled": false,
-                      "fill": "$--foreground",
+                      "fill": "$--ds-text",
                       "content": "0",
                       "lineHeight": 1.4285714285714286,
                       "fontFamily": "Inter",
@@ -412,12 +409,11 @@
                   "clip": true,
                   "width": "fill_container",
                   "height": 56,
-                  "fill": "$--accent",
-                  "cornerRadius": "$--radius-none",
+                  "fill": "$--ds-canvas-alt",
                   "stroke": {
                     "align": "inside",
                     "thickness": 1,
-                    "fill": "$--border"
+                    "fill": "$--ds-border"
                   },
                   "layout": "vertical",
                   "justifyContent": "center",
@@ -430,7 +426,7 @@
                       "y": 0,
                       "name": "0",
                       "enabled": false,
-                      "fill": "$--foreground",
+                      "fill": "$--ds-text",
                       "content": "0",
                       "lineHeight": 1.4285714285714286,
                       "fontFamily": "Inter",
@@ -446,12 +442,11 @@
                   "clip": true,
                   "width": "fill_container",
                   "height": 56,
-                  "fill": "$--accent",
-                  "cornerRadius": "$--radius-none",
+                  "fill": "$--ds-canvas-alt",
                   "stroke": {
                     "align": "inside",
                     "thickness": 1,
-                    "fill": "$--border"
+                    "fill": "$--ds-border"
                   },
                   "layout": "vertical",
                   "justifyContent": "center",
@@ -464,7 +459,7 @@
                       "y": 0,
                       "name": "0",
                       "enabled": false,
-                      "fill": "$--foreground",
+                      "fill": "$--ds-text",
                       "content": "0",
                       "lineHeight": 1.4285714285714286,
                       "fontFamily": "Inter",
@@ -492,7 +487,7 @@
                       "type": "text",
                       "id": "BnSQf",
                       "name": "•",
-                      "fill": "$--foreground",
+                      "fill": "$--ds-text",
                       "content": "•",
                       "lineHeight": 1.4285714285714286,
                       "fontFamily": "Inter",
@@ -508,12 +503,11 @@
                   "clip": true,
                   "width": "fill_container",
                   "height": 56,
-                  "fill": "$--accent",
-                  "cornerRadius": "$--radius-none",
+                  "fill": "$--ds-canvas-alt",
                   "stroke": {
                     "align": "inside",
                     "thickness": 1,
-                    "fill": "$--border"
+                    "fill": "$--ds-border"
                   },
                   "layout": "vertical",
                   "justifyContent": "center",
@@ -526,7 +520,7 @@
                       "y": 0,
                       "name": "0",
                       "enabled": false,
-                      "fill": "$--foreground",
+                      "fill": "$--ds-text",
                       "content": "0",
                       "lineHeight": 1.4285714285714286,
                       "fontFamily": "Inter",
@@ -542,12 +536,11 @@
                   "clip": true,
                   "width": "fill_container",
                   "height": 56,
-                  "fill": "$--accent",
-                  "cornerRadius": "$--radius-none",
+                  "fill": "$--ds-canvas-alt",
                   "stroke": {
                     "align": "inside",
                     "thickness": 1,
-                    "fill": "$--border"
+                    "fill": "$--ds-border"
                   },
                   "layout": "vertical",
                   "justifyContent": "center",
@@ -560,7 +553,7 @@
                       "y": 0,
                       "name": "0",
                       "enabled": false,
-                      "fill": "$--foreground",
+                      "fill": "$--ds-text",
                       "content": "0",
                       "lineHeight": 1.4285714285714286,
                       "fontFamily": "Inter",
@@ -576,17 +569,17 @@
                   "clip": true,
                   "width": "fill_container",
                   "height": 56,
-                  "fill": "$--accent",
+                  "fill": "$--ds-canvas-alt",
                   "cornerRadius": [
-                    "$--radius-xs",
-                    "$--radius-pill",
-                    "$--radius-pill",
-                    "$--radius-xs"
+                    8,
+                    "$--ds-radius-pill",
+                    "$--ds-radius-pill",
+                    8
                   ],
                   "stroke": {
                     "align": "inside",
                     "thickness": 1,
-                    "fill": "$--border"
+                    "fill": "$--ds-border"
                   },
                   "layout": "vertical",
                   "justifyContent": "center",
@@ -599,7 +592,7 @@
                       "y": 0,
                       "name": "0",
                       "enabled": false,
-                      "fill": "$--foreground",
+                      "fill": "$--ds-text",
                       "content": "0",
                       "lineHeight": 1.4285714285714286,
                       "fontFamily": "Inter",
@@ -634,7 +627,7 @@
               "width": "fill_container",
               "fill": {
                 "type": "color",
-                "color": "$--white",
+                "color": "$--ds-cream",
                 "enabled": false
               },
               "stroke": {
@@ -648,13 +641,13 @@
                   "type": "text",
                   "id": "yBLtW",
                   "name": "Label Text",
-                  "fill": "$--foreground",
+                  "fill": "$--ds-text",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
                   "content": "Label Text",
                   "lineHeight": 1.4285714285714286,
                   "textAlignVertical": "middle",
-                  "fontFamily": "$--font-secondary",
+                  "fontFamily": "$--ds-font-body",
                   "fontSize": 14,
                   "fontWeight": "500"
                 }
@@ -665,12 +658,12 @@
               "id": "J2yno",
               "name": "Select Trigger",
               "width": "fill_container",
-              "fill": "$--accent",
-              "cornerRadius": "$--radius-pill",
+              "fill": "$--ds-canvas-alt",
+              "cornerRadius": "$--ds-radius-pill",
               "stroke": {
                 "align": "inside",
                 "thickness": 1,
-                "fill": "$--border"
+                "fill": "$--ds-border"
               },
               "gap": 8,
               "padding": [
@@ -683,12 +676,12 @@
                   "type": "text",
                   "id": "8mNGM",
                   "name": "Select option",
-                  "fill": "$--muted-foreground",
+                  "fill": "$--ds-text-muted",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
                   "content": "Select option",
                   "lineHeight": 1.4285714285714286,
-                  "fontFamily": "$--font-secondary",
+                  "fontFamily": "$--ds-font-body",
                   "fontSize": 14,
                   "fontWeight": "normal"
                 },
@@ -699,7 +692,7 @@
                   "height": 16,
                   "iconFontName": "chevron-down",
                   "iconFontFamily": "lucide",
-                  "fill": "$--muted-foreground"
+                  "fill": "$--ds-text-muted"
                 }
               ]
             }
@@ -727,7 +720,7 @@
               "width": "fill_container",
               "fill": {
                 "type": "color",
-                "color": "$--white",
+                "color": "$--ds-cream",
                 "enabled": false
               },
               "stroke": {
@@ -741,13 +734,13 @@
                   "type": "text",
                   "id": "EVJFg",
                   "name": "Label Text",
-                  "fill": "$--foreground",
+                  "fill": "$--ds-text",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
                   "content": "Label Text",
                   "lineHeight": 1.4285714285714286,
                   "textAlignVertical": "middle",
-                  "fontFamily": "$--font-secondary",
+                  "fontFamily": "$--ds-font-body",
                   "fontSize": 14,
                   "fontWeight": "500"
                 }
@@ -758,12 +751,12 @@
               "id": "FcSY0",
               "name": "Input",
               "width": "fill_container",
-              "fill": "$--accent",
-              "cornerRadius": "$--radius-pill",
+              "fill": "$--ds-canvas-alt",
+              "cornerRadius": "$--ds-radius-pill",
               "stroke": {
                 "align": "inside",
                 "thickness": 1,
-                "fill": "$--border"
+                "fill": "$--ds-border"
               },
               "gap": 8,
               "padding": [
@@ -776,13 +769,13 @@
                   "type": "text",
                   "id": "SdDrF",
                   "name": "Input Value",
-                  "fill": "$--muted-foreground",
+                  "fill": "$--ds-text-muted",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
                   "content": "Placeholder",
                   "lineHeight": 1.4285714285714286,
                   "textAlignVertical": "middle",
-                  "fontFamily": "$--font-secondary",
+                  "fontFamily": "$--ds-font-body",
                   "fontSize": 14,
                   "fontWeight": "normal"
                 }
@@ -807,12 +800,12 @@
           ],
           "width": 240,
           "height": 80,
-          "fill": "$--popover",
-          "cornerRadius": "$--radius-m",
+          "fill": "$--ds-surface",
+          "cornerRadius": "$--ds-radius-md",
           "stroke": {
             "align": "inside",
             "thickness": 1,
-            "fill": "$--border"
+            "fill": "$--ds-border"
           },
           "effect": {
             "type": "shadow",
@@ -842,7 +835,7 @@
             "thickness": {
               "bottom": 1
             },
-            "fill": "$--border"
+            "fill": "$--ds-border"
           },
           "layout": "vertical",
           "children": [
@@ -867,10 +860,10 @@
                   "type": "text",
                   "id": "yqb5P",
                   "name": "Accordion Trigger",
-                  "fill": "$--foreground",
+                  "fill": "$--ds-text",
                   "content": "What is a micro-interaction?",
                   "lineHeight": 1.5,
-                  "fontFamily": "$--font-primary",
+                  "fontFamily": "$--ds-font-ui",
                   "fontSize": 16,
                   "fontWeight": "500"
                 },
@@ -895,7 +888,7 @@
                       "height": 16,
                       "iconFontName": "chevron-up",
                       "iconFontFamily": "lucide",
-                      "fill": "$--foreground"
+                      "fill": "$--ds-text"
                     }
                   ]
                 }
@@ -920,12 +913,12 @@
                   "type": "text",
                   "id": "7sFLs",
                   "name": "Accordion Content",
-                  "fill": "$--muted-foreground",
+                  "fill": "$--ds-text-muted",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
                   "content": "Micro-interactions are events which have one main task — a single purpose — and they are found all over your device and within apps.",
                   "lineHeight": 1.4285714285714286,
-                  "fontFamily": "$--font-secondary",
+                  "fontFamily": "$--ds-font-body",
                   "fontSize": 14,
                   "fontWeight": "normal"
                 }
@@ -941,8 +934,8 @@
           "name": "Alert/Info",
           "reusable": true,
           "width": 640,
-          "fill": "$--color-info",
-          "cornerRadius": "$--radius-m",
+          "fill": "$--ds-info",
+          "cornerRadius": "$--ds-radius-md",
           "stroke": {
             "align": "inside",
             "thickness": {
@@ -982,7 +975,7 @@
                   "height": 24,
                   "iconFontName": "info",
                   "iconFontFamily": "lucide",
-                  "fill": "$--color-info-foreground"
+                  "fill": "$--ds-ink"
                 }
               ]
             },
@@ -1002,12 +995,12 @@
                   "type": "text",
                   "id": "Q9Aqm",
                   "name": "Alert Title",
-                  "fill": "$--color-info-foreground",
+                  "fill": "$--ds-ink",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
                   "content": "Rover status update",
                   "lineHeight": 1.5,
-                  "fontFamily": "$--font-secondary",
+                  "fontFamily": "$--ds-font-body",
                   "fontSize": 16,
                   "fontWeight": "500"
                 },
@@ -1015,12 +1008,15 @@
                   "type": "text",
                   "id": "SmO4x",
                   "name": "Alert Description",
-                  "fill": "$--color-info-foreground",
+                  "theme": {
+                    "Mode": "Dark"
+                  },
+                  "fill": "$--ds-ink",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
                   "content": "Spirit-9 completed its nightly diagnostics. All systems are running within optimal parameters.",
                   "lineHeight": 1.5,
-                  "fontFamily": "$--font-secondary",
+                  "fontFamily": "$--ds-font-body",
                   "fontSize": 16,
                   "fontWeight": "normal"
                 }
@@ -1035,8 +1031,8 @@
           "y": 1678,
           "name": "Label/Success",
           "reusable": true,
-          "fill": "$--color-success",
-          "cornerRadius": "$--radius-pill",
+          "fill": "$--ds-success",
+          "cornerRadius": "$--ds-radius-pill",
           "stroke": {
             "align": "inside",
             "thickness": 1
@@ -1053,10 +1049,10 @@
               "type": "text",
               "id": "1qRIv",
               "name": "Text",
-              "fill": "$--color-success-foreground",
+              "fill": "$--ds-ink",
               "content": "Explorer",
               "lineHeight": 1.1428571428571428,
-              "fontFamily": "$--font-primary",
+              "fontFamily": "$--ds-font-ui",
               "fontSize": 14,
               "fontWeight": "500"
             }
@@ -1071,12 +1067,12 @@
           "reusable": true,
           "clip": true,
           "width": 480,
-          "fill": "$--card",
-          "cornerRadius": "$--radius-l",
+          "fill": "$--ds-surface",
+          "cornerRadius": "$--ds-radius-lg",
           "stroke": {
             "align": "inside",
             "thickness": 1,
-            "fill": "$--border"
+            "fill": "$--ds-border"
           },
           "effect": {
             "type": "shadow",
@@ -1166,12 +1162,12 @@
                   "type": "text",
                   "id": "mJz5e",
                   "name": "Label Text",
-                  "fill": "$--foreground",
+                  "fill": "$--ds-text",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
                   "content": "Enable autonomous navigation",
                   "lineHeight": 1.5,
-                  "fontFamily": "$--font-secondary",
+                  "fontFamily": "$--ds-font-body",
                   "fontSize": 16,
                   "fontWeight": "normal"
                 },
@@ -1179,12 +1175,12 @@
                   "type": "text",
                   "id": "0LaMb",
                   "name": "Supporting text",
-                  "fill": "$--muted-foreground",
+                  "fill": "$--ds-text-muted",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
                   "content": "Let the rover find the safest route on its own.",
                   "lineHeight": 1.5,
-                  "fontFamily": "$--font-secondary",
+                  "fontFamily": "$--ds-font-body",
                   "fontSize": 16,
                   "fontWeight": "normal"
                 }
@@ -1201,8 +1197,8 @@
           "reusable": true,
           "width": 40,
           "height": 40,
-          "fill": "$--secondary",
-          "cornerRadius": "$--radius-pill",
+          "fill": "$--ds-surface",
+          "cornerRadius": "$--ds-radius-pill",
           "stroke": {
             "align": "inside",
             "thickness": 1
@@ -1215,12 +1211,12 @@
               "type": "text",
               "id": "ELfku",
               "name": "Avatar Title",
-              "fill": "$--secondary-foreground",
+              "fill": "$--ds-text",
               "content": "PJ",
               "lineHeight": 1.4285714285714286,
               "textAlign": "center",
               "textAlignVertical": "middle",
-              "fontFamily": "$--font-primary",
+              "fontFamily": "$--ds-font-ui",
               "fontSize": 14,
               "fontWeight": "500"
             }
@@ -1237,7 +1233,7 @@
           "height": 20,
           "fill": {
             "type": "color",
-            "color": "$--white",
+            "color": "$--ds-cream",
             "enabled": false
           },
           "stroke": {
@@ -1269,7 +1265,7 @@
                   "height": 16,
                   "iconFontName": "ellipsis",
                   "iconFontFamily": "lucide",
-                  "fill": "$--muted-foreground"
+                  "fill": "$--ds-text-muted"
                 }
               ]
             }
@@ -1284,7 +1280,7 @@
           "reusable": true,
           "fill": {
             "type": "color",
-            "color": "$--white",
+            "color": "$--ds-cream",
             "enabled": false
           },
           "stroke": {
@@ -1299,10 +1295,10 @@
               "type": "text",
               "id": "3JeEr",
               "name": "Breadcrumb Item",
-              "fill": "$--foreground",
+              "fill": "$--ds-text",
               "content": "Breadcrumb Item",
               "lineHeight": 1.4285714285714286,
-              "fontFamily": "$--font-secondary",
+              "fontFamily": "$--ds-font-body",
               "fontSize": 14,
               "fontWeight": "normal"
             }
@@ -1315,8 +1311,8 @@
           "y": 2170,
           "name": "Button/Default",
           "reusable": true,
-          "fill": "$--primary",
-          "cornerRadius": "$--radius-pill",
+          "fill": "$--ds-brand",
+          "cornerRadius": "$--ds-radius-pill",
           "gap": 6,
           "padding": [
             10,
@@ -1346,7 +1342,7 @@
                   "height": 16,
                   "iconFontName": "plus",
                   "iconFontFamily": "lucide",
-                  "fill": "$--primary-foreground"
+                  "fill": "$--ds-ink"
                 }
               ]
             },
@@ -1354,12 +1350,12 @@
               "type": "text",
               "id": "FT3cO",
               "name": "Button",
-              "fill": "$--primary-foreground",
+              "fill": "$--ds-ink",
               "content": "Button",
               "lineHeight": 1.4286,
               "textAlign": "center",
               "textAlignVertical": "middle",
-              "fontFamily": "$--font-primary",
+              "fontFamily": "$--ds-font-ui",
               "fontSize": 14,
               "fontWeight": "500"
             }
@@ -1372,8 +1368,8 @@
           "y": 2170,
           "name": "Button/Large/Default",
           "reusable": true,
-          "fill": "$--primary",
-          "cornerRadius": "$--radius-pill",
+          "fill": "$--ds-brand",
+          "cornerRadius": "$--ds-radius-pill",
           "gap": 6,
           "padding": [
             16,
@@ -1403,7 +1399,7 @@
                   "height": 20,
                   "iconFontName": "plus",
                   "iconFontFamily": "lucide",
-                  "fill": "$--primary-foreground"
+                  "fill": "$--ds-ink"
                 }
               ]
             },
@@ -1411,12 +1407,12 @@
               "type": "text",
               "id": "fIEfR",
               "name": "Button",
-              "fill": "$--primary-foreground",
+              "fill": "$--ds-ink",
               "content": "Button",
               "lineHeight": 1.5555555555555556,
               "textAlign": "center",
               "textAlignVertical": "middle",
-              "fontFamily": "$--font-primary",
+              "fontFamily": "$--ds-font-ui",
               "fontSize": 14,
               "fontWeight": "500"
             }
@@ -1448,20 +1444,20 @@
           "x": 200,
           "y": 654,
           "name": "Alert/Success",
-          "fill": "$--color-success",
+          "fill": "$--ds-success",
           "descendants": {
             "tH8a1": {
               "iconFontFamily": "lucide",
               "iconFontName": "shield-check",
-              "fill": "$--color-success-foreground"
+              "fill": "$--ds-ink"
             },
             "Q9Aqm": {
               "content": "Mission approved",
-              "fill": "$--color-success-foreground"
+              "fill": "$--ds-ink"
             },
             "SmO4x": {
               "content": "Your request to rent the Curiosity-X rover has been confirmed. Deployment scheduled for Sol 482.",
-              "fill": "$--color-success-foreground"
+              "fill": "$--ds-ink"
             }
           }
         },
@@ -1473,20 +1469,20 @@
           "x": 200,
           "y": 802,
           "name": "Alert/Warning",
-          "fill": "$--color-warning",
+          "fill": "$--ds-warn",
           "descendants": {
             "tH8a1": {
               "iconFontFamily": "lucide",
               "iconFontName": "octagon-alert",
-              "fill": "$--color-warning-foreground"
+              "fill": "$--ds-ink"
             },
             "Q9Aqm": {
               "content": "Terrain instability detected",
-              "fill": "$--color-warning-foreground"
+              "fill": "$--ds-ink"
             },
             "SmO4x": {
               "content": "The selected route crosses an area with loose regolith. Proceed with caution or reroute to a safer path.",
-              "fill": "$--color-warning-foreground"
+              "fill": "$--ds-ink"
             }
           }
         },
@@ -1498,20 +1494,20 @@
           "x": 200,
           "y": 950,
           "name": "Alert/Error",
-          "fill": "$--color-error",
+          "fill": "$--ds-danger",
           "descendants": {
             "tH8a1": {
               "iconFontFamily": "lucide",
               "iconFontName": "square-x",
-              "fill": "$--color-error-foreground"
+              "fill": "$--ds-on-danger-fg"
             },
             "Q9Aqm": {
               "content": "Communication link lost",
-              "fill": "$--color-error-foreground"
+              "fill": "$--ds-on-danger-fg"
             },
             "SmO4x": {
               "content": "Rover telemetry signal interrupted. Check your base antenna alignment or retry connection in 10 minutes.",
-              "fill": "$--color-error-foreground"
+              "fill": "$--ds-on-danger-fg"
             }
           }
         },
@@ -1542,11 +1538,11 @@
           "ref": "qHX3A",
           "x": 200,
           "y": 1750,
-          "fill": "$--color-warning",
+          "fill": "$--ds-warn",
           "descendants": {
             "1qRIv": {
               "content": "Transporter",
-              "fill": "$--color-warning-foreground"
+              "fill": "$--ds-ink"
             }
           }
         },
@@ -1557,11 +1553,11 @@
           "ref": "qHX3A",
           "x": 200,
           "y": 1822,
-          "fill": "$--color-info",
+          "fill": "$--ds-info",
           "descendants": {
             "1qRIv": {
               "content": "Hauler",
-              "fill": "$--color-info-foreground"
+              "fill": "$--ds-ink"
             }
           }
         },
@@ -1572,11 +1568,11 @@
           "ref": "qHX3A",
           "x": 200,
           "y": 1894,
-          "fill": "$--secondary",
+          "fill": "$--ds-surface",
           "descendants": {
             "1qRIv": {
               "content": "Pioneer",
-              "fill": "$--secondary-foreground"
+              "fill": "$--ds-text"
             }
           }
         },
@@ -1590,7 +1586,7 @@
           "name": "Breadcrumb Item/Default",
           "descendants": {
             "3JeEr": {
-              "fill": "$--muted-foreground"
+              "fill": "$--ds-text-muted"
             }
           }
         },
@@ -1617,13 +1613,13 @@
           "x": 200,
           "y": 2246,
           "name": "Button/Large/Secondary",
-          "fill": "$--secondary",
+          "fill": "$--ds-surface",
           "descendants": {
             "cfxzz": {
-              "fill": "$--secondary-foreground"
+              "fill": "$--ds-text"
             },
             "fIEfR": {
-              "fill": "$--secondary-foreground"
+              "fill": "$--ds-text"
             }
           }
         },
@@ -1635,13 +1631,13 @@
           "x": 200,
           "y": 2322,
           "name": "Button/Large/Destructive",
-          "fill": "$--destructive",
+          "fill": "$--ds-danger",
           "descendants": {
             "cfxzz": {
-              "fill": "$--destructive-foreground"
+              "fill": "$--ds-on-danger-fg"
             },
             "fIEfR": {
-              "fill": "$--destructive-foreground"
+              "fill": "$--ds-on-danger-fg"
             }
           }
         },
@@ -1656,14 +1652,14 @@
           "stroke": {
             "align": "inside",
             "thickness": 1,
-            "fill": "$--input"
+            "fill": "$--ds-border-strong"
           },
           "descendants": {
             "cfxzz": {
-              "fill": "$--foreground"
+              "fill": "$--ds-text"
             },
             "fIEfR": {
-              "fill": "$--foreground"
+              "fill": "$--ds-text"
             }
           }
         },
@@ -1675,13 +1671,13 @@
           "x": 200,
           "y": 2474,
           "name": "Button/Large/Ghost",
-          "fill": "$--accent",
+          "fill": "$--ds-canvas-alt",
           "descendants": {
             "cfxzz": {
-              "fill": "$--foreground"
+              "fill": "$--ds-text"
             },
             "fIEfR": {
-              "fill": "$--foreground"
+              "fill": "$--ds-text"
             }
           }
         },
@@ -1697,15 +1693,15 @@
           "stroke": {
             "align": "inside",
             "thickness": 1,
-            "fill": "$--input"
+            "fill": "$--ds-border-strong"
           },
           "padding": 16,
           "descendants": {
             "cfxzz": {
-              "fill": "$--foreground"
+              "fill": "$--ds-text"
             },
             "fIEfR": {
-              "fill": "$--foreground",
+              "fill": "$--ds-text",
               "enabled": false
             }
           }
@@ -1778,13 +1774,13 @@
           "x": 418,
           "y": 2246,
           "name": "Button/Secondary",
-          "fill": "$--secondary",
+          "fill": "$--ds-surface",
           "descendants": {
             "zF167": {
-              "fill": "$--secondary-foreground"
+              "fill": "$--ds-text"
             },
             "FT3cO": {
-              "fill": "$--secondary-foreground"
+              "fill": "$--ds-text"
             }
           }
         },
@@ -1796,13 +1792,13 @@
           "x": 419,
           "y": 2322,
           "name": "Button/Destructive",
-          "fill": "$--destructive",
+          "fill": "$--ds-danger",
           "descendants": {
             "zF167": {
-              "fill": "$--destructive-foreground"
+              "fill": "$--ds-on-danger-fg"
             },
             "FT3cO": {
-              "fill": "$--destructive-foreground"
+              "fill": "$--ds-on-danger-fg"
             }
           }
         },
@@ -1817,15 +1813,15 @@
           "stroke": {
             "align": "inside",
             "thickness": 1,
-            "fill": "$--input"
+            "fill": "$--ds-border-strong"
           },
           "fill": [],
           "descendants": {
             "zF167": {
-              "fill": "$--foreground"
+              "fill": "$--ds-text"
             },
             "FT3cO": {
-              "fill": "$--foreground"
+              "fill": "$--ds-text"
             }
           }
         },
@@ -1837,13 +1833,13 @@
           "x": 419,
           "y": 2474,
           "name": "Button/Ghost",
-          "fill": "$--accent",
+          "fill": "$--ds-canvas-alt",
           "descendants": {
             "zF167": {
-              "fill": "$--foreground"
+              "fill": "$--ds-text"
             },
             "FT3cO": {
-              "fill": "$--foreground"
+              "fill": "$--ds-text"
             }
           }
         },
@@ -1943,13 +1939,13 @@
                   "type": "text",
                   "id": "YbbDj",
                   "name": "Dialog Title",
-                  "fill": "$--card-foreground",
+                  "fill": "$--ds-text",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
                   "content": "Add a title here",
                   "lineHeight": 1.5555555555555556,
                   "textAlignVertical": "middle",
-                  "fontFamily": "$--font-primary",
+                  "fontFamily": "$--ds-font-ui",
                   "fontSize": 18,
                   "fontWeight": "500"
                 },
@@ -1957,13 +1953,13 @@
                   "type": "text",
                   "id": "1M1tK",
                   "name": "Dialog Description",
-                  "fill": "$--muted-foreground",
+                  "fill": "$--ds-text-muted",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
                   "content": "And add a detailed description here.",
                   "lineHeight": 1.4285714285714286,
                   "textAlignVertical": "middle",
-                  "fontFamily": "$--font-secondary",
+                  "fontFamily": "$--ds-font-body",
                   "fontSize": 14,
                   "fontWeight": "normal"
                 }
@@ -2016,8 +2012,8 @@
           "y": 2970,
           "name": "Tab Item/Active",
           "reusable": true,
-          "fill": "$--secondary",
-          "cornerRadius": "$--radius-pill",
+          "fill": "$--ds-surface",
+          "cornerRadius": "$--ds-radius-pill",
           "stroke": {
             "align": "inside",
             "thickness": 1
@@ -2045,10 +2041,10 @@
               "type": "text",
               "id": "lsCeq",
               "name": "Label Selected",
-              "fill": "$--secondary-foreground",
+              "fill": "$--ds-text",
               "content": "Tab",
               "lineHeight": 1.4285714285714286,
-              "fontFamily": "$--font-secondary",
+              "fontFamily": "$--ds-font-body",
               "fontSize": 14,
               "fontWeight": "normal"
             }
@@ -2061,12 +2057,12 @@
           "ref": "Axg1e",
           "x": 200,
           "y": 3050,
-          "fill": "$--white",
+          "fill": "$--ds-cream",
           "effect": [],
           "name": "Tab Item/Inactive",
           "descendants": {
             "lsCeq": {
-              "fill": "$--accent-foreground"
+              "fill": "$--ds-text"
             }
           }
         },
@@ -2084,12 +2080,12 @@
           "clip": true,
           "width": 120,
           "height": 56,
-          "fill": "$--card",
-          "cornerRadius": "$--radius-pill",
+          "fill": "$--ds-surface",
+          "cornerRadius": "$--ds-radius-pill",
           "stroke": {
             "align": "inside",
             "thickness": 1,
-            "fill": "$--input"
+            "fill": "$--ds-border-strong"
           },
           "gap": 8,
           "padding": 8,
@@ -2120,7 +2116,7 @@
               "id": "3Xrrm",
               "type": "ref",
               "ref": "H2eCV",
-              "x": 143,
+              "x": 146,
               "y": 8,
               "descendants": {
                 "lsCeq": {
@@ -2134,7 +2130,7 @@
               "id": "xqcvU",
               "type": "ref",
               "ref": "H2eCV",
-              "x": 239,
+              "x": 244,
               "y": 8,
               "descendants": {
                 "lsCeq": {
@@ -2148,7 +2144,7 @@
               "id": "claME",
               "type": "ref",
               "ref": "H2eCV",
-              "x": 338,
+              "x": 344,
               "y": 8,
               "descendants": {
                 "lsCeq": {
@@ -2176,12 +2172,12 @@
                   "type": "text",
                   "id": "g2OEs",
                   "name": "Card Title",
-                  "fill": "$--foreground",
+                  "fill": "$--ds-text",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
                   "content": "Modal Title",
                   "lineHeight": 1.4,
-                  "fontFamily": "$--font-primary",
+                  "fontFamily": "$--ds-font-ui",
                   "fontSize": 20,
                   "fontWeight": "500"
                 },
@@ -2189,12 +2185,12 @@
                   "type": "text",
                   "id": "zkEXz",
                   "name": "Modal Subtitle",
-                  "fill": "$--muted-foreground",
+                  "fill": "$--ds-text-muted",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
                   "content": "Modal Subtitle",
                   "lineHeight": 1.4285714285714286,
-                  "fontFamily": "$--font-secondary",
+                  "fontFamily": "$--ds-font-body",
                   "fontSize": 14,
                   "fontWeight": "normal"
                 }
@@ -2266,8 +2262,8 @@
               "name": "Icon Base",
               "width": 48,
               "height": 48,
-              "fill": "$--accent",
-              "cornerRadius": "$--radius-m",
+              "fill": "$--ds-canvas-alt",
+              "cornerRadius": "$--ds-radius-md",
               "stroke": {
                 "align": "inside",
                 "thickness": 1
@@ -2283,7 +2279,7 @@
                   "height": 24,
                   "iconFontName": "triangle-alert",
                   "iconFontFamily": "lucide",
-                  "fill": "$--accent-foreground"
+                  "fill": "$--ds-text"
                 }
               ]
             },
@@ -2316,7 +2312,7 @@
               "clip": true,
               "width": 16,
               "height": 16,
-              "fill": "$--primary",
+              "fill": "$--ds-brand",
               "cornerRadius": 8,
               "stroke": {
                 "align": "inside",
@@ -2330,7 +2326,7 @@
                   "x": 6,
                   "y": 6,
                   "name": "dot",
-                  "fill": "$--primary-foreground",
+                  "fill": "$--ds-ink",
                   "width": 4,
                   "height": 4,
                   "stroke": {
@@ -2352,11 +2348,11 @@
           "name": "Radio/Default",
           "descendants": {
             "D1yxy": {
-              "fill": "$--background",
+              "fill": "$--ds-field",
               "stroke": {
                 "align": "inside",
                 "thickness": 1,
-                "fill": "$--input"
+                "fill": "$--ds-border-strong"
               }
             },
             "ohsro": {
@@ -2438,7 +2434,7 @@
           "name": "Switch/Unchecked",
           "descendants": {
             "dX8wO": {
-              "fill": "$--input",
+              "fill": "$--ds-border-strong",
               "justifyContent": "start",
               "alignItems": "center"
             }
@@ -2468,12 +2464,12 @@
               "clip": true,
               "width": 16,
               "height": 16,
-              "fill": "$--primary",
-              "cornerRadius": "$--radius-xs",
+              "fill": "$--ds-brand",
+              "cornerRadius": 8,
               "stroke": {
                 "align": "inside",
                 "thickness": 1,
-                "fill": "$--primary"
+                "fill": "$--ds-brand"
               },
               "layout": "none",
               "children": [
@@ -2486,7 +2482,7 @@
                   "height": 12,
                   "iconFontName": "check",
                   "iconFontFamily": "lucide",
-                  "fill": "$--primary-foreground"
+                  "fill": "$--ds-ink"
                 }
               ]
             }
@@ -2505,9 +2501,9 @@
               "stroke": {
                 "align": "inside",
                 "thickness": 1,
-                "fill": "$--input"
+                "fill": "$--ds-border-strong"
               },
-              "fill": "$--background"
+              "fill": "$--ds-field"
             },
             "kKi23": {
               "enabled": false
@@ -2589,7 +2585,7 @@
           "descendants": {
             "SdDrF": {
               "content": "Input Value",
-              "fill": "$--foreground"
+              "fill": "$--ds-text"
             }
           }
         },
@@ -2631,7 +2627,7 @@
           "descendants": {
             "8mNGM": {
               "content": "Selected option",
-              "fill": "$--foreground"
+              "fill": "$--ds-text"
             }
           }
         },
@@ -2702,7 +2698,7 @@
           "name": "Textarea Group/Filled",
           "descendants": {
             "7Lfkv": {
-              "fill": "$--foreground"
+              "fill": "$--ds-text"
             }
           }
         },
@@ -2771,12 +2767,12 @@
           "reusable": true,
           "width": 40,
           "height": 40,
-          "fill": "$--background",
-          "cornerRadius": "$--radius-pill",
+          "fill": "$--ds-pagination-active",
+          "cornerRadius": "$--ds-radius-pill",
           "stroke": {
             "align": "inside",
             "thickness": 1,
-            "fill": "$--border"
+            "fill": "$--ds-border"
           },
           "justifyContent": "center",
           "alignItems": "center",
@@ -2785,10 +2781,10 @@
               "type": "text",
               "id": "Q8IAk",
               "name": "1",
-              "fill": "$--foreground",
+              "fill": "$--ds-text",
               "content": "1",
               "lineHeight": 1.4285714285714286,
-              "fontFamily": "$--font-secondary",
+              "fontFamily": "$--ds-font-body",
               "fontSize": 14,
               "fontWeight": "normal"
             }
@@ -2829,7 +2825,7 @@
               "height": 16,
               "iconFontName": "ellipsis",
               "iconFontFamily": "lucide",
-              "fill": "$--foreground"
+              "fill": "$--ds-text"
             }
           ]
         },
@@ -2847,8 +2843,8 @@
             "align": "inside",
             "thickness": 1
           },
-          "fill": "$--tile",
-          "cornerRadius": "$--radius-m",
+          "fill": "$--ds-canvas-alt",
+          "cornerRadius": "$--ds-radius-md",
           "descendants": {
             "SaWqo": {
               "height": "fit_content",
@@ -2857,12 +2853,12 @@
                   "type": "text",
                   "id": "YFOfL",
                   "name": "title",
-                  "fill": "$--card-foreground",
+                  "fill": "$--ds-text",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
                   "content": "Navigation AI v2.3",
                   "lineHeight": 1.5,
-                  "fontFamily": "$--font-primary",
+                  "fontFamily": "$--ds-font-ui",
                   "fontSize": 16,
                   "fontWeight": "500"
                 }
@@ -2879,12 +2875,12 @@
                   "type": "text",
                   "id": "oGPgx",
                   "name": "title",
-                  "fill": "$--muted-foreground",
+                  "fill": "$--ds-text-muted",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
                   "content": "Enhanced obstacle detection and smoother route planning for rocky terrains.",
                   "lineHeight": 1.5,
-                  "fontFamily": "$--font-secondary",
+                  "fontFamily": "$--ds-font-body",
                   "fontSize": 16,
                   "fontWeight": "normal"
                 }
@@ -2921,9 +2917,9 @@
             "align": "inside",
             "thickness": 1
           },
-          "fill": "$--tile",
+          "fill": "$--ds-canvas-alt",
           "effect": [],
-          "cornerRadius": "$--radius-m",
+          "cornerRadius": "$--ds-radius-md",
           "name": "Card Plain",
           "padding": 0,
           "descendants": {
@@ -2933,12 +2929,12 @@
                   "type": "text",
                   "id": "j8oHz",
                   "name": "title",
-                  "fill": "$--card-foreground",
+                  "fill": "$--ds-text",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
                   "content": "Active Rovers",
                   "lineHeight": 1.5,
-                  "fontFamily": "$--font-primary",
+                  "fontFamily": "$--ds-font-ui",
                   "fontSize": 16,
                   "fontWeight": "500"
                 }
@@ -2951,12 +2947,12 @@
                   "type": "text",
                   "id": "4K2KF",
                   "name": "title",
-                  "fill": "$--card-foreground",
+                  "fill": "$--ds-text",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
                   "content": "1,280",
                   "lineHeight": 1.5,
-                  "fontFamily": "$--font-secondary",
+                  "fontFamily": "$--ds-font-body",
                   "fontSize": 32,
                   "fontWeight": "normal"
                 },
@@ -2992,9 +2988,9 @@
             "align": "inside",
             "thickness": 1
           },
-          "fill": "$--tile",
+          "fill": "$--ds-canvas-alt",
           "name": "Card Image",
-          "cornerRadius": "$--radius-m",
+          "cornerRadius": "$--ds-radius-md",
           "descendants": {
             "SaWqo": {
               "height": "fit_content",
@@ -3005,8 +3001,8 @@
                   "name": "image-placeholder",
                   "width": "fill_container",
                   "height": 160,
-                  "fill": "$--background",
-                  "cornerRadius": "$--radius-xs",
+                  "fill": "$--ds-image-placeholder",
+                  "cornerRadius": 8,
                   "stroke": {
                     "align": "inside",
                     "thickness": {
@@ -3028,12 +3024,12 @@
                   "type": "text",
                   "id": "FSXkf",
                   "name": "title",
-                  "fill": "$--card-foreground",
+                  "fill": "$--ds-text",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
                   "content": "Aurora Scout",
                   "lineHeight": 1.5,
-                  "fontFamily": "$--font-secondary",
+                  "fontFamily": "$--ds-font-body",
                   "fontSize": 24,
                   "fontWeight": "normal"
                 },
@@ -3041,12 +3037,12 @@
                   "type": "text",
                   "id": "V4hpg",
                   "name": "title",
-                  "fill": "$--muted-foreground",
+                  "fill": "$--ds-text-muted",
                   "textGrowth": "fixed-width",
                   "width": "fill_container",
                   "content": "SKU: LS-2029",
                   "lineHeight": 1.5,
-                  "fontFamily": "$--font-secondary",
+                  "fontFamily": "$--ds-font-body",
                   "fontSize": 16,
                   "fontWeight": "normal"
                 }
@@ -3093,12 +3089,12 @@
           "reusable": true,
           "width": 256,
           "height": "fill_container(640)",
-          "fill": "$--sidebar",
-          "cornerRadius": "$--radius-m",
+          "fill": "$--ds-surface",
+          "cornerRadius": "$--ds-radius-md",
           "stroke": {
             "align": "inside",
             "thickness": 1,
-            "fill": "$--sidebar-border"
+            "fill": "$--ds-border"
           },
           "effect": {
             "type": "shadow",
@@ -3157,7 +3153,7 @@
                           "y": 4,
                           "name": "Union",
                           "geometry": "M16 26c1.65686 0 3 1.34314 3 3 0 1.65686-1.34314 3-3 3-1.65686 0-3-1.34314-3-3 0-1.65686 1.34314-3 3-3z m-10-2c1.10457 0 2 0.89543 2 2 0 1.10457-0.89543 2-2 2-1.10457 0-2-0.89543-2-2 0-1.10457 0.89543-2 2-2z m20 0c1.10457 0 2 0.89543 2 2 0 1.10457-0.89543 2-2 2-1.10457 0-2-0.89543-2-2 0-1.10457 0.89543-2 2-2z m-10-12c2.20914 0 4 1.79086 4 4 0 2.20914-1.79086 4-4 4-2.20914 0-4-1.79086-4-4 0-2.20914 1.79086-4 4-4z m-13 1c1.65685 0 3 1.34314 3 3 0 1.65686-1.34315 3-3 3-1.65685 0-3-1.34314-3-3 0-1.65686 1.34315-3 3-3z m26 0c1.65686 0 3 1.34314 3 3 0 1.65686-1.34314 3-3 3-1.65686 0-3-1.34314-3-3 0-1.65686 1.34314-3 3-3z m-23-9c1.10457 0 2 0.89543 2 2 0 1.10457-0.89543 2-2 2-1.10457 0-2-0.89543-2-2 0-1.10457 0.89543-2 2-2z m20 0c1.10457 0 2 0.89543 2 2 0 1.10457-0.89543 2-2 2-1.10457 0-2-0.89543-2-2 0-1.10457 0.89543-2 2-2z m-10-4c1.65686 0 3 1.34315 3 3 0 1.65685-1.34314 3-3 3-1.65686 0-3-1.34315-3-3 0-1.65685 1.34314-3 3-3z",
-                          "fill": "$--sidebar-primary-foreground",
+                          "fill": "$--ds-text",
                           "width": 32,
                           "height": 32
                         }
@@ -3167,7 +3163,7 @@
                       "type": "text",
                       "id": "Fpzpi",
                       "name": "Flux",
-                      "fill": "$--sidebar-primary-foreground",
+                      "fill": "$--ds-text",
                       "content": "HALO",
                       "lineHeight": 1.5,
                       "fontFamily": "Inter",
@@ -3184,7 +3180,7 @@
                   "y": 24,
                   "descendants": {
                     "zF167": {
-                      "fill": "$--sidebar-foreground",
+                      "fill": "$--ds-text-secondary",
                       "iconFontFamily": "lucide",
                       "iconFontName": "panel-left"
                     }
@@ -3241,7 +3237,7 @@
                       "type": "text",
                       "id": "56YSe",
                       "name": "Name",
-                      "fill": "$--sidebar-accent-foreground",
+                      "fill": "$--ds-text",
                       "textGrowth": "fixed-width",
                       "width": "fill_container",
                       "content": "Joe Doe",
@@ -3254,7 +3250,7 @@
                       "type": "text",
                       "id": "95h3W",
                       "name": "Email",
-                      "fill": "$--sidebar-foreground",
+                      "fill": "$--ds-text-secondary",
                       "textGrowth": "fixed-width",
                       "width": "fill_container",
                       "content": "joe@acmecorp.com",
@@ -3272,7 +3268,7 @@
                   "height": 24,
                   "iconFontName": "ellipsis-vertical",
                   "iconFontFamily": "lucide",
-                  "fill": "$--sidebar-accent-foreground"
+                  "fill": "$--ds-text"
                 }
               ]
             }
@@ -3297,7 +3293,7 @@
               "type": "text",
               "id": "V5UNQ",
               "name": "Section Header",
-              "fill": "$--sidebar-foreground",
+              "fill": "$--ds-text-secondary",
               "textGrowth": "fixed-width",
               "width": "fill_container",
               "content": "Title",
@@ -3316,7 +3312,7 @@
           "name": "Sidebar Item/Active",
           "reusable": true,
           "width": 224,
-          "fill": "$--sidebar-accent",
+          "fill": "$--ds-canvas-alt",
           "cornerRadius": 24,
           "stroke": {
             "align": "inside",
@@ -3335,7 +3331,7 @@
               "type": "text",
               "id": "W2XqE",
               "name": "Item Title",
-              "fill": "$--sidebar-accent-foreground",
+              "fill": "$--ds-text",
               "textGrowth": "fixed-width",
               "width": "fill_container",
               "content": "Item",
@@ -3351,7 +3347,7 @@
               "height": 24,
               "iconFontName": "grip",
               "iconFontFamily": "lucide",
-              "fill": "$--sidebar-accent-foreground"
+              "fill": "$--ds-text"
             }
           ]
         },
@@ -3366,7 +3362,7 @@
           "name": "Sidebar Item/Default",
           "descendants": {
             "edTIG": {
-              "fill": "$--sidebar-foreground"
+              "fill": "$--ds-text-secondary"
             }
           }
         },
@@ -3378,7 +3374,7 @@
           "name": "List Search Box/Filled",
           "reusable": true,
           "width": 240,
-          "cornerRadius": "$--radius-pill",
+          "cornerRadius": "$--ds-radius-pill",
           "stroke": {
             "align": "inside",
             "thickness": 1
@@ -3398,7 +3394,7 @@
               "name": "⇧⌘A",
               "enabled": false,
               "opacity": 0.5,
-              "fill": "$--foreground",
+              "fill": "$--ds-text",
               "content": "⌘N",
               "lineHeight": 1.3333333333333333,
               "textAlign": "right",
@@ -3413,18 +3409,18 @@
               "height": 16,
               "iconFontName": "search",
               "iconFontFamily": "lucide",
-              "fill": "$--foreground"
+              "fill": "$--ds-text"
             },
             {
               "type": "text",
               "id": "4K0sM",
               "name": "Label",
-              "fill": "$--foreground",
+              "fill": "$--ds-text",
               "textGrowth": "fixed-width",
               "width": "fill_container",
               "content": "Search Query",
               "lineHeight": 1.4285714285714286,
-              "fontFamily": "$--font-secondary",
+              "fontFamily": "$--ds-font-body",
               "fontSize": 14,
               "fontWeight": "normal"
             },
@@ -3458,7 +3454,7 @@
                     "thickness": 1,
                     "join": "round",
                     "cap": "round",
-                    "fill": "$--foreground"
+                    "fill": "$--ds-text"
                   }
                 }
               ]
@@ -3470,7 +3466,7 @@
               "height": 16,
               "iconFontName": "x",
               "iconFontFamily": "lucide",
-              "fill": "$--foreground"
+              "fill": "$--ds-text"
             }
           ]
         },
@@ -3482,7 +3478,7 @@
           "name": "List Item/Checked",
           "reusable": true,
           "width": 240,
-          "cornerRadius": "$--radius-pill",
+          "cornerRadius": "$--ds-radius-pill",
           "stroke": {
             "align": "inside",
             "thickness": 1
@@ -3522,7 +3518,7 @@
                       "height": 16,
                       "iconFontName": "check",
                       "iconFontFamily": "lucide",
-                      "fill": "$--foreground"
+                      "fill": "$--ds-text"
                     }
                   ]
                 },
@@ -3530,10 +3526,10 @@
                   "type": "text",
                   "id": "Ar3LN",
                   "name": "Label",
-                  "fill": "$--foreground",
+                  "fill": "$--ds-text",
                   "content": "List Item",
                   "lineHeight": 1.4285714285714286,
-                  "fontFamily": "$--font-secondary",
+                  "fontFamily": "$--ds-font-body",
                   "fontSize": 14,
                   "fontWeight": "normal"
                 }
@@ -3552,7 +3548,7 @@
                   "id": "qLwQe",
                   "name": "⇧⌘A",
                   "opacity": 0.6000000238418579,
-                  "fill": "$--foreground",
+                  "fill": "$--ds-text",
                   "content": "⇧⌘A",
                   "lineHeight": 1.3333333333333333,
                   "textAlign": "right",
@@ -3579,7 +3575,7 @@
                       "height": 16,
                       "iconFontName": "chevron-right",
                       "iconFontFamily": "lucide",
-                      "fill": "$--foreground"
+                      "fill": "$--ds-text"
                     }
                   ]
                 }
@@ -3616,7 +3612,7 @@
               "stroke": {
                 "align": "center",
                 "thickness": 1,
-                "fill": "$--border"
+                "fill": "$--ds-border"
               }
             }
           ]
@@ -3629,7 +3625,7 @@
           "name": "List Title",
           "reusable": true,
           "width": 240,
-          "cornerRadius": "$--radius-pill",
+          "cornerRadius": "$--ds-radius-pill",
           "stroke": {
             "align": "inside",
             "thickness": 1
@@ -3645,12 +3641,12 @@
               "type": "text",
               "id": "v1BHO",
               "name": "Label",
-              "fill": "$--muted-foreground",
+              "fill": "$--ds-text-muted",
               "textGrowth": "fixed-width",
               "width": "fill_container",
               "content": "List Title",
               "lineHeight": 1.3333333333333333,
-              "fontFamily": "$--font-secondary",
+              "fontFamily": "$--ds-font-body",
               "fontSize": 12,
               "fontWeight": "500"
             }
@@ -3681,7 +3677,7 @@
           "descendants": {
             "4K0sM": {
               "content": "Search…",
-              "fill": "$--muted-foreground"
+              "fill": "$--ds-text-muted"
             },
             "WHpeY": {
               "enabled": false
@@ -3731,14 +3727,14 @@
               "stroke": {
                 "align": "inside",
                 "thickness": 1,
-                "fill": "$--input"
+                "fill": "$--ds-border-strong"
               },
               "descendants": {
                 "cfxzz": {
-                  "fill": "$--foreground"
+                  "fill": "$--ds-text"
                 },
                 "fIEfR": {
-                  "fill": "$--foreground"
+                  "fill": "$--ds-text"
                 }
               }
             }
@@ -3764,10 +3760,10 @@
               "type": "text",
               "id": "xCnHe",
               "name": "0 of 5 row(s) selected.",
-              "fill": "$--muted-foreground",
+              "fill": "$--ds-text-muted",
               "content": "Showing 10 records",
               "lineHeight": 1.4285714285714286,
-              "fontFamily": "$--font-secondary",
+              "fontFamily": "$--ds-font-body",
               "fontSize": 14,
               "fontWeight": "normal"
             },
@@ -3798,7 +3794,7 @@
             "thickness": {
               "bottom": 1
             },
-            "fill": "$--border"
+            "fill": "$--ds-border"
           },
           "alignItems": "center"
         },
@@ -3824,12 +3820,12 @@
               "type": "text",
               "id": "fur2C",
               "name": "Label",
-              "fill": "$--muted-foreground",
+              "fill": "$--ds-text-muted",
               "textGrowth": "fixed-width",
               "width": "fill_container",
               "content": "Name",
               "lineHeight": 1.4285714285714286,
-              "fontFamily": "$--font-primary",
+              "fontFamily": "$--ds-font-ui",
               "fontSize": 14,
               "fontWeight": "normal"
             }
@@ -3867,12 +3863,12 @@
           ],
           "width": 1024,
           "height": 300,
-          "fill": "$--background",
-          "cornerRadius": "$--radius-m",
+          "fill": "$--ds-page",
+          "cornerRadius": "$--ds-radius-md",
           "stroke": {
             "align": "inside",
             "thickness": 1,
-            "fill": "$--border"
+            "fill": "$--ds-border"
           },
           "layout": "vertical",
           "alignItems": "center"
@@ -3926,7 +3922,7 @@
                       "width": "fill_container(0)",
                       "fill": {
                         "type": "color",
-                        "color": "$--white",
+                        "color": "$--ds-cream",
                         "enabled": false
                       },
                       "stroke": {
@@ -3940,13 +3936,13 @@
                           "type": "text",
                           "id": "dtLabelTxt1",
                           "name": "Label Text",
-                          "fill": "$--foreground",
+                          "fill": "$--ds-text",
                           "textGrowth": "fixed-width",
                           "width": "fill_container",
                           "content": "Label Text",
                           "lineHeight": 1.4285714285714286,
                           "textAlignVertical": "middle",
-                          "fontFamily": "$--font-secondary",
+                          "fontFamily": "$--ds-font-body",
                           "fontSize": 14,
                           "fontWeight": "500"
                         }
@@ -3958,12 +3954,12 @@
                       "name": "Input",
                       "width": "fill_container",
                       "height": 40,
-                      "fill": "$--background",
-                      "cornerRadius": "$--radius-pill",
+                      "fill": "$--ds-field",
+                      "cornerRadius": "$--ds-radius-pill",
                       "stroke": {
                         "align": "inside",
                         "thickness": 1,
-                        "fill": "$--input"
+                        "fill": "$--ds-border-strong"
                       },
                       "gap": 8,
                       "padding": [
@@ -3976,11 +3972,11 @@
                           "type": "text",
                           "id": "dtInputVal1",
                           "name": "Input Value",
-                          "fill": "$--muted-foreground",
+                          "fill": "$--ds-text-muted",
                           "content": "Search…",
                           "lineHeight": 1.4285714285714286,
                           "textAlignVertical": "middle",
-                          "fontFamily": "$--font-secondary",
+                          "fontFamily": "$--ds-font-body",
                           "fontSize": 14,
                           "fontWeight": "normal"
                         }
@@ -4019,81 +4015,6 @@
           ]
         }
       ]
-    },
-    {
-      "type": "frame",
-      "id": "rYhmQ",
-      "x": 3800,
-      "y": 3841,
-      "name": "dashboard-football",
-      "theme": {
-        "Mode": "Light"
-      },
-      "clip": true,
-      "width": 1440,
-      "height": 933,
-      "fill": "$--background",
-      "layout": "vertical",
-      "gap": 24,
-      "padding": 32
-    },
-    {
-      "type": "frame",
-      "id": "OVVG0",
-      "x": 3800,
-      "y": 2085,
-      "name": "dashboard-revenue",
-      "theme": {
-        "Mode": "Light"
-      },
-      "clip": true,
-      "width": 1440,
-      "height": "fit_content(717)",
-      "fill": "$--background"
-    },
-    {
-      "type": "frame",
-      "id": "uL1xr",
-      "x": 3800,
-      "y": 374,
-      "name": "dashboard-utility",
-      "theme": {
-        "Mode": "Light"
-      },
-      "clip": true,
-      "width": 1440,
-      "height": "fit_content(900)",
-      "fill": "$--background"
-    },
-    {
-      "type": "prompt",
-      "id": "KZT7e",
-      "x": 3800,
-      "y": 1700,
-      "model": "cursor-composer",
-      "width": 400,
-      "height": 219,
-      "content": "Design a dashboard into \"dashboard-revenue\" frame for a revenue tracking app with a sidebar, showing revenue stats, history in the content."
-    },
-    {
-      "type": "prompt",
-      "id": "7cbgG",
-      "x": 3800,
-      "y": 0,
-      "model": "cursor-composer",
-      "width": 400,
-      "height": 219,
-      "content": "Design a dashboard with a sidebar on the left into \"dashboard-utility\" frame for a utility company showing current usage and a history in a table."
-    },
-    {
-      "type": "prompt",
-      "id": "1xdoT",
-      "x": 3800,
-      "y": 3509,
-      "model": "cursor-composer",
-      "width": 400,
-      "height": 219,
-      "content": "Design a dashboard into \"dashboard-football\" frame with a table ranking UEFA teams. Show goal counts, captain name, etc. Put stats on the top."
     }
   ],
   "themes": {
@@ -4103,7 +4024,24 @@
     ]
   },
   "variables": {
-    "--sidebar": {
+    "--ds-page": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#F4F1EA",
+          "theme": {
+            "Mode": "Light"
+          }
+        },
+        {
+          "value": "#111213",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--ds-field": {
       "type": "color",
       "value": [
         {
@@ -4113,167 +4051,69 @@
           }
         },
         {
-          "value": "#1A182E",
+          "value": "#111213",
           "theme": {
             "Mode": "Dark"
           }
         }
       ]
     },
-    "--sidebar-foreground": {
+    "--ds-pagination-active": {
       "type": "color",
       "value": [
         {
-          "value": "#939399",
+          "value": "#E4E0D8",
           "theme": {
             "Mode": "Light"
           }
         },
         {
-          "value": "#ACABB2",
+          "value": "#111213",
           "theme": {
             "Mode": "Dark"
           }
         }
       ]
     },
-    "--sidebar-primary": {
+    "--ds-image-placeholder": {
       "type": "color",
       "value": [
         {
-          "value": "#F5F5F5",
+          "value": "#EDEAE4",
           "theme": {
             "Mode": "Light"
           }
         },
         {
-          "value": "#0F5FFE",
+          "value": "#111213",
           "theme": {
             "Mode": "Dark"
           }
         }
       ]
     },
-    "--sidebar-primary-foreground": {
+    "--ds-ink": {
+      "type": "color",
+      "value": "#111213"
+    },
+    "--ds-canvas-alt": {
       "type": "color",
       "value": [
         {
-          "value": "#2A2933",
+          "value": "#E8E4DC",
           "theme": {
             "Mode": "Light"
           }
         },
         {
-          "value": "#E8E8EA",
+          "value": "#161A1E",
           "theme": {
             "Mode": "Dark"
           }
         }
       ]
     },
-    "--sidebar-border": {
-      "type": "color",
-      "value": [
-        {
-          "value": "#D9D9DB",
-          "theme": {
-            "Mode": "Light"
-          }
-        },
-        {
-          "value": "#2B283D",
-          "theme": {
-            "Mode": "Dark"
-          }
-        }
-      ]
-    },
-    "--sidebar-accent": {
-      "type": "color",
-      "value": [
-        {
-          "value": "#F5F5F5",
-          "theme": {
-            "Mode": "Light"
-          }
-        },
-        {
-          "value": "#2B283D",
-          "theme": {
-            "Mode": "Dark"
-          }
-        }
-      ]
-    },
-    "--sidebar-accent-foreground": {
-      "type": "color",
-      "value": [
-        {
-          "value": "#2A2933",
-          "theme": {
-            "Mode": "Light"
-          }
-        },
-        {
-          "value": "#E8E8EA",
-          "theme": {
-            "Mode": "Dark"
-          }
-        }
-      ]
-    },
-    "--sidebar-ring": {
-      "type": "color",
-      "value": [
-        {
-          "value": "#D9D9DB",
-          "theme": {
-            "Mode": "Light"
-          }
-        },
-        {
-          "value": "#2B283D",
-          "theme": {
-            "Mode": "Dark"
-          }
-        }
-      ]
-    },
-    "--background": {
-      "type": "color",
-      "value": [
-        {
-          "value": "$si-color-cream-100",
-          "theme": {
-            "Mode": "Light"
-          }
-        },
-        {
-          "value": "$si-color-bg-canvas",
-          "theme": {
-            "Mode": "Dark"
-          }
-        }
-      ]
-    },
-    "--foreground": {
-      "type": "color",
-      "value": [
-        {
-          "value": "$si-color-ink-950",
-          "theme": {
-            "Mode": "Light"
-          }
-        },
-        {
-          "value": "$si-color-text-primary",
-          "theme": {
-            "Mode": "Dark"
-          }
-        }
-      ]
-    },
-    "--card": {
+    "--ds-surface": {
       "type": "color",
       "value": [
         {
@@ -4283,542 +4123,174 @@
           }
         },
         {
-          "value": "#1A182E",
+          "value": "#2B2F34",
           "theme": {
             "Mode": "Dark"
           }
         }
       ]
     },
-    "--card-foreground": {
+    "--ds-text": {
       "type": "color",
       "value": [
         {
-          "value": "#2A2933",
+          "value": "#111213",
           "theme": {
             "Mode": "Light"
           }
         },
+        {
+          "value": "#F3F1EC",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--ds-text-secondary": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#3D444D",
+          "theme": {
+            "Mode": "Light"
+          }
+        },
+        {
+          "value": "#D5D3CD",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--ds-text-muted": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#5C6670",
+          "theme": {
+            "Mode": "Light"
+          }
+        },
+        {
+          "value": "#8F969E",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--ds-border": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#D8D4CC",
+          "theme": {
+            "Mode": "Light"
+          }
+        },
+        {
+          "value": "#8F969E2E",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--ds-border-strong": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#9CA3AF",
+          "theme": {
+            "Mode": "Light"
+          }
+        },
+        {
+          "value": "#8F969E",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--ds-brand": {
+      "type": "color",
+      "value": "#FFC935"
+    },
+    "--ds-info": {
+      "type": "color",
+      "value": "#00D4FF"
+    },
+    "--ds-success": {
+      "type": "color",
+      "value": "#31C76A"
+    },
+    "--ds-danger": {
+      "type": "color",
+      "value": "#FF5252"
+    },
+    "--ds-warn": {
+      "type": "color",
+      "value": "#F59E0B"
+    },
+    "--ds-cream": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#EDEBE6",
+          "theme": {
+            "Mode": "Light"
+          }
+        },
+        {
+          "value": "#F3F1EC",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "--ds-on-danger-fg": {
+      "type": "color",
+      "value": [
         {
           "value": "#FFFFFF",
           "theme": {
-            "Mode": "Dark"
-          }
-        }
-      ]
-    },
-    "--popover": {
-      "type": "color",
-      "value": [
-        {
-          "value": "#FFFFFF",
-          "theme": {
             "Mode": "Light"
           }
         },
         {
-          "value": "#1A182E",
+          "value": "#F3F1EC",
           "theme": {
             "Mode": "Dark"
           }
         }
       ]
     },
-    "--popover-foreground": {
-      "type": "color",
-      "value": [
-        {
-          "value": "#2A2933",
-          "theme": {
-            "Mode": "Light"
-          }
-        },
-        {
-          "value": "#FFFFFF",
-          "theme": {
-            "Mode": "Dark"
-          }
-        }
-      ]
-    },
-    "--primary": {
-      "type": "color",
-      "value": [
-        {
-          "value": "#5749F4",
-          "theme": {
-            "Mode": "Light"
-          }
-        },
-        {
-          "value": "#5749F4",
-          "theme": {
-            "Mode": "Dark"
-          }
-        }
-      ]
-    },
-    "--primary-foreground": {
-      "type": "color",
-      "value": [
-        {
-          "value": "#FFFFFF",
-          "theme": {
-            "Mode": "Light"
-          }
-        },
-        {
-          "value": "#FFFFFF",
-          "theme": {
-            "Mode": "Dark"
-          }
-        }
-      ]
-    },
-    "--secondary": {
-      "type": "color",
-      "value": [
-        {
-          "value": "#D9D9DB",
-          "theme": {
-            "Mode": "Light"
-          }
-        },
-        {
-          "value": "#403F51",
-          "theme": {
-            "Mode": "Dark"
-          }
-        }
-      ]
-    },
-    "--secondary-foreground": {
-      "type": "color",
-      "value": [
-        {
-          "value": "#2A2933",
-          "theme": {
-            "Mode": "Light"
-          }
-        },
-        {
-          "value": "#FFFFFF",
-          "theme": {
-            "Mode": "Dark"
-          }
-        }
-      ]
-    },
-    "--muted": {
-      "type": "color",
-      "value": [
-        {
-          "value": "#F5F5F5",
-          "theme": {
-            "Mode": "Light"
-          }
-        },
-        {
-          "value": "#2E2E2E",
-          "theme": {
-            "Mode": "Dark"
-          }
-        }
-      ]
-    },
-    "--muted-foreground": {
-      "type": "color",
-      "value": [
-        {
-          "value": "#616167",
-          "theme": {
-            "Mode": "Light"
-          }
-        },
-        {
-          "value": "#888799",
-          "theme": {
-            "Mode": "Dark"
-          }
-        }
-      ]
-    },
-    "--accent": {
-      "type": "color",
-      "value": [
-        {
-          "value": "#F5f5f5",
-          "theme": {
-            "Mode": "Light"
-          }
-        },
-        {
-          "value": "#131124",
-          "theme": {
-            "Mode": "Dark"
-          }
-        }
-      ]
-    },
-    "--accent-foreground": {
-      "type": "color",
-      "value": [
-        {
-          "value": "#2A2933",
-          "theme": {
-            "Mode": "Light"
-          }
-        },
-        {
-          "value": "#F2F3F0",
-          "theme": {
-            "Mode": "Dark"
-          }
-        }
-      ]
-    },
-    "--destructive": {
-      "type": "color",
-      "value": [
-        {
-          "value": "#CC3314",
-          "theme": {
-            "Mode": "Light"
-          }
-        },
-        {
-          "value": "#CC3314",
-          "theme": {
-            "Mode": "Dark"
-          }
-        }
-      ]
-    },
-    "--border": {
-      "type": "color",
-      "value": [
-        {
-          "value": "#C5C5CB",
-          "theme": {
-            "Mode": "Light"
-          }
-        },
-        {
-          "value": "#2B283D",
-          "theme": {
-            "Mode": "Dark"
-          }
-        }
-      ]
-    },
-    "--input": {
-      "type": "color",
-      "value": [
-        {
-          "value": "#C5C5CB",
-          "theme": {
-            "Mode": "Light"
-          }
-        },
-        {
-          "value": "#2B283D",
-          "theme": {
-            "Mode": "Dark"
-          }
-        }
-      ]
-    },
-    "--ring": {
-      "type": "color",
-      "value": [
-        {
-          "value": "#E1E2E5"
-        },
-        {
-          "value": "#666666",
-          "theme": {
-            "Mode": "Dark"
-          }
-        }
-      ]
-    },
-    "--white": {
-      "type": "color",
-      "value": "#FFFFFF"
-    },
-    "--black": {
-      "type": "color",
-      "value": "#000000"
-    },
-    "--font-primary": {
+    "--ds-font-ui": {
       "type": "string",
-      "value": [
-        {
-          "value": "Inter",
-          "theme": {
-            "Mode": "Light"
-          }
-        },
-        {
-          "value": "Inter",
-          "theme": {
-            "Mode": "Dark"
-          }
-        }
-      ]
+      "value": "Inter"
     },
-    "--font-secondary": {
+    "--ds-font-body": {
       "type": "string",
-      "value": [
-        {
-          "value": "Inter",
-          "theme": {
-            "Mode": "Light"
-          }
-        },
-        {
-          "value": "Inter",
-          "theme": {
-            "Mode": "Dark"
-          }
-        }
-      ]
+      "value": "Work Sans"
     },
-    "--radius-pill": {
+    "--ds-radius-md": {
+      "type": "number",
+      "value": 18
+    },
+    "--ds-radius-lg": {
+      "type": "number",
+      "value": 22
+    },
+    "--ds-radius-pill": {
       "type": "number",
       "value": 999
-    },
-    "--color-success": {
-      "type": "color",
-      "value": [
-        {
-          "value": "#A1E5A1",
-          "theme": {
-            "Mode": "Light"
-          }
-        },
-        {
-          "value": "#3B4748",
-          "theme": {
-            "Mode": "Dark"
-          }
-        }
-      ]
-    },
-    "--color-success-foreground": {
-      "type": "color",
-      "value": [
-        {
-          "value": "#003300",
-          "theme": {
-            "Mode": "Light"
-          }
-        },
-        {
-          "value": "#A1E5A1",
-          "theme": {
-            "Mode": "Dark"
-          }
-        }
-      ]
-    },
-    "--color-warning": {
-      "type": "color",
-      "value": [
-        {
-          "value": "#FFD9B2",
-          "theme": {
-            "Mode": "Light"
-          }
-        },
-        {
-          "value": "#53484F",
-          "theme": {
-            "Mode": "Dark"
-          }
-        }
-      ]
-    },
-    "--color-warning-foreground": {
-      "type": "color",
-      "value": [
-        {
-          "value": "#4D2700",
-          "theme": {
-            "Mode": "Light"
-          }
-        },
-        {
-          "value": "#FFD9B2",
-          "theme": {
-            "Mode": "Dark"
-          }
-        }
-      ]
-    },
-    "--color-error": {
-      "type": "color",
-      "value": [
-        {
-          "value": "#FFBFB2",
-          "theme": {
-            "Mode": "Light"
-          }
-        },
-        {
-          "value": "#53424F",
-          "theme": {
-            "Mode": "Dark"
-          }
-        }
-      ]
-    },
-    "--color-error-foreground": {
-      "type": "color",
-      "value": [
-        {
-          "value": "#590F00",
-          "theme": {
-            "Mode": "Light"
-          }
-        },
-        {
-          "value": "#FFBFB2",
-          "theme": {
-            "Mode": "Dark"
-          }
-        }
-      ]
-    },
-    "--color-info": {
-      "type": "color",
-      "value": [
-        {
-          "value": "#C9D6F0",
-          "theme": {
-            "Mode": "Light"
-          }
-        },
-        {
-          "value": "#404562",
-          "theme": {
-            "Mode": "Dark"
-          }
-        }
-      ]
-    },
-    "--color-info-foreground": {
-      "type": "color",
-      "value": [
-        {
-          "value": "#001133"
-        },
-        {
-          "value": "#B2CCFF",
-          "theme": {
-            "Mode": "Dark"
-          }
-        }
-      ]
-    },
-    "--destructive-foreground": {
-      "type": "color",
-      "value": [
-        {
-          "value": "#FFFFFF"
-        },
-        {
-          "value": "#FFFFFF",
-          "theme": {
-            "Mode": "Dark"
-          }
-        }
-      ]
-    },
-    "--radius-m": {
-      "type": "number",
-      "value": [
-        {
-          "value": 24,
-          "theme": {
-            "Mode": "Light"
-          }
-        },
-        {
-          "value": 24,
-          "theme": {
-            "Mode": "Dark"
-          }
-        }
-      ]
-    },
-    "--radius-l": {
-      "type": "number",
-      "value": [
-        {
-          "value": 40,
-          "theme": {
-            "Mode": "Light"
-          }
-        },
-        {
-          "value": 40,
-          "theme": {
-            "Mode": "Dark"
-          }
-        }
-      ]
-    },
-    "--radius-xs": {
-      "type": "number",
-      "value": [
-        {
-          "value": 6,
-          "theme": {
-            "Mode": "Light"
-          }
-        },
-        {
-          "value": 6,
-          "theme": {
-            "Mode": "Dark"
-          }
-        }
-      ]
-    },
-    "--radius-none": {
-      "type": "number",
-      "value": [
-        {
-          "value": 0,
-          "theme": {
-            "Mode": "Light"
-          }
-        },
-        {
-          "value": 0,
-          "theme": {
-            "Mode": "Dark"
-          }
-        }
-      ]
-    },
-    "--tile": {
-      "type": "color",
-      "value": [
-        {
-          "value": "#F5F5F5",
-          "theme": {
-            "Mode": "Light"
-          }
-        },
-        {
-          "value": "#1A182E",
-          "theme": {
-            "Mode": "Dark"
-          }
-        }
-      ]
     }
+  },
+  "imports": {
+    "si": "tokens.pen"
   }
 }

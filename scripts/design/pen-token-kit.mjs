@@ -1,6 +1,9 @@
 /**
  * Shared helpers for .pen files that consume @sindustries/design-tokens via Pencil `imports`.
- * Variables live in tokens.pen — do not copy them into kit consumers (drift risk).
+ * Token definitions live in tokens.pen; consumers normally reference `$si-*` from that import.
+ * design-systems.pen is an exception: it keeps local `$--ds-*` variables + themes for Light/Dark
+ * (see scripts/design/apply-design-systems-ds-themes.mjs). Use stripRootVariables only for files
+ * that must not carry a duplicate variable table.
  */
 import { dirname, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';

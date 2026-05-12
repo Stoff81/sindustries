@@ -1,6 +1,6 @@
 /**
  * Ensure packages/design-tokens/design-systems.pen imports tokens.pen (same folder).
- * Does not remove the kit's own `variables` / `themes` (e.g. $-- tokens); only merges `imports.si`.
+ * Preserves root `variables` / `themes` (Light/Dark + `$--ds-*` kit variables).
  */
 import { readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';

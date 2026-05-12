@@ -83,7 +83,7 @@ If you only need the value inside the existing `tokens` export for app code, add
 | Website (`apps/website`) | `@sindustries/design-tokens/styles.css` in `main.jsx` | `var(--si-color-bg-canvas)` etc. in CSS |
 | Budget mobile (`apps/budget-mobile`) | `@sindustries/design-tokens/tokens` | `import { colors, space, radius } from '…'` in TS/TSX |
 | Budgeting Pencil (`docs/designs/budgeting/main.pen`) | `imports` → `tokens.pen` | Merged **variables** only (`$si-…`). Open `tokens.pen` for the full specimen UI. |
-| Design systems kit (`packages/design-tokens/design-systems.pen`) | `imports` → `./tokens.pen` | Merges **`$si-…`** alongside the kit’s own **`$--…`** variables. Nodes still bind to **`$--…`** unless you point those definitions at **`$si-…`** (see note below). |
+| Design systems kit (`packages/design-tokens/design-systems.pen`) | `imports` → `./tokens.pen` | **Only `$si-…`** on art (no local `variables` / `themes`). Reusable Halo components live here. |
 | Other packages | Same as above | Prefer semantic `colors.*` when available |
 
 ## Pencil
@@ -105,13 +105,11 @@ There is **no** separate “variable sync” script in this repo that pushes `pe
 
 **`npm run sync:budgeting-pen`** (repo root) is **not** variable sync: it only normalizes `docs/designs/budgeting/main.pen` (import path, strip duplicate root `variables`, remove legacy frame `q4Jkj` if present).
 
-**Design systems (`design-systems.pen`) and `$si` vs `$--`**
+**Design systems (`design-systems.pen`)**
 
-Importing `tokens.pen` adds **`$si-color-…`**, **`$si-space-…`**, etc., but this kit’s components were built with **`$--background`**, **`$--primary`**, … Those are **different** variable families. Until you rebind fills to **`$si-…`** or wire the kit’s **`variables`** entries to reference **`$si-*`** (e.g. `--background` themed values), the UI keeps following the **`$--`** palette. A minimal bridge is applied for **`--background`** and **`--foreground`** so the root canvas tracks Sindustries in Light/Dark; extend the same pattern for other keys as you align the kit.
+`design-systems.pen` imports **`tokens.pen`** and uses **`$si-…`** only (no second variable table). If an old branch reintroduces root **`variables`**, **`themes`**, or **`$--…`** strings, run **`npm run migrate:design-systems-pen`** from the repo root to normalize again (see `scripts/design/migrate-design-systems-to-si-vars.mjs`).
 
-**`npm run sync:design-systems-pen`** merges `imports.si` → `./tokens.pen` for `packages/design-tokens/design-systems.pen` and does **not** strip the kit’s root `variables` (the file keeps its **`$--…`** tokens).
-
-Repo helper: `scripts/design/pen-token-kit.mjs` computes the relative path into `tokens.pen` so scripts stay path-correct if files move. **Do not add a “copy variables into Halo” script** — duplicated `variables` blocks drift from the kit; use `imports` only.
+**`npm run sync:design-systems-pen`** sets `imports.si` → `./tokens.pen` and strips any duplicate root **`variables`** / **`themes`**.
 
 ### Design kits in Pencil
 
