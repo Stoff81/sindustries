@@ -1,6 +1,6 @@
 /**
  * Ensure packages/design-tokens/design-systems.pen imports tokens.pen (same folder).
- * Preserves root `variables` / `themes` (Light/Dark + `$--ds-*` kit variables).
+ * Preserves any root `variables` / `themes` on the document (does not strip them).
  */
 import { readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';

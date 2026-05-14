@@ -3,9 +3,7 @@
   "private": true,
   "scripts": {
     "sync:budgeting-pen": "node scripts/design/sync-budgeting-pen.mjs",
-    "sync:design-systems-pen": "node scripts/design/sync-design-systems-pen.mjs",
-    "migrate:design-systems-pen": "node scripts/design/migrate-design-systems-to-si-vars.mjs",
-    "apply:design-systems-ds-themes": "node scripts/design/apply-design-systems-ds-themes.mjs"
+    "sync:design-systems-pen": "node scripts/design/sync-design-systems-pen.mjs"
   },
   "workspaces": [
     "apps/*",
