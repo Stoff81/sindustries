@@ -1,3 +1,8 @@
+/**
+ * GENERATED FILE — do not edit by hand unless you know what you are doing.
+ * Source of truth: tokens.json → run `npm run build` in this package (scripts/build-tokens.mjs).
+ */
+
 export const tokens = {
   "core": {
     "color": {
@@ -61,42 +66,72 @@ export const tokens = {
       "10": 40
     },
     "radius": {
+      "xs": 8,
       "sm": 12,
       "md": 18,
       "lg": 22,
+      "2xl": 24,
       "xl": 28,
       "pill": 999
     }
   },
   "semantic": {
-    "color": {
-      "bg": {
-        "canvas": "#111213",
-        "canvasAlt": "#161a1e",
-        "surface": "#2b2f34",
-        "glass": "rgba(43, 47, 52, 0.68)"
+    "modes": {
+      "light": {
+        "ctaPrimary": "#7a8b7c",
+        "ctaPrimaryText": "#FFFFFF",
+        "ctaSecondary": "#ffc935",
+        "bgCanvas": "#F4F1EA",
+        "bgCanvasAlt": "#E8E4DC",
+        "bgSurface": "#FFFFFF",
+        "bgGlass": "rgba(255, 255, 255, 0.72)",
+        "textPrimary": "#111213",
+        "textSecondary": "#3D444D",
+        "textMuted": "#5C6670",
+        "borderStrong": "#9CA3AF",
+        "borderSubtle": "rgba(0, 0, 0, 0.06)",
+        "focus": "#00d4ff",
+        "statusSuccess": "#31c76a",
+        "statusDanger": "#ff5252",
+        "statusInfo": "#00d4ff",
+        "labelGreen": "#31c76a",
+        "labelBlue": "#60a5fa",
+        "labelOrange": "#f59e0b",
+        "labelPurple": "#a78bfa",
+        "labelGray": "#8f969e",
+        "bgField": "#FFFFFF",
+        "bgPaginationActive": "#E4E0D8",
+        "bgImagePlaceholder": "#EDEAE4",
+        "onDangerFg": "#FFFFFF",
+        "creamUi": "#EDEBE6"
       },
-      "text": {
-        "primary": "#f3f1ec",
-        "secondary": "#d5d3cd",
-        "muted": "#8f969e"
-      },
-      "border": {
-        "strong": "#8f969e",
-        "subtle": "rgba(143, 150, 158, 0.18)"
-      },
-      "focus": "#00d4ff",
-      "status": {
-        "success": "#31c76a",
-        "danger": "#ff5252",
-        "info": "#00d4ff"
-      },
-      "chart": {
-        "groceries": "#31c76a",
-        "subscriptions": "#60a5fa",
-        "transport": "#f59e0b",
-        "dining": "#a78bfa",
-        "other": "#8f969e"
+      "dark": {
+        "ctaPrimary": "#ffc935",
+        "ctaPrimaryText": "#111213",
+        "ctaSecondary": "#7a8b7c",
+        "bgCanvas": "#111213",
+        "bgCanvasAlt": "#161a1e",
+        "bgSurface": "#2b2f34",
+        "bgGlass": "rgba(43, 47, 52, 0.68)",
+        "textPrimary": "#f3f1ec",
+        "textSecondary": "#d5d3cd",
+        "textMuted": "#8f969e",
+        "borderStrong": "#8f969e",
+        "borderSubtle": "rgba(143, 150, 158, 0.18)",
+        "focus": "#00d4ff",
+        "statusSuccess": "#31c76a",
+        "statusDanger": "#ff5252",
+        "statusInfo": "#00d4ff",
+        "labelGreen": "#31c76a",
+        "labelBlue": "#60a5fa",
+        "labelOrange": "#f59e0b",
+        "labelPurple": "#a78bfa",
+        "labelGray": "#8f969e",
+        "bgField": "#111213",
+        "bgPaginationActive": "#111213",
+        "bgImagePlaceholder": "#111213",
+        "onDangerFg": "#f3f1ec",
+        "creamUi": "#f3f1ec"
       }
     },
     "font": {
@@ -131,24 +166,105 @@ export const tokens = {
   }
 } as const;
 
+export type SemanticMode = (typeof tokens)['semantic']['modes']['light'];
+
+/** Light and dark appearance (canonical source: tokens.json → semantic.modes). */
+export const semanticModes = tokens.semantic.modes;
+
+const dark = tokens.semantic.modes.dark;
+const light = tokens.semantic.modes.light;
+
+/** Default export shape matches the previous dark-first API (dark mode). */
 export const colors = {
-  bgCanvas: tokens.semantic.color.bg.canvas,
-  bgCanvasAlt: tokens.semantic.color.bg.canvasAlt,
-  bgSurface: tokens.semantic.color.bg.surface,
-  bgGlass: tokens.semantic.color.bg.glass,
-  textPrimary: tokens.semantic.color.text.primary,
-  textSecondary: tokens.semantic.color.text.secondary,
-  textMuted: tokens.semantic.color.text.muted,
-  borderStrong: tokens.semantic.color.border.strong,
-  borderSubtle: tokens.semantic.color.border.subtle,
-  focus: tokens.semantic.color.focus,
+  ctaPrimary: dark.ctaPrimary,
+  ctaPrimaryText: dark.ctaPrimaryText,
+  ctaSecondary: dark.ctaSecondary,
+  bgCanvas: dark.bgCanvas,
+  bgCanvasAlt: dark.bgCanvasAlt,
+  bgSurface: dark.bgSurface,
+  bgGlass: dark.bgGlass,
+  textPrimary: dark.textPrimary,
+  textSecondary: dark.textSecondary,
+  textMuted: dark.textMuted,
+  borderStrong: dark.borderStrong,
+  borderSubtle: dark.borderSubtle,
+  focus: dark.focus,
+  statusSuccess: dark.statusSuccess,
+  statusDanger: dark.statusDanger,
+  statusInfo: dark.statusInfo,
+  labelGreen: dark.labelGreen,
+  labelBlue: dark.labelBlue,
+  labelOrange: dark.labelOrange,
+  labelPurple: dark.labelPurple,
+  labelGray: dark.labelGray,
+  bgField: dark.bgField,
+  bgPaginationActive: dark.bgPaginationActive,
+  bgImagePlaceholder: dark.bgImagePlaceholder,
+  onDangerFg: dark.onDangerFg,
+  creamUi: dark.creamUi,
   brand: tokens.core.color.brand[500],
+  /** Solid ink for labels/icons on brand yellow (not themed canvas). */
+  ink950: tokens.core.color.ink[950],
   sage: tokens.core.color.sage[500],
-  info: tokens.semantic.color.status.info,
-  success: tokens.semantic.color.status.success,
-  danger: tokens.semantic.color.status.danger,
-  chart: tokens.semantic.color.chart
+  accentPink: tokens.core.color.accent[500],
+  info: dark.statusInfo,
+  success: dark.statusSuccess,
+  danger: dark.statusDanger,
+  labels: {
+    green: dark.labelGreen,
+    blue: dark.labelBlue,
+    orange: dark.labelOrange,
+    purple: dark.labelPurple,
+    gray: dark.labelGray
+  }
 } as const;
+
+/** Same keys as `colors`, resolved for light mode. */
+export const colorsLight = {
+  ctaPrimary: light.ctaPrimary,
+  ctaPrimaryText: light.ctaPrimaryText,
+  ctaSecondary: light.ctaSecondary,
+  bgCanvas: light.bgCanvas,
+  bgCanvasAlt: light.bgCanvasAlt,
+  bgSurface: light.bgSurface,
+  bgGlass: light.bgGlass,
+  textPrimary: light.textPrimary,
+  textSecondary: light.textSecondary,
+  textMuted: light.textMuted,
+  borderStrong: light.borderStrong,
+  borderSubtle: light.borderSubtle,
+  focus: light.focus,
+  statusSuccess: light.statusSuccess,
+  statusDanger: light.statusDanger,
+  statusInfo: light.statusInfo,
+  labelGreen: light.labelGreen,
+  labelBlue: light.labelBlue,
+  labelOrange: light.labelOrange,
+  labelPurple: light.labelPurple,
+  labelGray: light.labelGray,
+  bgField: light.bgField,
+  bgPaginationActive: light.bgPaginationActive,
+  bgImagePlaceholder: light.bgImagePlaceholder,
+  onDangerFg: light.onDangerFg,
+  creamUi: light.creamUi,
+  brand: tokens.core.color.brand[500],
+  /** Solid ink for labels/icons on brand yellow (not themed canvas). */
+  ink950: tokens.core.color.ink[950],
+  sage: tokens.core.color.sage[500],
+  accentPink: tokens.core.color.accent[500],
+  info: light.statusInfo,
+  success: light.statusSuccess,
+  danger: light.statusDanger,
+  labels: {
+    green: light.labelGreen,
+    blue: light.labelBlue,
+    orange: light.labelOrange,
+    purple: light.labelPurple,
+    gray: light.labelGray
+  }
+} as const;
+
+export const colorsDark = colors;
 
 export const fonts = tokens.semantic.font;
 export const space = tokens.core.space;

@@ -151,7 +151,7 @@ li {
 
 .btn.primary {
   background: var(--si-color-brand-500);
-  color: var(--si-color-bg-canvas);
+  color: var(--si-color-ink-950);
   font-weight: 700;
 }
 

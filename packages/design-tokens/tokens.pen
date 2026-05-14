@@ -1,13 +1,19 @@
 {
   "version": "2.10",
+  "themes": {
+    "Mode": [
+      "Light",
+      "Dark"
+    ]
+  },
   "variables": {
-    "si-color-ink-950": {
-      "type": "color",
-      "value": "#111213"
-    },
     "si-color-ink-900": {
       "type": "color",
       "value": "#161A1E"
+    },
+    "si-color-ink-950": {
+      "type": "color",
+      "value": "#111213"
     },
     "si-color-surface-800": {
       "type": "color",
@@ -33,37 +39,37 @@
       "type": "color",
       "value": "#ECE3CC"
     },
-    "si-color-neutral-300": {
-      "type": "color",
-      "value": "#D3D3D3"
-    },
     "si-color-neutral-200": {
       "type": "color",
       "value": "#DDDDDD"
     },
-    "si-color-brand-500": {
+    "si-color-neutral-300": {
       "type": "color",
-      "value": "#FFC935"
+      "value": "#D3D3D3"
     },
     "si-color-brand-200": {
       "type": "color",
       "value": "#FFE891"
     },
-    "si-color-info-500": {
+    "si-color-brand-500": {
       "type": "color",
-      "value": "#00D4FF"
+      "value": "#FFC935"
     },
     "si-color-info-200": {
       "type": "color",
       "value": "#9EE9FF"
     },
-    "si-color-accent-500": {
+    "si-color-info-500": {
       "type": "color",
-      "value": "#FF3E8A"
+      "value": "#00D4FF"
     },
     "si-color-accent-200": {
       "type": "color",
       "value": "#FF8AB4"
+    },
+    "si-color-accent-500": {
+      "type": "color",
+      "value": "#FF3E8A"
     },
     "si-color-success-500": {
       "type": "color",
@@ -73,65 +79,447 @@
       "type": "color",
       "value": "#FF5252"
     },
+    "si-color-cta-primary": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#7A8B7C",
+          "theme": {
+            "Mode": "Light"
+          }
+        },
+        {
+          "value": "#FFC935",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "si-color-cta-primary-text": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#FFFFFF",
+          "theme": {
+            "Mode": "Light"
+          }
+        },
+        {
+          "value": "#111213",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "si-color-cta-secondary": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#FFC935",
+          "theme": {
+            "Mode": "Light"
+          }
+        },
+        {
+          "value": "#7A8B7C",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
     "si-color-bg-canvas": {
       "type": "color",
-      "value": "#111213"
+      "value": [
+        {
+          "value": "#F4F1EA",
+          "theme": {
+            "Mode": "Light"
+          }
+        },
+        {
+          "value": "#111213",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
     },
     "si-color-bg-canvas-alt": {
       "type": "color",
-      "value": "#161A1E"
+      "value": [
+        {
+          "value": "#E8E4DC",
+          "theme": {
+            "Mode": "Light"
+          }
+        },
+        {
+          "value": "#161A1E",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
     },
     "si-color-bg-surface": {
       "type": "color",
-      "value": "#2B2F34"
+      "value": [
+        {
+          "value": "#FFFFFF",
+          "theme": {
+            "Mode": "Light"
+          }
+        },
+        {
+          "value": "#2B2F34",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
     },
     "si-color-bg-glass": {
       "type": "color",
-      "value": "#2B2F34AD"
+      "value": [
+        {
+          "value": "#FFFFFFB8",
+          "theme": {
+            "Mode": "Light"
+          }
+        },
+        {
+          "value": "#2B2F34AD",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
     },
     "si-color-text-primary": {
       "type": "color",
-      "value": "#F3F1EC"
+      "value": [
+        {
+          "value": "#111213",
+          "theme": {
+            "Mode": "Light"
+          }
+        },
+        {
+          "value": "#F3F1EC",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
     },
     "si-color-text-secondary": {
       "type": "color",
-      "value": "#D5D3CD"
+      "value": [
+        {
+          "value": "#3D444D",
+          "theme": {
+            "Mode": "Light"
+          }
+        },
+        {
+          "value": "#D5D3CD",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
     },
     "si-color-text-muted": {
       "type": "color",
-      "value": "#8F969E"
+      "value": [
+        {
+          "value": "#5C6670",
+          "theme": {
+            "Mode": "Light"
+          }
+        },
+        {
+          "value": "#8F969E",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
     },
     "si-color-border-strong": {
       "type": "color",
-      "value": "#8F969E"
+      "value": [
+        {
+          "value": "#9CA3AF",
+          "theme": {
+            "Mode": "Light"
+          }
+        },
+        {
+          "value": "#8F969E",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
     },
     "si-color-border-subtle": {
       "type": "color",
-      "value": "#8F969E2E"
+      "value": [
+        {
+          "value": "#0000000F",
+          "theme": {
+            "Mode": "Light"
+          }
+        },
+        {
+          "value": "#8F969E2E",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
     },
     "si-color-focus": {
       "type": "color",
-      "value": "#00D4FF"
+      "value": [
+        {
+          "value": "#00D4FF",
+          "theme": {
+            "Mode": "Light"
+          }
+        },
+        {
+          "value": "#00D4FF",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
     },
-    "si-color-chart-groceries": {
+    "si-color-status-success": {
       "type": "color",
-      "value": "#31C76A"
+      "value": [
+        {
+          "value": "#31C76A",
+          "theme": {
+            "Mode": "Light"
+          }
+        },
+        {
+          "value": "#31C76A",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
     },
-    "si-color-chart-subscriptions": {
+    "si-color-status-danger": {
       "type": "color",
-      "value": "#60A5FA"
+      "value": [
+        {
+          "value": "#FF5252",
+          "theme": {
+            "Mode": "Light"
+          }
+        },
+        {
+          "value": "#FF5252",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
     },
-    "si-color-chart-transport": {
+    "si-color-status-info": {
       "type": "color",
-      "value": "#F59E0B"
+      "value": [
+        {
+          "value": "#00D4FF",
+          "theme": {
+            "Mode": "Light"
+          }
+        },
+        {
+          "value": "#00D4FF",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
     },
-    "si-color-chart-dining": {
+    "si-color-label-green": {
       "type": "color",
-      "value": "#A78BFA"
+      "value": [
+        {
+          "value": "#31C76A",
+          "theme": {
+            "Mode": "Light"
+          }
+        },
+        {
+          "value": "#31C76A",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
     },
-    "si-color-chart-other": {
+    "si-color-label-blue": {
       "type": "color",
-      "value": "#8F969E"
+      "value": [
+        {
+          "value": "#60A5FA",
+          "theme": {
+            "Mode": "Light"
+          }
+        },
+        {
+          "value": "#60A5FA",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "si-color-label-orange": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#F59E0B",
+          "theme": {
+            "Mode": "Light"
+          }
+        },
+        {
+          "value": "#F59E0B",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "si-color-label-purple": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#A78BFA",
+          "theme": {
+            "Mode": "Light"
+          }
+        },
+        {
+          "value": "#A78BFA",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "si-color-label-gray": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#8F969E",
+          "theme": {
+            "Mode": "Light"
+          }
+        },
+        {
+          "value": "#8F969E",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "si-color-bg-field": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#FFFFFF",
+          "theme": {
+            "Mode": "Light"
+          }
+        },
+        {
+          "value": "#111213",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "si-color-bg-pagination-active": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#E4E0D8",
+          "theme": {
+            "Mode": "Light"
+          }
+        },
+        {
+          "value": "#111213",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "si-color-bg-image-placeholder": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#EDEAE4",
+          "theme": {
+            "Mode": "Light"
+          }
+        },
+        {
+          "value": "#111213",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "si-color-on-danger-fg": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#FFFFFF",
+          "theme": {
+            "Mode": "Light"
+          }
+        },
+        {
+          "value": "#F3F1EC",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
+    },
+    "si-color-cream-ui": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#EDEBE6",
+          "theme": {
+            "Mode": "Light"
+          }
+        },
+        {
+          "value": "#F3F1EC",
+          "theme": {
+            "Mode": "Dark"
+          }
+        }
+      ]
     },
     "si-font-body": {
       "type": "string",
@@ -181,6 +569,10 @@
       "type": "number",
       "value": 40
     },
+    "si-radius-xs": {
+      "type": "number",
+      "value": 8
+    },
     "si-radius-sm": {
       "type": "number",
       "value": 12
@@ -192,6 +584,10 @@
     "si-radius-lg": {
       "type": "number",
       "value": 22
+    },
+    "si-radius-2xl": {
+      "type": "number",
+      "value": 24
     },
     "si-radius-xl": {
       "type": "number",
@@ -215,10 +611,13 @@
       "type": "frame",
       "id": "siSpecRoot",
       "name": "Design tokens specimen",
+      "theme": {
+        "Mode": "Dark"
+      },
       "x": 32,
       "y": 32,
       "width": 960,
-      "height": 1320,
+      "height": 1370,
       "fill": "$si-color-bg-canvas",
       "cornerRadius": "$si-radius-xl",
       "layout": "vertical",
@@ -594,13 +993,278 @@
                       "width": "fill_container",
                       "height": 28,
                       "cornerRadius": "$si-radius-sm",
-                      "fill": "$si-color-chart-other"
+                      "fill": "$si-color-sage-500"
                     },
                     {
                       "type": "text",
                       "id": "siSws7t",
                       "fill": "$si-color-text-primary",
-                      "content": "Other",
+                      "content": "Sage",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "800",
+                      "textGrowth": "auto"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "siSwRow2",
+              "width": "fill_container",
+              "height": 94,
+              "layout": "horizontal",
+              "gap": 12,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "siSws8",
+                  "width": 104,
+                  "height": 86,
+                  "fill": "$si-color-bg-canvas-alt",
+                  "cornerRadius": "$si-radius-md",
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "$si-color-border-subtle"
+                  },
+                  "layout": "vertical",
+                  "gap": 6,
+                  "padding": 8,
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "id": "siSws8q",
+                      "width": "fill_container",
+                      "height": 28,
+                      "cornerRadius": "$si-radius-sm",
+                      "fill": "$si-color-accent-500"
+                    },
+                    {
+                      "type": "text",
+                      "id": "siSws8t",
+                      "fill": "$si-color-text-primary",
+                      "content": "Accent pink",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "800",
+                      "textGrowth": "auto"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "siSpecLabelSec",
+          "width": "fill_container",
+          "fill": "$si-color-bg-surface",
+          "cornerRadius": "$si-radius-lg",
+          "stroke": {
+            "align": "inside",
+            "thickness": 1,
+            "fill": "$si-color-border-subtle"
+          },
+          "layout": "vertical",
+          "gap": 14,
+          "padding": 18,
+          "children": [
+            {
+              "type": "text",
+              "id": "siSpecLabelTitle",
+              "fill": "$si-color-text-primary",
+              "content": "Color Labels",
+              "fontFamily": "Inter",
+              "fontSize": 20,
+              "fontWeight": "800",
+              "textGrowth": "auto"
+            },
+            {
+              "type": "frame",
+              "id": "siLblRow",
+              "width": "fill_container",
+              "height": 94,
+              "layout": "horizontal",
+              "gap": 12,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "siLbl0",
+                  "width": 104,
+                  "height": 86,
+                  "fill": "$si-color-bg-canvas-alt",
+                  "cornerRadius": "$si-radius-md",
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "$si-color-border-subtle"
+                  },
+                  "layout": "vertical",
+                  "gap": 6,
+                  "padding": 8,
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "id": "siLbl0q",
+                      "width": "fill_container",
+                      "height": 28,
+                      "cornerRadius": "$si-radius-sm",
+                      "fill": "$si-color-label-green"
+                    },
+                    {
+                      "type": "text",
+                      "id": "siLbl0t",
+                      "fill": "$si-color-text-primary",
+                      "content": "Green",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "800",
+                      "textGrowth": "auto"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "siLbl1",
+                  "width": 104,
+                  "height": 86,
+                  "fill": "$si-color-bg-canvas-alt",
+                  "cornerRadius": "$si-radius-md",
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "$si-color-border-subtle"
+                  },
+                  "layout": "vertical",
+                  "gap": 6,
+                  "padding": 8,
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "id": "siLbl1q",
+                      "width": "fill_container",
+                      "height": 28,
+                      "cornerRadius": "$si-radius-sm",
+                      "fill": "$si-color-label-blue"
+                    },
+                    {
+                      "type": "text",
+                      "id": "siLbl1t",
+                      "fill": "$si-color-text-primary",
+                      "content": "Blue",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "800",
+                      "textGrowth": "auto"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "siLbl2",
+                  "width": 104,
+                  "height": 86,
+                  "fill": "$si-color-bg-canvas-alt",
+                  "cornerRadius": "$si-radius-md",
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "$si-color-border-subtle"
+                  },
+                  "layout": "vertical",
+                  "gap": 6,
+                  "padding": 8,
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "id": "siLbl2q",
+                      "width": "fill_container",
+                      "height": 28,
+                      "cornerRadius": "$si-radius-sm",
+                      "fill": "$si-color-label-orange"
+                    },
+                    {
+                      "type": "text",
+                      "id": "siLbl2t",
+                      "fill": "$si-color-text-primary",
+                      "content": "Orange",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "800",
+                      "textGrowth": "auto"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "siLbl3",
+                  "width": 104,
+                  "height": 86,
+                  "fill": "$si-color-bg-canvas-alt",
+                  "cornerRadius": "$si-radius-md",
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "$si-color-border-subtle"
+                  },
+                  "layout": "vertical",
+                  "gap": 6,
+                  "padding": 8,
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "id": "siLbl3q",
+                      "width": "fill_container",
+                      "height": 28,
+                      "cornerRadius": "$si-radius-sm",
+                      "fill": "$si-color-label-purple"
+                    },
+                    {
+                      "type": "text",
+                      "id": "siLbl3t",
+                      "fill": "$si-color-text-primary",
+                      "content": "Purple",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "800",
+                      "textGrowth": "auto"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "siLbl4",
+                  "width": 104,
+                  "height": 86,
+                  "fill": "$si-color-bg-canvas-alt",
+                  "cornerRadius": "$si-radius-md",
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "$si-color-border-subtle"
+                  },
+                  "layout": "vertical",
+                  "gap": 6,
+                  "padding": 8,
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "id": "siLbl4q",
+                      "width": "fill_container",
+                      "height": 28,
+                      "cornerRadius": "$si-radius-sm",
+                      "fill": "$si-color-label-gray"
+                    },
+                    {
+                      "type": "text",
+                      "id": "siLbl4t",
+                      "fill": "$si-color-text-primary",
+                      "content": "Gray",
                       "fontFamily": "Inter",
                       "fontSize": 11,
                       "fontWeight": "800",
@@ -1007,6 +1671,34 @@
               "children": [
                 {
                   "type": "frame",
+                  "id": "siRdkxs",
+                  "width": 76,
+                  "height": 76,
+                  "fill": "$si-color-bg-canvas-alt",
+                  "cornerRadius": 8,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "$si-color-border-subtle"
+                  },
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "siRdlxs",
+                      "fill": "$si-color-text-primary",
+                      "content": "xs",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "700",
+                      "textGrowth": "auto"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
                   "id": "siRdksm",
                   "width": 76,
                   "height": 76,
@@ -1091,6 +1783,34 @@
                 },
                 {
                   "type": "frame",
+                  "id": "siRdk2xl",
+                  "width": 76,
+                  "height": 76,
+                  "fill": "$si-color-bg-canvas-alt",
+                  "cornerRadius": 24,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "$si-color-border-subtle"
+                  },
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "siRdl2xl",
+                      "fill": "$si-color-text-primary",
+                      "content": "2xl",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "700",
+                      "textGrowth": "auto"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
                   "id": "siRdkxl",
                   "width": 76,
                   "height": 76,
@@ -1144,138 +1864,6 @@
                       "textGrowth": "auto"
                     }
                   ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "type": "frame",
-          "id": "siSpecDemo",
-          "width": "fill_container",
-          "height": 132,
-          "fill": "$si-color-bg-surface",
-          "cornerRadius": "$si-radius-lg",
-          "stroke": {
-            "align": "inside",
-            "thickness": 1,
-            "fill": "$si-color-border-subtle"
-          },
-          "gap": 14,
-          "padding": 18,
-          "layout": "horizontal",
-          "alignItems": "center",
-          "children": [
-            {
-              "type": "frame",
-              "id": "siSpecMini",
-              "width": "fill_container",
-              "height": "fill_container",
-              "fill": "$si-color-bg-canvas-alt",
-              "cornerRadius": "$si-radius-lg",
-              "stroke": {
-                "align": "inside",
-                "thickness": 1,
-                "fill": "$si-color-border-subtle"
-              },
-              "layout": "vertical",
-              "gap": 8,
-              "padding": 14,
-              "children": [
-                {
-                  "type": "text",
-                  "id": "siSpecMiniTitle",
-                  "fill": "$si-color-text-primary",
-                  "content": "Budget card",
-                  "fontFamily": "Inter",
-                  "fontSize": 17,
-                  "fontWeight": "800",
-                  "textGrowth": "auto"
-                },
-                {
-                  "type": "text",
-                  "id": "siSpecMiniBody",
-                  "fill": "$si-color-text-secondary",
-                  "textGrowth": "fixed-width",
-                  "width": "fill_container",
-                  "content": "Shared surface, text, radius, spacing, and chart colors.",
-                  "fontFamily": "Work Sans",
-                  "fontSize": 13,
-                  "fontWeight": "normal",
-                  "lineHeight": 1.35
-                }
-              ]
-            },
-            {
-              "type": "frame",
-              "id": "siSpecBtn",
-              "width": 176,
-              "height": 50,
-              "fill": "$si-color-brand-500",
-              "cornerRadius": "$si-radius-pill",
-              "layout": "vertical",
-              "justifyContent": "center",
-              "alignItems": "center",
-              "children": [
-                {
-                  "type": "text",
-                  "id": "siSpecBtnTx",
-                  "fill": "$si-color-bg-canvas",
-                  "content": "Primary action",
-                  "fontFamily": "Inter",
-                  "fontSize": 14,
-                  "fontWeight": "800",
-                  "textGrowth": "auto"
-                }
-              ]
-            },
-            {
-              "type": "frame",
-              "id": "siSpecChart",
-              "width": 236,
-              "height": 50,
-              "layout": "horizontal",
-              "gap": 6,
-              "children": [
-                {
-                  "type": "frame",
-                  "id": "siCh0",
-                  "width": "fill_container",
-                  "height": "fill_container",
-                  "fill": "$si-color-chart-groceries",
-                  "cornerRadius": "$si-radius-sm"
-                },
-                {
-                  "type": "frame",
-                  "id": "siCh1",
-                  "width": "fill_container",
-                  "height": "fill_container",
-                  "fill": "$si-color-chart-subscriptions",
-                  "cornerRadius": "$si-radius-sm"
-                },
-                {
-                  "type": "frame",
-                  "id": "siCh2",
-                  "width": "fill_container",
-                  "height": "fill_container",
-                  "fill": "$si-color-chart-transport",
-                  "cornerRadius": "$si-radius-sm"
-                },
-                {
-                  "type": "frame",
-                  "id": "siCh3",
-                  "width": "fill_container",
-                  "height": "fill_container",
-                  "fill": "$si-color-chart-dining",
-                  "cornerRadius": "$si-radius-sm"
-                },
-                {
-                  "type": "frame",
-                  "id": "siCh4",
-                  "width": "fill_container",
-                  "height": "fill_container",
-                  "fill": "$si-color-chart-other",
-                  "cornerRadius": "$si-radius-sm"
                 }
               ]
             }

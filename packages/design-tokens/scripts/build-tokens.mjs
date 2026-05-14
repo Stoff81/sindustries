@@ -30,6 +30,46 @@ function resolveTree(value) {
 
 const resolved = resolveTree(tokens);
 
+// ---------------------------------------------------------------------------
+// Auto-derived token inventories
+// ---------------------------------------------------------------------------
+// Adding a new key to tokens.json should be sufficient — these inventories drive
+// CSS variables, Pencil themed variables, and the generated TS `colors` export
+// without any further wiring. Curated specimen swatches stay explicit because
+// "which tokens to show" is an editorial choice; see swatches/labelSwatches.
+
+const kebab = (s) => s.replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`);
+
+/** Flat list of core color primitives → CSS/Pencil variable name + value. */
+const corePrimitiveColors = [];
+for (const [group, variants] of Object.entries(resolved.core.color)) {
+  if (variants && typeof variants === 'object') {
+    for (const [variant, value] of Object.entries(variants)) {
+      corePrimitiveColors.push({
+        cssName: `si-color-${group}-${variant}`,
+        value
+      });
+    }
+  }
+}
+
+/**
+ * Mode-aware semantic colors — every key under `semantic.modes.light` (must
+ * match `semantic.modes.dark`) produces an `--si-color-<kebab>` CSS variable
+ * and a themed Pencil variable.
+ */
+const semanticModeKeys = Object.keys(resolved.semantic.modes.light);
+const semanticModeColors = semanticModeKeys.map((modeKey) => ({
+  modeKey,
+  cssName: `si-color-${kebab(modeKey)}`,
+  lightValue: resolved.semantic.modes.light[modeKey],
+  darkValue: resolved.semantic.modes.dark[modeKey]
+}));
+
+// ---------------------------------------------------------------------------
+// Pencil variables
+// ---------------------------------------------------------------------------
+
 function clampByte(n) {
   return Math.max(0, Math.min(255, Math.round(Number(n))));
 }
@@ -61,68 +101,40 @@ function colorToPencil(value) {
   return v;
 }
 
+function themedColorFromModes(lightVal, darkVal) {
+  return {
+    type: 'color',
+    value: [
+      { value: colorToPencil(String(lightVal)), theme: { Mode: 'Light' } },
+      { value: colorToPencil(String(darkVal)), theme: { Mode: 'Dark' } }
+    ]
+  };
+}
+
 function buildPencilVariables() {
   const v = {};
-  const color = (name, val) => {
-    v[name] = { type: 'color', value: colorToPencil(String(val)) };
-  };
-  const str = (name, val) => {
-    v[name] = { type: 'string', value: String(val) };
-  };
-  const num = (name, val) => {
-    v[name] = { type: 'number', value: Number(val) };
-  };
 
-  const c = resolved.core.color;
-  color('si-color-ink-950', c.ink['950']);
-  color('si-color-ink-900', c.ink['900']);
-  color('si-color-surface-800', c.surface['800']);
-  color('si-color-slate-500', c.slate['500']);
-  color('si-color-sage-500', c.sage['500']);
-  color('si-color-cream-100', c.cream['100']);
-  color('si-color-cream-200', c.cream['200']);
-  color('si-color-paper-200', c.paper['200']);
-  color('si-color-neutral-300', c.neutral['300']);
-  color('si-color-neutral-200', c.neutral['200']);
-  color('si-color-brand-500', c.brand['500']);
-  color('si-color-brand-200', c.brand['200']);
-  color('si-color-info-500', c.info['500']);
-  color('si-color-info-200', c.info['200']);
-  color('si-color-accent-500', c.accent['500']);
-  color('si-color-accent-200', c.accent['200']);
-  color('si-color-success-500', c.success['500']);
-  color('si-color-danger-500', c.danger['500']);
+  for (const { cssName, value } of corePrimitiveColors) {
+    v[cssName] = { type: 'color', value: colorToPencil(String(value)) };
+  }
 
-  const s = resolved.semantic.color;
-  color('si-color-bg-canvas', s.bg.canvas);
-  color('si-color-bg-canvas-alt', s.bg.canvasAlt);
-  color('si-color-bg-surface', s.bg.surface);
-  color('si-color-bg-glass', s.bg.glass);
-  color('si-color-text-primary', s.text.primary);
-  color('si-color-text-secondary', s.text.secondary);
-  color('si-color-text-muted', s.text.muted);
-  color('si-color-border-strong', s.border.strong);
-  color('si-color-border-subtle', s.border.subtle);
-  color('si-color-focus', s.focus);
-  color('si-color-chart-groceries', s.chart.groceries);
-  color('si-color-chart-subscriptions', s.chart.subscriptions);
-  color('si-color-chart-transport', s.chart.transport);
-  color('si-color-chart-dining', s.chart.dining);
-  color('si-color-chart-other', s.chart.other);
+  for (const { cssName, lightValue, darkValue } of semanticModeColors) {
+    v[cssName] = themedColorFromModes(lightValue, darkValue);
+  }
 
-  str('si-font-body', resolved.semantic.font.body);
-  str('si-font-ui', resolved.semantic.font.ui);
-  str('si-font-display', resolved.semantic.font.display);
+  v['si-font-body'] = { type: 'string', value: String(resolved.semantic.font.body) };
+  v['si-font-ui'] = { type: 'string', value: String(resolved.semantic.font.ui) };
+  v['si-font-display'] = { type: 'string', value: String(resolved.semantic.font.display) };
 
   for (const [key, val] of Object.entries(resolved.core.space)) {
-    num(`si-space-${key}`, val);
+    v[`si-space-${key}`] = { type: 'number', value: Number(val) };
   }
   for (const [key, val] of Object.entries(resolved.core.radius)) {
-    num(`si-radius-${key}`, val);
+    v[`si-radius-${key}`] = { type: 'number', value: Number(val) };
   }
 
-  str('si-shadow-soft', resolved.semantic.shadow.soft);
-  str('si-shadow-hard', resolved.semantic.shadow.hard);
+  v['si-shadow-soft'] = { type: 'string', value: String(resolved.semantic.shadow.soft) };
+  v['si-shadow-hard'] = { type: 'string', value: String(resolved.semantic.shadow.hard) };
 
   return v;
 }
@@ -131,9 +143,13 @@ const pencilVariables = buildPencilVariables();
 
 const penTokensPayload = {
   description:
-    'Generated by scripts/build-tokens.mjs from tokens.json. Do not edit by hand; run npm run build in this package.',
+    'GENERATED — do not edit this file by hand unless you know what you are doing. Produced from tokens.json via scripts/build-tokens.mjs (run npm run build in this package).',
   variables: pencilVariables
 };
+
+// ---------------------------------------------------------------------------
+// Pencil specimen document
+// ---------------------------------------------------------------------------
 
 function chunk(arr, size) {
   const out = [];
@@ -156,6 +172,9 @@ function buildPencilSpecimenDocumentChildren() {
   const sp = resolved.core.space;
   const rad = resolved.core.radius;
 
+  // Curated swatch lists: which tokens to spotlight in the specimen is an
+  // editorial choice, so this stays hand-maintained. The build script does not
+  // require any of these entries to exist — missing names are skipped.
   const swatches = [
     ['Canvas', 'si-color-bg-canvas'],
     ['Surface', 'si-color-bg-surface'],
@@ -164,7 +183,16 @@ function buildPencilSpecimenDocumentChildren() {
     ['Brand', 'si-color-brand-500'],
     ['Success', 'si-color-success-500'],
     ['Danger', 'si-color-danger-500'],
-    ['Other', 'si-color-chart-other']
+    ['Sage', 'si-color-sage-500'],
+    ['Accent pink', 'si-color-accent-500']
+  ];
+
+  const labelSwatches = [
+    ['Green', 'si-color-label-green'],
+    ['Blue', 'si-color-label-blue'],
+    ['Orange', 'si-color-label-orange'],
+    ['Purple', 'si-color-label-purple'],
+    ['Gray', 'si-color-label-gray']
   ];
 
   const swatchCards = swatches.map(([label, key], i) => ({
@@ -210,6 +238,50 @@ function buildPencilSpecimenDocumentChildren() {
     alignItems: 'center',
     children: row
   }));
+
+  const labelCards = labelSwatches.map(([label, key], i) => ({
+    type: 'frame',
+    id: `siLbl${i}`,
+    width: 104,
+    height: 86,
+    fill: '$si-color-bg-canvas-alt',
+    cornerRadius: '$si-radius-md',
+    stroke: strokeSubtle,
+    layout: 'vertical',
+    gap: 6,
+    padding: 8,
+    children: [
+      {
+        type: 'rectangle',
+        id: `siLbl${i}q`,
+        width: 'fill_container',
+        height: 28,
+        cornerRadius: '$si-radius-sm',
+        fill: `$${key}`
+      },
+      {
+        type: 'text',
+        id: `siLbl${i}t`,
+        fill: '$si-color-text-primary',
+        content: label,
+        fontFamily: 'Inter',
+        fontSize: 11,
+        fontWeight: '800',
+        textGrowth: 'auto'
+      }
+    ]
+  }));
+
+  const labelRow = {
+    type: 'frame',
+    id: 'siLblRow',
+    width: 'fill_container',
+    height: 94,
+    layout: 'horizontal',
+    gap: 12,
+    alignItems: 'center',
+    children: labelCards
+  };
 
   const spaceBars = Object.entries(sp)
     .sort(([a], [b]) => Number(a) - Number(b))
@@ -268,24 +340,16 @@ function buildPencilSpecimenDocumentChildren() {
     ]
   }));
 
-  const chartStrip = ['groceries', 'subscriptions', 'transport', 'dining', 'other'].map((key, i) => ({
-    type: 'frame',
-    id: `siCh${i}`,
-    width: 'fill_container',
-    height: 'fill_container',
-    fill: `$si-color-chart-${key}`,
-    cornerRadius: '$si-radius-sm'
-  }));
-
   return [
     {
       type: 'frame',
       id: 'siSpecRoot',
       name: 'Design tokens specimen',
+      theme: { Mode: 'Dark' },
       x: 32,
       y: 32,
       width: 960,
-      height: 1320,
+      height: 1370,
       fill: '$si-color-bg-canvas',
       cornerRadius: '$si-radius-xl',
       layout: 'vertical',
@@ -361,6 +425,30 @@ function buildPencilSpecimenDocumentChildren() {
               textGrowth: 'auto'
             },
             ...swatchRows
+          ]
+        },
+        {
+          type: 'frame',
+          id: 'siSpecLabelSec',
+          width: 'fill_container',
+          fill: '$si-color-bg-surface',
+          cornerRadius: '$si-radius-lg',
+          stroke: strokeSubtle,
+          layout: 'vertical',
+          gap: 14,
+          padding: 18,
+          children: [
+            {
+              type: 'text',
+              id: 'siSpecLabelTitle',
+              fill: '$si-color-text-primary',
+              content: 'Color Labels',
+              fontFamily: 'Inter',
+              fontSize: 20,
+              fontWeight: '800',
+              textGrowth: 'auto'
+            },
+            labelRow
           ]
         },
         {
@@ -484,89 +572,6 @@ function buildPencilSpecimenDocumentChildren() {
               children: radiusTiles
             }
           ]
-        },
-        {
-          type: 'frame',
-          id: 'siSpecDemo',
-          width: 'fill_container',
-          height: 132,
-          fill: '$si-color-bg-surface',
-          cornerRadius: '$si-radius-lg',
-          stroke: strokeSubtle,
-          gap: 14,
-          padding: 18,
-          layout: 'horizontal',
-          alignItems: 'center',
-          children: [
-            {
-              type: 'frame',
-              id: 'siSpecMini',
-              width: 'fill_container',
-              height: 'fill_container',
-              fill: '$si-color-bg-canvas-alt',
-              cornerRadius: '$si-radius-lg',
-              stroke: strokeSubtle,
-              layout: 'vertical',
-              gap: 8,
-              padding: 14,
-              children: [
-                {
-                  type: 'text',
-                  id: 'siSpecMiniTitle',
-                  fill: '$si-color-text-primary',
-                  content: 'Budget card',
-                  fontFamily: 'Inter',
-                  fontSize: 17,
-                  fontWeight: '800',
-                  textGrowth: 'auto'
-                },
-                {
-                  type: 'text',
-                  id: 'siSpecMiniBody',
-                  fill: '$si-color-text-secondary',
-                  textGrowth: 'fixed-width',
-                  width: 'fill_container',
-                  content: 'Shared surface, text, radius, spacing, and chart colors.',
-                  fontFamily: 'Work Sans',
-                  fontSize: 13,
-                  fontWeight: 'normal',
-                  lineHeight: 1.35
-                }
-              ]
-            },
-            {
-              type: 'frame',
-              id: 'siSpecBtn',
-              width: 176,
-              height: 50,
-              fill: '$si-color-brand-500',
-              cornerRadius: '$si-radius-pill',
-              layout: 'vertical',
-              justifyContent: 'center',
-              alignItems: 'center',
-              children: [
-                {
-                  type: 'text',
-                  id: 'siSpecBtnTx',
-                  fill: '$si-color-bg-canvas',
-                  content: 'Primary action',
-                  fontFamily: 'Inter',
-                  fontSize: 14,
-                  fontWeight: '800',
-                  textGrowth: 'auto'
-                }
-              ]
-            },
-            {
-              type: 'frame',
-              id: 'siSpecChart',
-              width: 236,
-              height: 50,
-              layout: 'horizontal',
-              gap: 6,
-              children: chartStrip
-            }
-          ]
         }
       ]
     }
@@ -575,9 +580,14 @@ function buildPencilSpecimenDocumentChildren() {
 
 const pencilDocument = {
   version: '2.10',
+  themes: { Mode: ['Light', 'Dark'] },
   variables: pencilVariables,
   children: buildPencilSpecimenDocumentChildren()
 };
+
+// ---------------------------------------------------------------------------
+// styles.css
+// ---------------------------------------------------------------------------
 
 function cssVar(name, value) {
   return `  --${name}: ${value};`;
@@ -587,46 +597,27 @@ function pxVar(name, value) {
   return cssVar(name, `${value}px`);
 }
 
-const css = `@import url('https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Inter:wght@400;500;600;700;800&family=Work+Sans:wght@400;500;600;700;800;900&display=swap');
+const corePrimitiveLines = corePrimitiveColors.map(({ cssName, value }) => cssVar(cssName, value));
+const darkSemanticLines = semanticModeColors.map(({ cssName, darkValue }) => cssVar(cssName, darkValue));
+const lightSemanticLines = semanticModeColors.map(({ cssName, lightValue }) => cssVar(cssName, lightValue));
 
-:root {
+const generatedCssBanner = `/*
+ * GENERATED FILE — do not edit by hand unless you know what you are doing.
+ * Source of truth: tokens.json → run \`npm run build\` in this package (scripts/build-tokens.mjs).
+ */
+
+`;
+
+const css = `${generatedCssBanner}@import url('https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Inter:wght@400;500;600;700;800&family=Work+Sans:wght@400;500;600;700;800;900&display=swap');
+
+:root,
+[data-si-theme="dark"] {
   color-scheme: dark;
 
 ${[
-  cssVar('si-color-ink-950', resolved.core.color.ink['950']),
-  cssVar('si-color-ink-900', resolved.core.color.ink['900']),
-  cssVar('si-color-surface-800', resolved.core.color.surface['800']),
-  cssVar('si-color-slate-500', resolved.core.color.slate['500']),
-  cssVar('si-color-sage-500', resolved.core.color.sage['500']),
-  cssVar('si-color-cream-100', resolved.core.color.cream['100']),
-  cssVar('si-color-cream-200', resolved.core.color.cream['200']),
-  cssVar('si-color-paper-200', resolved.core.color.paper['200']),
-  cssVar('si-color-neutral-300', resolved.core.color.neutral['300']),
-  cssVar('si-color-neutral-200', resolved.core.color.neutral['200']),
-  cssVar('si-color-brand-500', resolved.core.color.brand['500']),
-  cssVar('si-color-brand-200', resolved.core.color.brand['200']),
-  cssVar('si-color-info-500', resolved.core.color.info['500']),
-  cssVar('si-color-info-200', resolved.core.color.info['200']),
-  cssVar('si-color-accent-500', resolved.core.color.accent['500']),
-  cssVar('si-color-accent-200', resolved.core.color.accent['200']),
-  cssVar('si-color-success-500', resolved.core.color.success['500']),
-  cssVar('si-color-danger-500', resolved.core.color.danger['500']),
+  ...corePrimitiveLines,
   '',
-  cssVar('si-color-bg-canvas', resolved.semantic.color.bg.canvas),
-  cssVar('si-color-bg-canvas-alt', resolved.semantic.color.bg.canvasAlt),
-  cssVar('si-color-bg-surface', resolved.semantic.color.bg.surface),
-  cssVar('si-color-bg-glass', resolved.semantic.color.bg.glass),
-  cssVar('si-color-text-primary', resolved.semantic.color.text.primary),
-  cssVar('si-color-text-secondary', resolved.semantic.color.text.secondary),
-  cssVar('si-color-text-muted', resolved.semantic.color.text.muted),
-  cssVar('si-color-border-strong', resolved.semantic.color.border.strong),
-  cssVar('si-color-border-subtle', resolved.semantic.color.border.subtle),
-  cssVar('si-color-focus', resolved.semantic.color.focus),
-  cssVar('si-color-chart-groceries', resolved.semantic.color.chart.groceries),
-  cssVar('si-color-chart-subscriptions', resolved.semantic.color.chart.subscriptions),
-  cssVar('si-color-chart-transport', resolved.semantic.color.chart.transport),
-  cssVar('si-color-chart-dining', resolved.semantic.color.chart.dining),
-  cssVar('si-color-chart-other', resolved.semantic.color.chart.other),
+  ...darkSemanticLines,
   '',
   cssVar('si-font-body', `'${resolved.semantic.font.body}', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif`),
   cssVar('si-font-ui', `'${resolved.semantic.font.ui}', 'Work Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif`),
@@ -639,6 +630,12 @@ ${[
   cssVar('si-shadow-soft', resolved.semantic.shadow.soft),
   cssVar('si-shadow-hard', resolved.semantic.shadow.hard)
 ].join('\n')}
+}
+
+[data-si-theme="light"] {
+  color-scheme: light;
+
+${lightSemanticLines.join('\n')}
 }
 
 *,
@@ -680,26 +677,63 @@ a {
 }
 `;
 
-const ts = `export const tokens = ${JSON.stringify(resolved, null, 2)} as const;
+// ---------------------------------------------------------------------------
+// src/tokens.ts
+// ---------------------------------------------------------------------------
+//
+// `colors` and `colorsLight` auto-expand every semantic-mode key from
+// tokens.json, then layer the small set of ergonomic shortcuts (core-color
+// aliases, status aliases, nested `labels` object) on top for backward
+// compatibility. Adding a new semantic-mode key in tokens.json appears here
+// automatically; the explicit extras only need editing if you want a
+// renamed/grouped accessor for an existing token.
 
-export const colors = {
-  bgCanvas: tokens.semantic.color.bg.canvas,
-  bgCanvasAlt: tokens.semantic.color.bg.canvasAlt,
-  bgSurface: tokens.semantic.color.bg.surface,
-  bgGlass: tokens.semantic.color.bg.glass,
-  textPrimary: tokens.semantic.color.text.primary,
-  textSecondary: tokens.semantic.color.text.secondary,
-  textMuted: tokens.semantic.color.text.muted,
-  borderStrong: tokens.semantic.color.border.strong,
-  borderSubtle: tokens.semantic.color.border.subtle,
-  focus: tokens.semantic.color.focus,
+function renderModeBlock(modeAccessor) {
+  const semantic = semanticModeKeys.map((k) => `  ${k}: ${modeAccessor}.${k},`).join('\n');
+  return `{
+${semantic}
   brand: tokens.core.color.brand[500],
+  /** Solid ink for labels/icons on brand yellow (not themed canvas). */
+  ink950: tokens.core.color.ink[950],
   sage: tokens.core.color.sage[500],
-  info: tokens.semantic.color.status.info,
-  success: tokens.semantic.color.status.success,
-  danger: tokens.semantic.color.status.danger,
-  chart: tokens.semantic.color.chart
-} as const;
+  accentPink: tokens.core.color.accent[500],
+  info: ${modeAccessor}.statusInfo,
+  success: ${modeAccessor}.statusSuccess,
+  danger: ${modeAccessor}.statusDanger,
+  labels: {
+    green: ${modeAccessor}.labelGreen,
+    blue: ${modeAccessor}.labelBlue,
+    orange: ${modeAccessor}.labelOrange,
+    purple: ${modeAccessor}.labelPurple,
+    gray: ${modeAccessor}.labelGray
+  }
+} as const`;
+}
+
+const generatedTsBanner = `/**
+ * GENERATED FILE — do not edit by hand unless you know what you are doing.
+ * Source of truth: tokens.json → run \`npm run build\` in this package (scripts/build-tokens.mjs).
+ */
+
+`;
+
+const ts = `${generatedTsBanner}export const tokens = ${JSON.stringify(resolved, null, 2)} as const;
+
+export type SemanticMode = (typeof tokens)['semantic']['modes']['light'];
+
+/** Light and dark appearance (canonical source: tokens.json → semantic.modes). */
+export const semanticModes = tokens.semantic.modes;
+
+const dark = tokens.semantic.modes.dark;
+const light = tokens.semantic.modes.light;
+
+/** Default export shape matches the previous dark-first API (dark mode). */
+export const colors = ${renderModeBlock('dark')};
+
+/** Same keys as \`colors\`, resolved for light mode. */
+export const colorsLight = ${renderModeBlock('light')};
+
+export const colorsDark = colors;
 
 export const fonts = tokens.semantic.font;
 export const space = tokens.core.space;

@@ -207,7 +207,16 @@ const TOKEN_SWATCHES = [
   ['Brand', 'var(--si-color-brand-500)'],
   ['Success', 'var(--si-color-success-500)'],
   ['Danger', 'var(--si-color-danger-500)'],
-  ['Other', 'var(--si-color-chart-other)']
+  ['Sage', 'var(--si-color-sage-500)'],
+  ['Accent pink', 'var(--si-color-accent-500)']
+];
+
+const TOKEN_LABELS = [
+  ['Green', 'var(--si-color-label-green)'],
+  ['Blue', 'var(--si-color-label-blue)'],
+  ['Orange', 'var(--si-color-label-orange)'],
+  ['Purple', 'var(--si-color-label-purple)'],
+  ['Gray', 'var(--si-color-label-gray)']
 ];
 
 const TOKEN_SPACES = ['1', '2', '3', '4', '5', '6', '7', '8', '10'];
@@ -229,6 +238,19 @@ function TokensPage() {
         <p className="eyebrow">Color</p>
         <div className="token-swatch-grid">
           {TOKEN_SWATCHES.map(([label, value]) => (
+            <article className="token-swatch-card" key={label}>
+              <span className="token-swatch" style={{ background: value }} />
+              <strong>{label}</strong>
+              <code>{value}</code>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="panel token-section">
+        <p className="eyebrow">Color Labels</p>
+        <div className="token-swatch-grid">
+          {TOKEN_LABELS.map(([label, value]) => (
             <article className="token-swatch-card" key={label}>
               <span className="token-swatch" style={{ background: value }} />
               <strong>{label}</strong>
